@@ -14,16 +14,20 @@ def quicksort(arr):
 n = 10
 print('--------A--------')
 A = [1 for i in range(n)]
+print(f'A: {A}')
 print(quicksort(A))
 print('-----------------')
 print('--------B--------')
-B = [i for i in range(n)] 
+B = [i for i in range(n)]
+print(f'B: {B}') 
 print(quicksort(B))
 print('-----------------')
 print('--------C--------')
 C = [(n - i) % 3 for i in range(n)]
+print(f'C: {C}')
 print(quicksort(C))
 print('-----------------')
 print('--------D--------')
 D = [i + 5 if i % 2 == 1 else n - 5 - i for i in range(n)]
+print(f'D: {D}')
 print(quicksort(D))
