@@ -4,3 +4,8 @@ DL/207253220/ex1_report.md
 *train
 NLP/p1/train/neg/** 
 **.zip
+NLP/glove.6B/glove.6B.50d.txt
+NLP/glove.6B/glove.6B.300d.txt
+NLP/glove.6B/glove.6B.100d.txt
+NLP/glove.6B/glove.6B.200d.txt
+NLP/p1/glove.6B.100d.txt
