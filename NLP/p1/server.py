@@ -1,12 +1,14 @@
 
 
 
-from utils_classes import SentimentLSTMTwoLayers, tokenize_comments, pad_sequences
+from utils_classes import SentimentLSTMTwoLayers, tokenize_comments, pad_sequences , SentimentGRUTwoLayers
 import torch
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI(
 )
 # Add CORS middleware
@@ -17,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
+app.mount("/static", StaticFiles(directory="public"), name="static")
 
 vocab_file = 'imdb.vocab'
 with open(vocab_file, 'r') as f:
@@ -40,13 +43,15 @@ num_epochs = 10
 # Load model and state dict
 model = SentimentLSTMTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim, 2)
 model.load_state_dict(torch.load("model_parameters_2_LAYERS_layers_new.pth"))
+model_gru_two_layers = SentimentGRUTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim)
+model_gru_two_layers.load_state_dict(torch.load("model_parameters_GRU_2_LAYERS.pth"))
 # model_gru = SentimentGRU(vocab_size, embedding_dim, hidden_dim, output_dim, embedding_matrix_gru, freeze_embeddings=True)
 
 
 # Define the request schema
 class PredictRequest(BaseModel):
-    comments: List[str]  # List of input comments
-
+    comments: List[str]
+    model: str
 # Define the prediction endpoint
 @app.post("/predict")
 async def predict(request: PredictRequest):
@@ -56,10 +61,13 @@ async def predict(request: PredictRequest):
         
         tokenized_comments = pad_sequences(tokenize_comments(request.comments, vocab), max_len=max_len, pad_value=vocab["<PAD>"])
         input_tensor = torch.tensor(tokenized_comments, dtype=torch.long)
-
+        
         # Make predictions
         with torch.no_grad():
-            predictions = model(input_tensor)
+            model_used = model(input_tensor)
+            if (request.model == 'GRU-TWO-LAYERS'):
+                model_used = model_gru_two_layers(input_tensor)
+            predictions = model_used
         
         # Convert predictions to probabilities and labels
         results = [
