@@ -2,12 +2,6 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 import pandas as pd
-import plotly.express as px
-import matplotlib.pyplot as plt
-import io
-from PIL import Image
-import plotly.graph_objects as go
-import json as js
 import plotly.io as pio
 
 def get_graph(file):
