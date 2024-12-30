@@ -43,29 +43,33 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 # App Layout
 app.layout = html.Div([
     dbc.Row([
-        dbc.Col(html.Div([
-            dcc.Graph(figure=math_result_distribution)
-        ]), width=6),
-        dbc.Col(html.Div([
-            dcc.Graph(figure=total_fouls_vs_goal_diff)
-        ]), width=6),
-        dbc.Col(html.Div([
-            dcc.Graph(figure=home_win_rate_vs_possession)
-        ]), width=6),
-        dbc.Col(html.Div([
-            dcc.Graph(figure=shots_vs_win_percentage)
-        ]), width=6),
-        dbc.Col(html.Div([
-            dcc.Graph(figure=shots_diff_vs_win_percentage)
-        ]), width=6),
-        dbc.Col(html.Div([
-            dcc.Graph(figure=clearance_bins_vs_win_percentage)
-        ]), width=6),
-        # dbc.Col(html.Div([
-        #     html.Img(src=matplotlib_image, style={"width": "100%"})
-        # ]), width=6),
-    ]),
+        dbc.Col(
+            dcc.Graph(figure=math_result_distribution),
+            xs=12, sm=12, md=6, lg=6, xl=6  # Full width on small screens, half width on medium and larger
+        ),
+        dbc.Col(
+            dcc.Graph(figure=total_fouls_vs_goal_diff),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=home_win_rate_vs_possession),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=shots_vs_win_percentage),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=shots_diff_vs_win_percentage),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=clearance_bins_vs_win_percentage),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+    ])
 ])
+
 
 # Run the App
 if __name__ == "__main__":
