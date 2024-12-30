@@ -44,7 +44,7 @@ num_epochs = 10
 model = SentimentLSTMTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim, 2)
 model.load_state_dict(torch.load("model_parameters_2_LAYERS_layers_new.pth"))
 model_gru_two_layers = SentimentGRUTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim)
-model_gru_two_layers.load_state_dict(torch.load("model_parameters_GRU_2_LAYERS.pth"))
+model_gru_two_layers.load_state_dict(torch.load("model_parameters_gru_2_LAYERS_layers_new.pth"))
 # model_gru = SentimentGRU(vocab_size, embedding_dim, hidden_dim, output_dim, embedding_matrix_gru, freeze_embeddings=True)
 
 

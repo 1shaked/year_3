@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch
+import numpy as np
 
 class SentimentLSTMTwoLayers(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, num_layers=2, embedding_matrix=None, freeze_embeddings=True):
@@ -73,6 +74,19 @@ class SentimentGRUTwoLayers(nn.Module):
         output = self.sigmoid(final_output)
         return output
 
+def load_glove_embeddings(file_path, embedding_dim):
+    """
+    Load GloVe embeddings from the file into a dictionary.
+    """
+    embedding_dict = {}
+    with open(file_path, 'r', encoding="utf-8") as f:
+        for line in f:
+            values = line.split()
+            word = values[0]  # The word
+            vector = np.array(values[1:], dtype="float32")  # The embedding vector
+            embedding_dict[word] = vector
+    print(f"Loaded {len(embedding_dict)} word vectors.")
+    return embedding_dict
 
 
 
@@ -95,3 +109,34 @@ def pad_sequences(sequences, max_len, pad_value):
             seq = seq[:max_len]
         padded_sequences.append(seq)
     return padded_sequences
+
+
+def create_embedding_matrix(vocab, glove_embeddings, embedding_dim):
+    """
+    Create an embedding matrix where each row corresponds to a token in the vocabulary.
+    """
+    vocab_size = len(vocab)
+    embedding_matrix = np.zeros((vocab_size, embedding_dim))  # Initialize matrix with zeros
+
+    for word, idx in vocab.items():
+        if word in glove_embeddings:
+            embedding_matrix[idx] = glove_embeddings[word]
+        else:
+            # Initialize randomly for missing words
+            embedding_matrix[idx] = np.random.uniform(-0.01, 0.01, embedding_dim)
+
+    return embedding_matrix
+
+def get_vocabulary():
+    vocab_file = 'imdb.vocab'
+    with open(vocab_file, 'r') as f:
+        vocab_words = f.read().splitlines()
+
+    tokenized_sentences = vocab_words
+    tokenized_sentences.append('<UNK>')  # Add <UNK> token for unknown words
+    tokenized_sentences.append('<PAD>')  # Add <PAD> token to pad sequences
+    # Create vocabulary
+    vocab_size = len(vocab_words)
+    # tokens = list(chain(*tokenized_sentences))
+    vocab = {word: idx for idx, word in enumerate(tokenized_sentences)}
+    return vocab, vocab_size
