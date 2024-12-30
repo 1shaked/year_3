@@ -43,8 +43,8 @@ num_epochs = 10
 # Load model and state dict
 model = SentimentLSTMTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim, 2)
 model.load_state_dict(torch.load("model_parameters_2_LAYERS_layers_new.pth"))
-model_gru_two_layers = SentimentGRUTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim)
-model_gru_two_layers.load_state_dict(torch.load("model_parameters_gru_2_LAYERS_layers_new.pth"))
+# model_gru_two_layers = SentimentGRUTwoLayers(vocab_size, embedding_dim, hidden_dim, output_dim)
+# model_gru_two_layers.load_state_dict(torch.load("model_parameters_gru_2_LAYERS_layers_new.pth"))
 # model_gru = SentimentGRU(vocab_size, embedding_dim, hidden_dim, output_dim, embedding_matrix_gru, freeze_embeddings=True)
 
 
@@ -65,8 +65,8 @@ async def predict(request: PredictRequest):
         # Make predictions
         with torch.no_grad():
             model_used = model(input_tensor)
-            if (request.model == 'GRU-TWO-LAYERS'):
-                model_used = model_gru_two_layers(input_tensor)
+            # if (request.model == 'GRU-TWO-LAYERS'):
+            #     model_used = model_gru_two_layers(input_tensor)
             predictions = model_used
         
         # Convert predictions to probabilities and labels
