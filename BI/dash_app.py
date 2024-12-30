@@ -3,6 +3,7 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.io as pio
+import os
 
 def get_graph(file):
     with open(f'graphs/{file}.json') as f:
@@ -68,4 +69,6 @@ app.layout = html.Div([
 
 # Run the App
 if __name__ == "__main__":
-    app.run_server(debug=False)
+    # Get the port from the environment variable (default to 8050 if not set)
+    port = int(os.environ.get("PORT", 8050))
+    app.run_server(host="0.0.0.0", port=port)
