@@ -1,6 +1,7 @@
 
 
 
+from fastapi.responses import FileResponse
 from utils_classes import SentimentLSTMTwoLayers, tokenize_comments, pad_sequences , SentimentGRUTwoLayers
 import torch
 from fastapi import FastAPI, HTTPException
@@ -20,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 app.mount("/static", StaticFiles(directory="public"), name="static")
+app.mount("/assets", StaticFiles(directory="public/assets"), name="assets")
 
 vocab_file = 'imdb.vocab'
 with open(vocab_file, 'r') as f:
@@ -78,3 +80,9 @@ async def predict(request: PredictRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+async def read_root():
+    import os
+    print(os.listdir("public"))
+    return FileResponse("public/index.html")
