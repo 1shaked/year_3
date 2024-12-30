@@ -12,22 +12,22 @@ def get_graph(file):
     fig = pio.from_json(content)
     return fig
 
-# Sample Data
-world_cup = pd.read_csv('data/matches_world_cup.csv')
-english_league = pd.read_csv('data/df_full_premierleague.csv')
-df = pd.concat([world_cup, english_league], axis=0)
+# # Sample Data
+# world_cup = pd.read_csv('data/matches_world_cup.csv')
+# english_league = pd.read_csv('data/df_full_premierleague.csv')
+# df = pd.concat([world_cup, english_league], axis=0)
 
 
-def determine_result(row):
-    if row['goal_home_ft'] > row['goal_away_ft']:
-        return 'HW'  # Home Win
-    elif row['goal_home_ft'] < row['goal_away_ft']:
-        return 'AW'  # Away Win
-    else:
-        return 'D'   # Draw
+# def determine_result(row):
+#     if row['goal_home_ft'] > row['goal_away_ft']:
+#         return 'HW'  # Home Win
+#     elif row['goal_home_ft'] < row['goal_away_ft']:
+#         return 'AW'  # Away Win
+#     else:
+#         return 'D'   # Draw
 
-# Apply the function to each row
-df['result'] = df.apply(determine_result, axis=1)
+# # Apply the function to each row
+# df['result'] = df.apply(determine_result, axis=1)
 
 
 math_result_distribution = get_graph('match_result_distribution')
@@ -71,4 +71,4 @@ app.layout = html.Div([
 if __name__ == "__main__":
     # Get the port from the environment variable (default to 8050 if not set)
     port = int(os.environ.get("PORT", 8050))
-    app.run_server(host="0.0.0.0", port=port)
+    app.run_server(host="0.0.0.0", port=port, debug=True)
