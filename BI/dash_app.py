@@ -38,6 +38,10 @@ shots_diff_vs_win_percentage = get_graph('shots_diff_vs_win_percentage')
 clearance_bins_vs_win_percentage = get_graph('clearance_bins_vs_win_percentage')
 visualization_with_regression_plane_3d_scatter = get_graph('visualization_with_regression_plane_3d_scatter')
 correlation_heatmap = get_graph('correlation_heatmap')
+shooting_accuracy_distribution = get_graph('shooting_accuracy_distribution')
+shooting_accuracy_by_team = get_graph('shooting_accuracy_by_team')
+shooting_accuracy_vs_match_result = get_graph('shooting_accuracy_vs_match_result')
+top_10_teams_shooting_accuracy = get_graph('top_10_teams_shooting_accuracy')
 # Initialize Dash App
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -70,6 +74,22 @@ app.layout = html.Div([
         ),
         dbc.Col(
             dcc.Graph(figure=correlation_heatmap),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=shooting_accuracy_distribution),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=shooting_accuracy_by_team),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=shooting_accuracy_vs_match_result),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=top_10_teams_shooting_accuracy),
             xs=12, sm=12, md=6, lg=6, xl=6
         ),
     ])
