@@ -37,6 +37,7 @@ shots_vs_win_percentage = get_graph('shots_vs_win_percentage')
 shots_diff_vs_win_percentage = get_graph('shots_diff_vs_win_percentage')
 clearance_bins_vs_win_percentage = get_graph('clearance_bins_vs_win_percentage')
 visualization_with_regression_plane_3d_scatter = get_graph('visualization_with_regression_plane_3d_scatter')
+correlation_heatmap = get_graph('correlation_heatmap')
 # Initialize Dash App
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -65,6 +66,10 @@ app.layout = html.Div([
         ),
         dbc.Col(
             dcc.Graph(figure=clearance_bins_vs_win_percentage),
+            xs=12, sm=12, md=6, lg=6, xl=6
+        ),
+        dbc.Col(
+            dcc.Graph(figure=correlation_heatmap),
             xs=12, sm=12, md=6, lg=6, xl=6
         ),
     ])
