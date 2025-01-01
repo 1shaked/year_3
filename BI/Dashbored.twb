@@ -1,0 +1,2326 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20243.24.1112.0850                               -->
+<workbook original-version='18.1' source-build='2024.3.1 (20243.24.1112.0850)' source-platform='mac' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AnimationOnByDefault />
+    <MarkAnimation />
+    <ObjectModelEncapsulateLegacy />
+    <ObjectModelTableType />
+    <SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <SortTagCleanup />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='data (df_full_tab)' inline='true' name='federated.11s68jr0750yhw1bzf42n0f7xlmm' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='df_full_tab' name='excel-direct.0ex41yc0l50xc91dg3itw1oyoljs'>
+            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='/Volumes/SanDisk/BlackDisk/year_3/BI/data/df_full_tab.xlsx' interpretationMode='0' password='' server='' validate='no' />
+          </named-connection>
+        </named-connections>
+        <relation connection='excel-direct.0ex41yc0l50xc91dg3itw1oyoljs' name='data' table='[data$]' type='table'>
+          <columns gridOrigin='A1:AN6723:no:A1:AN6723:0' header='yes' outcome='2'>
+            <column datatype='string' name='date' ordinal='0' />
+            <column datatype='string' name='home_team' ordinal='1' />
+            <column datatype='string' name='away_team' ordinal='2' />
+            <column datatype='string' name='result_full' ordinal='3' />
+            <column datatype='string' name='result_ht' ordinal='4' />
+            <column datatype='integer' name='home_clearances' ordinal='5' />
+            <column datatype='integer' name='home_fouls_conceded' ordinal='6' />
+            <column datatype='integer' name='home_passes' ordinal='7' />
+            <column datatype='real' name='home_possession' ordinal='8' />
+            <column datatype='integer' name='home_red_cards' ordinal='9' />
+            <column datatype='integer' name='home_shots' ordinal='10' />
+            <column datatype='integer' name='home_shots_on_target' ordinal='11' />
+            <column datatype='integer' name='home_tackles' ordinal='12' />
+            <column datatype='integer' name='home_touches' ordinal='13' />
+            <column datatype='integer' name='home_yellow_cards' ordinal='14' />
+            <column datatype='integer' name='away_clearances' ordinal='15' />
+            <column datatype='integer' name='away_fouls_conceded' ordinal='16' />
+            <column datatype='integer' name='away_offsides' ordinal='17' />
+            <column datatype='integer' name='away_passes' ordinal='18' />
+            <column datatype='real' name='away_possession' ordinal='19' />
+            <column datatype='integer' name='away_red_cards' ordinal='20' />
+            <column datatype='integer' name='away_shots' ordinal='21' />
+            <column datatype='integer' name='away_shots_on_target' ordinal='22' />
+            <column datatype='integer' name='away_tackles' ordinal='23' />
+            <column datatype='integer' name='away_touches' ordinal='24' />
+            <column datatype='integer' name='away_yellow_cards' ordinal='25' />
+            <column datatype='integer' name='goal_home_ft' ordinal='26' />
+            <column datatype='integer' name='goal_away_ft' ordinal='27' />
+            <column datatype='string' name='sg_match_ft' ordinal='28' />
+            <column datatype='integer' name='goal_home_ht' ordinal='29' />
+            <column datatype='integer' name='goal_away_ht' ordinal='30' />
+            <column datatype='integer' name='sg_match_ht' ordinal='31' />
+            <column datatype='string' name='result' ordinal='32' />
+            <column datatype='string' name='possession_bin' ordinal='33' />
+            <column datatype='integer' name='home_shots_diff' ordinal='34' />
+            <column datatype='real' name='shooting_accuracy_home' ordinal='35' />
+            <column datatype='real' name='shooting_accuracy_away' ordinal='36' />
+            <column datatype='real' name='shooting_accuracy_home_bin' ordinal='37' />
+            <column datatype='real' name='shooting_accuracy_away_bin' ordinal='38' />
+            <column datatype='integer' name='win' ordinal='39' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>date</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[date]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>date</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_team</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[home_team]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_team</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_team</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[away_team]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_team</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>result_full</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[result_full]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>result_full</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>result_ht</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[result_ht]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>result_ht</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_clearances</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_clearances]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_clearances</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_fouls_conceded</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_fouls_conceded]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_fouls_conceded</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_passes</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_passes]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_passes</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_possession</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[home_possession]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_possession</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_red_cards</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_red_cards]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_red_cards</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_shots</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_shots]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_shots</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_shots_on_target</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_shots_on_target]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_shots_on_target</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_tackles</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_tackles]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_tackles</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_touches</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_touches]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_touches</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_yellow_cards</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_yellow_cards]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_yellow_cards</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_clearances</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_clearances]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_clearances</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_fouls_conceded</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_fouls_conceded]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_fouls_conceded</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_offsides</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_offsides]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_offsides</remote-alias>
+            <ordinal>17</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_passes</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_passes]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_passes</remote-alias>
+            <ordinal>18</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_possession</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[away_possession]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_possession</remote-alias>
+            <ordinal>19</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_red_cards</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_red_cards]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_red_cards</remote-alias>
+            <ordinal>20</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_shots</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_shots]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_shots</remote-alias>
+            <ordinal>21</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_shots_on_target</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_shots_on_target]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_shots_on_target</remote-alias>
+            <ordinal>22</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_tackles</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_tackles]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_tackles</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_touches</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_touches]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_touches</remote-alias>
+            <ordinal>24</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>away_yellow_cards</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[away_yellow_cards]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>away_yellow_cards</remote-alias>
+            <ordinal>25</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>goal_home_ft</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[goal_home_ft]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>goal_home_ft</remote-alias>
+            <ordinal>26</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>goal_away_ft</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[goal_away_ft]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>goal_away_ft</remote-alias>
+            <ordinal>27</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>sg_match_ft</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[sg_match_ft]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>sg_match_ft</remote-alias>
+            <ordinal>28</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>goal_home_ht</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[goal_home_ht]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>goal_home_ht</remote-alias>
+            <ordinal>29</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>goal_away_ht</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[goal_away_ht]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>goal_away_ht</remote-alias>
+            <ordinal>30</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>sg_match_ht</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[sg_match_ht]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>sg_match_ht</remote-alias>
+            <ordinal>31</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>result</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[result]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>result</remote-alias>
+            <ordinal>32</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>possession_bin</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[possession_bin]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>possession_bin</remote-alias>
+            <ordinal>33</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_shots_diff</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_shots_diff]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>home_shots_diff</remote-alias>
+            <ordinal>34</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>shooting_accuracy_home</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[shooting_accuracy_home]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>shooting_accuracy_home</remote-alias>
+            <ordinal>35</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>shooting_accuracy_away</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[shooting_accuracy_away]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>shooting_accuracy_away</remote-alias>
+            <ordinal>36</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>shooting_accuracy_home_bin</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[shooting_accuracy_home_bin]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>shooting_accuracy_home_bin</remote-alias>
+            <ordinal>37</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>shooting_accuracy_away_bin</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[shooting_accuracy_away_bin]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>shooting_accuracy_away_bin</remote-alias>
+            <ordinal>38</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>win</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[win]</local-name>
+            <parent-name>[data]</parent-name>
+            <remote-alias>win</remote-alias>
+            <ordinal>39</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[data]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>1</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:AN6723:no:A1:AN6723:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>2</attribute>
+            </attributes>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='data' datatype='table' name='[__tableau_internal_object_id__].[data_CE9CD72290C04F44A6378910827B630B]' role='measure' type='quantitative' />
+      <column caption='Away Clearances' datatype='integer' name='[away_clearances]' role='measure' type='quantitative' />
+      <column caption='Away Fouls Conceded' datatype='integer' name='[away_fouls_conceded]' role='measure' type='quantitative' />
+      <column caption='Away Offsides' datatype='integer' name='[away_offsides]' role='measure' type='quantitative' />
+      <column caption='Away Passes' datatype='integer' name='[away_passes]' role='measure' type='quantitative' />
+      <column caption='Away Possession' datatype='real' name='[away_possession]' role='measure' type='quantitative' />
+      <column caption='Away Red Cards' datatype='integer' name='[away_red_cards]' role='measure' type='quantitative' />
+      <column caption='Away Shots' datatype='integer' name='[away_shots]' role='measure' type='quantitative' />
+      <column caption='Away Shots On Target' datatype='integer' name='[away_shots_on_target]' role='measure' type='quantitative' />
+      <column caption='Away Tackles' datatype='integer' name='[away_tackles]' role='measure' type='quantitative' />
+      <column caption='Away Team' datatype='string' name='[away_team]' role='dimension' type='nominal' />
+      <column caption='Away Touches' datatype='integer' name='[away_touches]' role='measure' type='quantitative' />
+      <column caption='Away Yellow Cards' datatype='integer' name='[away_yellow_cards]' role='measure' type='quantitative' />
+      <column caption='Date' datatype='string' name='[date]' role='dimension' type='nominal' />
+      <column caption='Goal Away Ft' datatype='integer' name='[goal_away_ft]' role='measure' type='quantitative' />
+      <column caption='Goal Away Ht' datatype='integer' name='[goal_away_ht]' role='measure' type='quantitative' />
+      <column caption='Goal Home Ft' datatype='integer' name='[goal_home_ft]' role='measure' type='quantitative' />
+      <column caption='Goal Home Ht' datatype='integer' name='[goal_home_ht]' role='measure' type='quantitative' />
+      <column caption='Home Clearances' datatype='integer' name='[home_clearances]' role='measure' type='quantitative' />
+      <column caption='Home Fouls Conceded' datatype='integer' name='[home_fouls_conceded]' role='measure' type='quantitative' />
+      <column caption='Home Passes' datatype='integer' name='[home_passes]' role='measure' type='quantitative' />
+      <column caption='Home Possession' datatype='real' name='[home_possession]' role='measure' type='quantitative' />
+      <column caption='Home Red Cards' datatype='integer' name='[home_red_cards]' role='measure' type='quantitative' />
+      <column caption='Home Shots' datatype='integer' name='[home_shots]' role='measure' type='quantitative' />
+      <column caption='Home Shots Diff' datatype='integer' name='[home_shots_diff]' role='measure' type='quantitative' />
+      <column caption='Home Shots On Target' datatype='integer' name='[home_shots_on_target]' role='measure' type='quantitative' />
+      <column caption='Home Tackles' datatype='integer' name='[home_tackles]' role='measure' type='quantitative' />
+      <column caption='Home Team' datatype='string' name='[home_team]' role='dimension' type='nominal' />
+      <column caption='Home Touches' datatype='integer' name='[home_touches]' role='measure' type='quantitative' />
+      <column caption='Home Yellow Cards' datatype='integer' name='[home_yellow_cards]' role='measure' type='quantitative' />
+      <column caption='Possession Bin' datatype='string' name='[possession_bin]' role='dimension' type='nominal' />
+      <column caption='Result' datatype='string' name='[result]' role='dimension' type='nominal' />
+      <column caption='Result Full' datatype='string' name='[result_full]' role='dimension' type='nominal' />
+      <column caption='Result Ht' datatype='string' name='[result_ht]' role='dimension' type='nominal' />
+      <column caption='Sg Match Ft' datatype='string' name='[sg_match_ft]' role='dimension' type='nominal' />
+      <column caption='Sg Match Ht' datatype='integer' name='[sg_match_ht]' role='measure' type='quantitative' />
+      <column caption='Shooting Accuracy Away' datatype='real' name='[shooting_accuracy_away]' role='measure' type='quantitative' />
+      <column caption='Shooting Accuracy Away Bin' datatype='real' name='[shooting_accuracy_away_bin]' role='measure' type='quantitative' />
+      <column caption='Shooting Accuracy Home' datatype='real' name='[shooting_accuracy_home]' role='measure' type='quantitative' />
+      <column caption='Shooting Accuracy Home Bin' datatype='real' name='[shooting_accuracy_home_bin]' role='measure' type='quantitative' />
+      <column caption='Win' datatype='integer' name='[win]' role='measure' type='quantitative' />
+      <layout common-percentage='1' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' user-set-layout-v2='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='data' id='data_CE9CD72290C04F44A6378910827B630B'>
+            <properties context=''>
+              <relation connection='excel-direct.0ex41yc0l50xc91dg3itw1oyoljs' name='data' table='[data$]' type='table'>
+                <columns gridOrigin='A1:AN6723:no:A1:AN6723:0' header='yes' outcome='2'>
+                  <column datatype='string' name='date' ordinal='0' />
+                  <column datatype='string' name='home_team' ordinal='1' />
+                  <column datatype='string' name='away_team' ordinal='2' />
+                  <column datatype='string' name='result_full' ordinal='3' />
+                  <column datatype='string' name='result_ht' ordinal='4' />
+                  <column datatype='integer' name='home_clearances' ordinal='5' />
+                  <column datatype='integer' name='home_fouls_conceded' ordinal='6' />
+                  <column datatype='integer' name='home_passes' ordinal='7' />
+                  <column datatype='real' name='home_possession' ordinal='8' />
+                  <column datatype='integer' name='home_red_cards' ordinal='9' />
+                  <column datatype='integer' name='home_shots' ordinal='10' />
+                  <column datatype='integer' name='home_shots_on_target' ordinal='11' />
+                  <column datatype='integer' name='home_tackles' ordinal='12' />
+                  <column datatype='integer' name='home_touches' ordinal='13' />
+                  <column datatype='integer' name='home_yellow_cards' ordinal='14' />
+                  <column datatype='integer' name='away_clearances' ordinal='15' />
+                  <column datatype='integer' name='away_fouls_conceded' ordinal='16' />
+                  <column datatype='integer' name='away_offsides' ordinal='17' />
+                  <column datatype='integer' name='away_passes' ordinal='18' />
+                  <column datatype='real' name='away_possession' ordinal='19' />
+                  <column datatype='integer' name='away_red_cards' ordinal='20' />
+                  <column datatype='integer' name='away_shots' ordinal='21' />
+                  <column datatype='integer' name='away_shots_on_target' ordinal='22' />
+                  <column datatype='integer' name='away_tackles' ordinal='23' />
+                  <column datatype='integer' name='away_touches' ordinal='24' />
+                  <column datatype='integer' name='away_yellow_cards' ordinal='25' />
+                  <column datatype='integer' name='goal_home_ft' ordinal='26' />
+                  <column datatype='integer' name='goal_away_ft' ordinal='27' />
+                  <column datatype='string' name='sg_match_ft' ordinal='28' />
+                  <column datatype='integer' name='goal_home_ht' ordinal='29' />
+                  <column datatype='integer' name='goal_away_ht' ordinal='30' />
+                  <column datatype='integer' name='sg_match_ht' ordinal='31' />
+                  <column datatype='string' name='result' ordinal='32' />
+                  <column datatype='string' name='possession_bin' ordinal='33' />
+                  <column datatype='integer' name='home_shots_diff' ordinal='34' />
+                  <column datatype='real' name='shooting_accuracy_home' ordinal='35' />
+                  <column datatype='real' name='shooting_accuracy_away' ordinal='36' />
+                  <column datatype='real' name='shooting_accuracy_home_bin' ordinal='37' />
+                  <column datatype='real' name='shooting_accuracy_away_bin' ordinal='38' />
+                  <column datatype='integer' name='win' ordinal='39' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='regression (home_win_rate_vs_possession)' inline='true' name='federated.0lfjwbm06hqb9q13szn1p0lwne83' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='home_win_rate_vs_possession' name='excel-direct.1qiawgg1fy34bv1970g9w0vo2o7m'>
+            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='/Volumes/SanDisk/BlackDisk/year_3/BI/data/home_win_rate_vs_possession.xlsx' interpretationMode='0' password='' server='' validate='no' />
+          </named-connection>
+        </named-connections>
+        <relation connection='excel-direct.1qiawgg1fy34bv1970g9w0vo2o7m' name='regression' table='[regression$]' type='table'>
+          <columns gridOrigin='A1:G15:no:A1:G15:0' header='yes' outcome='6'>
+            <column datatype='integer' name='F1' ordinal='0' />
+            <column datatype='string' name='possession_bin' ordinal='1' />
+            <column datatype='integer' name='total_games' ordinal='2' />
+            <column datatype='integer' name='home_wins' ordinal='3' />
+            <column datatype='real' name='win_rate' ordinal='4' />
+            <column datatype='real' name='possession_mid' ordinal='5' />
+            <column datatype='real' name='regression_line' ordinal='6' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[regression]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:G15:no:A1:G15:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>6</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>F1</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[F1]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>F1</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>possession_bin</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[possession_bin]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>possession_bin</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total_games</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[total_games]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>total_games</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_wins</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_wins]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>home_wins</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>win_rate</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[win_rate]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>win_rate</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>possession_mid</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[possession_mid]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>possession_mid</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>regression_line</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[regression_line]</local-name>
+            <parent-name>[regression]</parent-name>
+            <remote-alias>regression_line</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[regression_D2EEF80FBE0E49D3B066F6786D88186D]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='regression' datatype='table' name='[__tableau_internal_object_id__].[regression_D2EEF80FBE0E49D3B066F6786D88186D]' role='measure' type='quantitative' />
+      <column caption='Home Wins' datatype='integer' name='[home_wins]' role='measure' type='quantitative' />
+      <column caption='Possession Bin' datatype='string' name='[possession_bin]' role='dimension' type='nominal' />
+      <column caption='Possession Mid' datatype='real' name='[possession_mid]' role='measure' type='quantitative' />
+      <column caption='Regression Line' datatype='real' name='[regression_line]' role='measure' type='quantitative' />
+      <column caption='Total Games' datatype='integer' name='[total_games]' role='measure' type='quantitative' />
+      <column caption='Win Rate' datatype='real' name='[win_rate]' role='measure' type='quantitative' />
+      <column-instance column='[regression_line]' derivation='Sum' name='[sum:regression_line:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[win_rate]' derivation='Sum' name='[sum:win_rate:qk]' pivot='key' type='quantitative' />
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[:Measure Names]' type='palette'>
+            <map to='#4e79a7'>
+              <bucket>&quot;[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:regression_line:qk]&quot;</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>&quot;[federated.0lfjwbm06hqb9q13szn1p0lwne83]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:win_rate:qk]&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='regression' id='regression_D2EEF80FBE0E49D3B066F6786D88186D'>
+            <properties context=''>
+              <relation connection='excel-direct.1qiawgg1fy34bv1970g9w0vo2o7m' name='regression' table='[regression$]' type='table'>
+                <columns gridOrigin='A1:G15:no:A1:G15:0' header='yes' outcome='6'>
+                  <column datatype='integer' name='F1' ordinal='0' />
+                  <column datatype='string' name='possession_bin' ordinal='1' />
+                  <column datatype='integer' name='total_games' ordinal='2' />
+                  <column datatype='integer' name='home_wins' ordinal='3' />
+                  <column datatype='real' name='win_rate' ordinal='4' />
+                  <column datatype='real' name='possession_mid' ordinal='5' />
+                  <column datatype='real' name='regression_line' ordinal='6' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='shots_diff (shots_diff_vs_win_percentage_tableau)' inline='true' name='federated.08inb6t0vm3m6q1bxrg1i0lfxn6r' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='shots_diff_vs_win_percentage_tableau' name='excel-direct.03vytxj1dms5z41ekxt6x0fypuy0'>
+            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='/Volumes/SanDisk/BlackDisk/year_3/BI/data/shots_diff_vs_win_percentage_tableau.xlsx' interpretationMode='0' password='' server='' validate='no' />
+          </named-connection>
+        </named-connections>
+        <relation connection='excel-direct.03vytxj1dms5z41ekxt6x0fypuy0' name='shots_diff' table='[shots_diff$]' type='table'>
+          <columns gridOrigin='A1:F23:no:A1:F23:0' header='yes' outcome='6'>
+            <column datatype='integer' name='F1' ordinal='0' />
+            <column datatype='integer' name='home_shots_diff' ordinal='1' />
+            <column datatype='integer' name='total_games' ordinal='2' />
+            <column datatype='integer' name='wins' ordinal='3' />
+            <column datatype='real' name='win_percentage' ordinal='4' />
+            <column datatype='real' name='regression_line' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:F23:no:A1:F23:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>6</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>F1</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[F1]</local-name>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias>F1</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[shots!diff_9B4002FE804841509E3DDFD275EB27A3]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>home_shots_diff</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[home_shots_diff]</local-name>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias>home_shots_diff</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[shots!diff_9B4002FE804841509E3DDFD275EB27A3]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total_games</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[total_games]</local-name>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias>total_games</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[shots!diff_9B4002FE804841509E3DDFD275EB27A3]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>wins</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[wins]</local-name>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias>wins</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[shots!diff_9B4002FE804841509E3DDFD275EB27A3]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>win_percentage</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[win_percentage]</local-name>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias>win_percentage</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[shots!diff_9B4002FE804841509E3DDFD275EB27A3]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>regression_line</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[regression_line]</local-name>
+            <parent-name>[shots_diff]</parent-name>
+            <remote-alias>regression_line</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[shots!diff_9B4002FE804841509E3DDFD275EB27A3]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='shots_diff' datatype='table' name='[__tableau_internal_object_id__].[shots!diff_9B4002FE804841509E3DDFD275EB27A3]' role='measure' type='quantitative' />
+      <column aggregation='Sum' caption='Home Shots Diff' datatype='integer' name='[home_shots_diff]' role='dimension' type='ordinal' />
+      <column caption='Regression Line' datatype='real' name='[regression_line]' role='measure' type='quantitative' />
+      <column caption='Total Games' datatype='integer' name='[total_games]' role='measure' type='quantitative' />
+      <column caption='Win Percentage' datatype='real' name='[win_percentage]' role='measure' type='quantitative' />
+      <column caption='Wins' datatype='integer' name='[wins]' role='measure' type='quantitative' />
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='shots_diff' id='shots!diff_9B4002FE804841509E3DDFD275EB27A3'>
+            <properties context=''>
+              <relation connection='excel-direct.03vytxj1dms5z41ekxt6x0fypuy0' name='shots_diff' table='[shots_diff$]' type='table'>
+                <columns gridOrigin='A1:F23:no:A1:F23:0' header='yes' outcome='6'>
+                  <column datatype='integer' name='F1' ordinal='0' />
+                  <column datatype='integer' name='home_shots_diff' ordinal='1' />
+                  <column datatype='integer' name='total_games' ordinal='2' />
+                  <column datatype='integer' name='wins' ordinal='3' />
+                  <column datatype='real' name='win_percentage' ordinal='4' />
+                  <column datatype='real' name='regression_line' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='clearance_bins_vs_win_percentage (clearance_bins_vs_win_percentage_tableau)' inline='true' name='federated.133ie87077bt5712w1w9y0gygmpu' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='clearance_bins_vs_win_percentage_tableau' name='excel-direct.1y1h9bc15cspmc17hmuma06rfoss'>
+            <connection class='excel-direct' cleaning='no' compat='no' dataRefreshTime='' filename='/Volumes/SanDisk/BlackDisk/year_3/BI/data/clearance_bins_vs_win_percentage_tableau.xlsx' interpretationMode='0' password='' server='' validate='no' />
+          </named-connection>
+        </named-connections>
+        <relation connection='excel-direct.1y1h9bc15cspmc17hmuma06rfoss' name='clearance_bins_vs_win_percentage' table='[clearance_bins_vs_win_percentage$]' type='table'>
+          <columns gridOrigin='A1:G14:no:A1:G14:0' header='yes' outcome='6'>
+            <column datatype='integer' name='F1' ordinal='0' />
+            <column datatype='string' name='clearance_bin' ordinal='1' />
+            <column datatype='integer' name='total_games' ordinal='2' />
+            <column datatype='integer' name='wins' ordinal='3' />
+            <column datatype='real' name='win_percentage' ordinal='4' />
+            <column datatype='real' name='clearance_mid' ordinal='5' />
+            <column datatype='real' name='regression_line_clearance' ordinal='6' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='context'>0</attribute>
+              <attribute datatype='string' name='gridOrigin'>&quot;A1:G14:no:A1:G14:0&quot;</attribute>
+              <attribute datatype='boolean' name='header'>true</attribute>
+              <attribute datatype='integer' name='outcome'>6</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>F1</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[F1]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>F1</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>clearance_bin</remote-name>
+            <remote-type>130</remote-type>
+            <local-name>[clearance_bin]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>clearance_bin</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='1' name='LEN_S2' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;WSTR&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total_games</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[total_games]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>total_games</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>wins</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[wins]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>wins</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;I8&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>win_percentage</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[win_percentage]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>win_percentage</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>clearance_mid</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[clearance_mid]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>clearance_mid</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>regression_line_clearance</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[regression_line_clearance]</local-name>
+            <parent-name>[clearance_bins_vs_win_percentage]</parent-name>
+            <remote-alias>regression_line_clearance</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <precision>15</precision>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;R8&quot;</attribute>
+            </attributes>
+            <object-id>[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='clearance_bins_vs_win_percentage' datatype='table' name='[__tableau_internal_object_id__].[clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299]' role='measure' type='quantitative' />
+      <column caption='Clearance Bin' datatype='string' name='[clearance_bin]' role='dimension' type='nominal' />
+      <column aggregation='Sum' caption='Clearance Mid' datatype='real' name='[clearance_mid]' role='dimension' type='ordinal' />
+      <column caption='Regression Line Clearance' datatype='real' name='[regression_line_clearance]' role='measure' type='quantitative' />
+      <column caption='Total Games' datatype='integer' name='[total_games]' role='measure' type='quantitative' />
+      <column caption='Win Percentage' datatype='real' name='[win_percentage]' role='measure' type='quantitative' />
+      <column caption='Wins' datatype='integer' name='[wins]' role='measure' type='quantitative' />
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='clearance_bins_vs_win_percentage' id='clearance!bins!vs!win!percentage_A35B4453C1D24137981B2CFF39192299'>
+            <properties context=''>
+              <relation connection='excel-direct.1y1h9bc15cspmc17hmuma06rfoss' name='clearance_bins_vs_win_percentage' table='[clearance_bins_vs_win_percentage$]' type='table'>
+                <columns gridOrigin='A1:G14:no:A1:G14:0' header='yes' outcome='6'>
+                  <column datatype='integer' name='F1' ordinal='0' />
+                  <column datatype='string' name='clearance_bin' ordinal='1' />
+                  <column datatype='integer' name='total_games' ordinal='2' />
+                  <column datatype='integer' name='wins' ordinal='3' />
+                  <column datatype='real' name='win_percentage' ordinal='4' />
+                  <column datatype='real' name='clearance_mid' ordinal='5' />
+                  <column datatype='real' name='regression_line_clearance' ordinal='6' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='clearance_bins_vs_win_percentage'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='clearance_bins_vs_win_percentage (clearance_bins_vs_win_percentage_tableau)' name='federated.133ie87077bt5712w1w9y0gygmpu' />
+          </datasources>
+          <datasource-dependencies datasource='federated.133ie87077bt5712w1w9y0gygmpu'>
+            <column caption='Clearance Bin' datatype='string' name='[clearance_bin]' role='dimension' type='nominal' />
+            <column-instance column='[clearance_bin]' derivation='None' name='[none:clearance_bin:nk]' pivot='key' type='nominal' />
+            <column caption='Regression Line Clearance' datatype='real' name='[regression_line_clearance]' role='measure' type='quantitative' />
+            <column-instance column='[regression_line_clearance]' derivation='Sum' name='[sum:regression_line_clearance:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total_games]' derivation='Sum' name='[sum:total_games:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[win_percentage]' derivation='Sum' name='[sum:win_percentage:qk]' pivot='key' type='quantitative' />
+            <column caption='Total Games' datatype='integer' name='[total_games]' role='measure' type='quantitative' />
+            <column caption='Win Percentage' datatype='real' name='[win_percentage]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.133ie87077bt5712w1w9y0gygmpu].[sum:regression_line_clearance:qk]' field-type='quantitative' fold='true' scope='rows' synchronized='true' type='space' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.133ie87077bt5712w1w9y0gygmpu].[:Measure Names]' />
+            </encodings>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.133ie87077bt5712w1w9y0gygmpu].[sum:win_percentage:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <size column='[federated.133ie87077bt5712w1w9y0gygmpu].[sum:total_games:qk]' />
+              <color column='[federated.133ie87077bt5712w1w9y0gygmpu].[:Measure Names]' />
+            </encodings>
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.133ie87077bt5712w1w9y0gygmpu].[sum:regression_line_clearance:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.133ie87077bt5712w1w9y0gygmpu].[:Measure Names]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>([federated.133ie87077bt5712w1w9y0gygmpu].[sum:win_percentage:qk] + [federated.133ie87077bt5712w1w9y0gygmpu].[sum:regression_line_clearance:qk])</rows>
+        <cols>[federated.133ie87077bt5712w1w9y0gygmpu].[none:clearance_bin:nk]</cols>
+      </table>
+      <simple-id uuid='{4F2EDB8F-51F2-4DCB-ACA1-9BE56FAA5AF1}' />
+    </worksheet>
+    <worksheet name='goals_diff_to_fouls'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Goals differance with respect to the fouls density</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='data (df_full_tab)' name='federated.11s68jr0750yhw1bzf42n0f7xlmm' />
+          </datasources>
+          <datasource-dependencies datasource='federated.11s68jr0750yhw1bzf42n0f7xlmm'>
+            <column caption='Home Fouls Conceded' datatype='integer' name='[home_fouls_conceded]' role='measure' type='quantitative' />
+            <column-instance column='[sg_match_ft]' derivation='None' name='[none:sg_match_ft:nk]' pivot='key' type='nominal' />
+            <column caption='Sg Match Ft' datatype='string' name='[sg_match_ft]' role='dimension' type='nominal' />
+            <column-instance column='[home_fouls_conceded]' derivation='Sum' name='[sum:home_fouls_conceded:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <manual-sort column='[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:sg_match_ft:nk]' direction='ASC'>
+            <dictionary>
+              <bucket>&quot;-9&quot;</bucket>
+              <bucket>&quot;-8&quot;</bucket>
+              <bucket>&quot;-7&quot;</bucket>
+              <bucket>&quot;-6&quot;</bucket>
+              <bucket>&quot;-5&quot;</bucket>
+              <bucket>&quot;-4&quot;</bucket>
+              <bucket>&quot;-3&quot;</bucket>
+              <bucket>&quot;-2&quot;</bucket>
+              <bucket>&quot;-1&quot;</bucket>
+              <bucket>&quot;0&quot;</bucket>
+              <bucket>&quot;1&quot;</bucket>
+              <bucket>&quot;2&quot;</bucket>
+              <bucket>&quot;3&quot;</bucket>
+              <bucket>&quot;4&quot;</bucket>
+              <bucket>&quot;5&quot;</bucket>
+              <bucket>&quot;6&quot;</bucket>
+              <bucket>&quot;7&quot;</bucket>
+              <bucket>&quot;8&quot;</bucket>
+              <bucket>&quot;9&quot;</bucket>
+            </dictionary>
+          </manual-sort>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='false' />
+              </style-rule>
+              <style-rule element='pane'>
+                <format attr='minheight' value='789' />
+                <format attr='maxheight' value='789' />
+                <format attr='minwidth' value='1140' />
+                <format attr='maxwidth' value='1140' />
+                <format attr='aspect' value='0' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[sum:home_fouls_conceded:qk]</rows>
+        <cols>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:sg_match_ft:nk]</cols>
+      </table>
+      <simple-id uuid='{B20E663F-536D-4194-8B37-617D425076C7}' />
+    </worksheet>
+    <worksheet name='home_win_rate_vs_possession'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000' fontsize='14'>Home Win Rate vs. Possession Percentage</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='regression (home_win_rate_vs_possession)' name='federated.0lfjwbm06hqb9q13szn1p0lwne83' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0lfjwbm06hqb9q13szn1p0lwne83'>
+            <column-instance column='[possession_bin]' derivation='None' name='[none:possession_bin:nk]' pivot='key' type='nominal' />
+            <column caption='Possession Bin' datatype='string' name='[possession_bin]' role='dimension' type='nominal' />
+            <column caption='Regression Line' datatype='real' name='[regression_line]' role='measure' type='quantitative' />
+            <column-instance column='[regression_line]' derivation='Sum' name='[sum:regression_line:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total_games]' derivation='Sum' name='[sum:total_games:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[win_rate]' derivation='Sum' name='[sum:win_rate:qk]' pivot='key' type='quantitative' />
+            <column caption='Total Games' datatype='integer' name='[total_games]' role='measure' type='quantitative' />
+            <column caption='Win Rate' datatype='real' name='[win_rate]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:regression_line:qk]' field-type='quantitative' fold='true' scope='rows' synchronized='true' type='space' />
+            <format attr='display' class='0' field='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:regression_line:qk]' scope='rows' value='false' />
+            <format attr='title' class='0' field='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:win_rate:qk]' scope='rows' value='Win Probability' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[:Measure Names]' />
+            </encodings>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:win_rate:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[:Measure Names]' />
+              <size column='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:total_games:qk]' />
+            </encodings>
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:regression_line:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[:Measure Names]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='1.9010497331619263' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:win_rate:qk] + [federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:regression_line:qk])</rows>
+        <cols>[federated.0lfjwbm06hqb9q13szn1p0lwne83].[none:possession_bin:nk]</cols>
+      </table>
+      <simple-id uuid='{968299BE-EC2E-4293-8515-B8FA041194B9}' />
+    </worksheet>
+    <worksheet name='pie_chart_location'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run>Winning based on location</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='data (df_full_tab)' name='federated.11s68jr0750yhw1bzf42n0f7xlmm' />
+          </datasources>
+          <datasource-dependencies datasource='federated.11s68jr0750yhw1bzf42n0f7xlmm'>
+            <column caption='COUNT([Result]) / TOTAL(COUNT([Result]))' datatype='real' name='[Calculation_243124042675142679]' role='measure' type='quantitative' user:unnamed='pie_chart_location'>
+              <calculation class='tableau' formula='COUNT([result]) / TOTAL(COUNT([result]))'>
+                <table-calc ordering-type='Rows' />
+              </calculation>
+            </column>
+            <column-instance column='[result]' derivation='Count' name='[cnt:result:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[result]' derivation='None' name='[none:result:nk]' pivot='key' type='nominal' />
+            <column caption='Result' datatype='string' name='[result]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_243124042675142679]' derivation='User' name='[usr:Calculation_243124042675142679:qk]' pivot='key' type='quantitative'>
+              <table-calc ordering-type='Rows' />
+            </column-instance>
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='height' value='426' />
+            <format attr='width' value='461' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Pie' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:result:nk]' />
+              <size column='[federated.11s68jr0750yhw1bzf42n0f7xlmm].[cnt:result:qk]' />
+              <text column='[federated.11s68jr0750yhw1bzf42n0f7xlmm].[usr:Calculation_243124042675142679:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='size' value='1.7471270561218262' />
+              </style-rule>
+              <style-rule element='pane'>
+                <format attr='minheight' value='-1' />
+                <format attr='maxheight' value='-1' />
+                <format attr='minwidth' value='-1' />
+                <format attr='maxwidth' value='-1' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{47059990-0058-44B0-82E5-B4248310F64D}' />
+    </worksheet>
+    <worksheet name='shots_vs_win_percentage'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run fontcolor='#000000' fontsize='14'>Win Percentage vs Number of Shots difference on Target</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='shots_diff (shots_diff_vs_win_percentage_tableau)' name='federated.08inb6t0vm3m6q1bxrg1i0lfxn6r' />
+          </datasources>
+          <datasource-dependencies datasource='federated.08inb6t0vm3m6q1bxrg1i0lfxn6r'>
+            <column aggregation='Sum' caption='Home Shots Diff' datatype='integer' name='[home_shots_diff]' role='dimension' type='ordinal' />
+            <column-instance column='[home_shots_diff]' derivation='None' name='[none:home_shots_diff:ok]' pivot='key' type='ordinal' />
+            <column caption='Regression Line' datatype='real' name='[regression_line]' role='measure' type='quantitative' />
+            <column-instance column='[regression_line]' derivation='Sum' name='[sum:regression_line:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[win_percentage]' derivation='Sum' name='[sum:win_percentage:qk]' pivot='key' type='quantitative' />
+            <column caption='Win Percentage' datatype='real' name='[win_percentage]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <encoding attr='space' class='0' field='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[sum:regression_line:qk]' field-type='quantitative' fold='true' scope='rows' synchronized='true' type='space' />
+            <format attr='display' class='0' field='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[sum:regression_line:qk]' scope='rows' value='false' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[:Measure Names]' />
+            </encodings>
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[sum:win_percentage:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Circle' />
+            <encodings>
+              <color column='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[:Measure Names]' />
+            </encodings>
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[sum:regression_line:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Line' />
+            <encodings>
+              <color column='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[:Measure Names]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>([federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[sum:win_percentage:qk] + [federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[sum:regression_line:qk])</rows>
+        <cols>[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[none:home_shots_diff:ok]</cols>
+      </table>
+      <simple-id uuid='{8205A320-30ED-4A28-9A8A-4D0FBEE3EB33}' />
+    </worksheet>
+  </worksheets>
+  <windows source-height='93'>
+    <window class='worksheet' name='pie_chart_location'>
+      <cards>
+        <edge name='left'>
+          <strip size='229'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:result:nk]' type='color' />
+            <card pane-specification-id='0' param='[federated.11s68jr0750yhw1bzf42n0f7xlmm].[cnt:result:qk]' type='size' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:Calculation_243124042627313680:qk]</field>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:Calculation_243124042627334161:qk]</field>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:Calculation_243124042627399698:qk]</field>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:result:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{E0BD6EFC-D3AF-418E-9DA7-B549FB613D62}' />
+    </window>
+    <window class='worksheet' name='goals_diff_to_fouls'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:away_team:nk]</field>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:date:nk]</field>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[none:sg_match_ft:nk]</field>
+            <field>[federated.11s68jr0750yhw1bzf42n0f7xlmm].[sum:sg_match_ft:ok]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{1F5B951A-263A-42CF-8BE3-1365FCB4C6DE}' />
+    </window>
+    <window class='worksheet' name='home_win_rate_vs_possession'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='1' param='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[:Measure Names]' type='color' />
+            <card pane-specification-id='1' param='[federated.0lfjwbm06hqb9q13szn1p0lwne83].[sum:total_games:qk]' type='size' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.0lfjwbm06hqb9q13szn1p0lwne83].[none:possession_bin:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{F506D88D-7139-495F-B56F-C11BB48D4D4A}' />
+    </window>
+    <window class='worksheet' name='shots_vs_win_percentage'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='1' param='[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[:Measure Names]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.08inb6t0vm3m6q1bxrg1i0lfxn6r].[none:home_shots_diff:ok]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{07DF352C-8666-4CF2-9DC4-20A5B73240BE}' />
+    </window>
+    <window class='worksheet' maximized='true' name='clearance_bins_vs_win_percentage'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='1' param='[federated.133ie87077bt5712w1w9y0gygmpu].[sum:total_games:qk]' type='size' />
+            <card pane-specification-id='1' param='[federated.133ie87077bt5712w1w9y0gygmpu].[:Measure Names]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.133ie87077bt5712w1w9y0gygmpu].[none:clearance_bin:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{5E14C6B1-A993-4BD3-A5E1-C6F3FE53D917}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='clearance_bins_vs_win_percentage' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hk
+      AAATIklEQVR4nO3dWWxc133H8e+9s5Az3ClyuEikuEmiaC2UTNlSJNVSoi0OsjU2nDi20+XJ
+      aIsUCZIiCfqQPhZFERQokADpQ4A0RhAE3eJGmwvbUiyKojaakiiJ+yKS4r7Oes/pA01aCilK
+      Q3KGHN7/B/CDx6PhoXx/c7b/vcfQWmuEsClzuR8g+RGJbNkBmJycXIl2CLEqlh0AEVvBYJDz
+      589z/fp1tNbP/I9SinfffZfW1lb6+vrmXhePc652A8Tirl+/Tk1NDdevX+edd94BZnpdwzAo
+      KyujubkZ0zRJTU3F7Xbj8Xi4evUqP/jBD2hqasI0Tfx+P729vbz88suUlpau8m+0tkgA1rit
+      W7dy4cIFsrOzycvLIzMzk7a2NsLhMAcOHGBkZIRwOExlZSWDg4Okpqaye/duDMMgPz+f7Oxs
+      pqenKSkpwTSlw/9jhp6x5A+YmJggLS1tBZskRPzM9QBLncz6/X4Mw1ixBgkRT04AwzCW9S0u
+      PYBIVDIoFLYmARC2JgEQthbVMujw8DB9fX1kZmbidDrx+XyxapcQcRFVALKyshgYGCAQCKC1
+      JicnB6UUkUgkVu0TIqaiCsDU1BQ+n49AIMDExASmaWKaJk6n7KeJxGQstxxaNsJEIpNJsLA1
+      CYCwNQmAsDUJgLA1CYCwNQmAsDUJgLA1CYCwtSUFQG6wFutF1MVwLS0tbNiwAaUUFRUVsWqX
+      EHERVQAyMzPJzMxEa41hGCilpBhOJLSoAuD3+ykqKmJsbAzLsqQYTiS8qK7clJQUAJKTk2PS
+      GCHiTVaBhK1JAIStSQCErUkAhK1JAIStSQCErUkAhK1JAIStRbURprUmGAzO7fzKDrBIdFFd
+      wffv30cpRSAQwOfzUVBQIJWhIqFFFYBIJEIoFKK4uJj29nby8/PnzqMSItEMjU9H92CsUCjE
+      6OgobrcbwzDIyMiQB2OJhKKUprlnmN/X3md0MiBPhhP2EAhFuHSrmw9utOPLSuHzL1ZQkp8p
+      ARDrl9aaoTE/Z+tbaGx9yL7KQj67t5SM1E+rmWUZR6w7SmnudQ1xuq6Ziekgx2rKefVIFS6n
+      Y957JQBi3fAHw9Te6uaDmx3kZ6fylcOVbM7LWPQQRxkCiYSmtWZgdJpz9S3cahvgxaqNHNlT
+      QkbKs920JT2ASEiWUtztHOJMXTNTgTDHa8p47bM7cDqeXNyglcLquYqjYBeGMwmQAIgE4w+G
+      +aixiw9vdrAxJ52vvVRFcV7Gs/1hK0S44deYWZsxUmeO95IhkFjzZoc5Z+qaudMxyP7nNnF0
+      Twlp3qRlf7YEQKxZllI0dQxyuq4ZfzDCiX3l7N1asOgwJ1pRDYECgQCDg4OkpKSglGLDhg0r
+      1hAhZk0Hwvzh404uftzFptw0Xj3y3NwwR2uNmnyI4c3GMJc/go+qB2hoaMDj8cwtK5WVlTEx
+      MTH3uBQhluPhyDTnr7Vxp2OAFysLObKnhFSP+7H36NFOAr95C/fRH+GoOL7snxlVhNLS0hgZ
+      GcHr9aKUkgdjiSVRkwOErvwc55bjGIV7ud0+wNkrLQRCFif3lfP6sZ1PHObojEKSDvw1zo17
+      MVfguouqB5gtfZ7tAQzDkDmAiFr49n8z/Psfc8V7iitJxyjOy+Dkvgo2+dLj3paoImQYxqK7
+      akIsRmtN3/Akp+9v4L7rhxys3sn3qucPc+JJVoFEzFmW4lb7AGfqWohYihP7ythdkb+iqzlL
+      JYN3ETNTgRAXbnbyUWMXJQWZvH58Bxtz4j/MWYz0AGJFaa3pHZrkTF0zzT0jHNxZxEvVm0lJ
+      Xr1hzmIkAGJFRCzFrbaHnLnSgqU0p/aVs6siD4e5+sOcxcgQSCzLpD/EhYZOLjV2UVqYxRvH
+      d1GYkzhfiNIDiKhprekZnOBsXQutvSMc2lnM4d3Fa3aYsxgJgHhmEUvxcWs/Z6+0ApqTNaXs
+      LM/H4Zh/p1WikCGQeKqJ6SAf3uzk8u1uygqzeOvkLnLGrhGq/S7hvhrMg9/GcLhWu5lLElUP
+      0N/fTzgcBsDtduPz+aQHWKe01nQPjHOmroWOvlEO797MoZ3FeJNdaBVh+tdvovo+BtOJ9/Vf
+      48jdttpNXpKoegDLshgdHSU1NRW/309OTo6cErnORCxFQ+tD/u9aO6ZhcOz5Et46uRPzkwqA
+      mf/XGnNjDephE0Z2Kcqbi07QayCqALjdbhwOB0lJSXJK5DozMR3k/Rsd1N3uZkvRBv7s89Xk
+      Z6c+8f2Og99Gbf8iRloeZvIz3pG1Bskk2Ma01nQ9HOdMXTMd/WMcqS7h4M4iPEmJOZ5fCgmA
+      DYUjFjdb+jlb24Q51MTnj+xjZ/XzmGt80yoWZOxiE1prJqZDfHCjnct3ethWmMo3gj8lx7gD
+      l36Byv5nzJKDq93MuJMArHNaazr7xzhd10LPwDh/Ur2ZH715GPdIE9N37wAaQlOEm97FKQEQ
+      60U4YnH9fh/n6ltJdjs49UIF2zfnYpozqzkqNR88meAfAQzM3K2r2+BVInOAdURrzdhUkA9u
+      tFN/9wGVxTmc2FdObub8e7a11li9DUSa/gczqxTXzlfmHhZlJxKABKa1Ro8/INz0O7rMUs4/
+      yObB4ARH9pTwmR1FJLulg38a+RtKYNbUILff+SHn+wsI08mJ4ml2f+sfMZ32WcZcLglAAgqG
+      I9Td7uG9j66TNeDjmKeeUlcfjJnosU7YUL7aTUwYSwrA7KhJbpCPr8Gxac7Xt9LQ0s/z2wr4
+      q5owyRd//+kbDAeGI/FKkldTVAFoa2vDNE3C4TBKKbZutefKQTwppbnfM8Tpy82MTQY5VlPG
+      117ajsvpQAeLmW75T1TvTTDMmYlsxsbVbnJCiWoSPDw8TFtbGxkZM7Uf8mS42AmEIly+08PF
+      hi5ys1I4UVNKSX7m/DeGp1HdVyApFTO/GszErc1fDVEHYGJiYu7JcHl5ebIKtMIGRqc4V9/K
+      rbaH1Gwr5OjeUjJTn+2wBxE9WQZdAyyluNc1xJm6FiamQxyvKWPvtgLcC5xpJVaWrAKtotkz
+      rT682UFedipfPrRt5uhOWVyIG+kBVsHDkSnOXmmhqXOQmspCjlaXPHZ0p4gfCUCcPHqm1XQg
+      zLGaMvZuLVjw6E4RPzIEijF/MMylT4Y5hTlp/OmfbKf4KUd3iviRHiBG+oYnOVffSlPHIC9s
+      L+TonlLSU+YXm2mtsR5cI3L3NGiFc8txHEUvYBj2uzllNUgAVtDsmVZn6lrwh8KcqCmnekv+
+      osOc8N3TBM7+CCLBmRdMF0mf+3tcz31Veok4kCHQCpgKhLjU2M3Fhg425qbxypEqinzpT72A
+      tRUmdPmnn178ACpM6PLPcG17GVwyMY41CcASzR72cK6+lXttD9hr3ODt9FbSIg4cXfsh8xVw
+      p8BiIQj7UVOD8z/bP4IOTWJIAGIuqgBorQkGZ76tlFJ4vd6YNGotsyzF7Y6Zwx7CEYtje4v5
+      auiX0HwapjUWYLVfxGq/gOdL/4LhXqRMxJ2CmV2GenDtsZfNzCKMBH7USCKJKgDj4+PcuXMH
+      j8eDz+fD4/HMHFupVKzat2ZMf7Kac7Ghk0256bz6yTDHan2fQMsZ4PGplNV1mdCt/8K1++uL
+      fKqB+/B3CPzuuzDVP/OSJxv34e+hDQfaBn+vqy2qAAwNDRGJRCgoKKCnp4f8/HyWOYde02YP
+      ezh7pYXWByMc2FHEd1878NiZVpHuetALX6hWVx2uXa8tOgxy5O/C+41fYXVdBm3h2PQiRlr+
+      iv8uYmFRBaCsrIyioiKCwSBbt27FMIy5p8MlOq2smeXItgtYEYt7aS/xXnOEiKU4XlPGW6eq
+      FzzTynA9+T5aw5WEYZpPX81Jy8NR9aXl/gpiCaKeBLtcLlyu9XXLnVYWwUv/ytiVX1E7XUFd
+      cDtFzn/nKxUuyl79B0z3k+c6ztKXCF/9BVihx/+DYeIs/xyykLm2Jf5X9zJpreluvsUv3u/g
+      JyNfRmHyN+n/wTdT3yOv7zSRxt8uOsxzFOzCvf9tcDzSE5hOXLu/jrP86OKrQGLVLbgR1tvb
+      y/DwMFVVVU/tvhN1IyxiKRrbHnK2roVw91WO6HNUuTpwGo+P5x2b9uF55d8W3ZnVWqH6bxNp
+      vwjKwlG0D8fG5zHk5pQ1b8EhUFtbGw0NDWzbtm3dPfl5YjrIxY+7qL3VRUlBFq8f38mGG+eI
+      NLYt+H4dDjz1Mw3DxJG/A0f+jpVuroixBa9uj8dDQUEB9+/fZ/v27Uv+cB2aQgfGMNIKVnVb
+      f/ZMq9nDHj6zo4jvfePg3GpOaONeIo2/5Y+XMgEcG/eAjOTXrQUD4HQ68Xq9uN3Le8JAsO7n
+      RO6dJuWN38IiE8lYiViKhpZ+ztW3Yhhwoqacb53aPW81x7XlOJGm32F1fPTY60ZWCe69b0lN
+      zjq2YADGxsa4e/cuR48eXdaHu6q+iCPvubjVtGitIeJnvL+TP3RY1N7uobzIx5sndlGwIfWJ
+      F7Lh8pD88j8Rvv5LIq0fgBXCsakGd82fY6TmxaXtYnUsOAnu6OigtbWVQ4cOPXXJc61MgrXW
+      dHb1cPp/36Wjb4T97kb2Z/WTdfQ7OLedeqZvca31p5taxjOs34uEN68H0FpTW1tLTk7O6m1w
+      aY1GzwzJDWPRCzEcsWaGOVfuo9s/5KirltfSu3AYCgIQeO/HeHO24MipeOqPNQwDDFm5sZN5
+      ATAMg4KCAhwOx7wLT2tNb2/v3BlhPp9vxRs0c4PIDUJ1P0MHxnFt/yKuXa9imI83dXwqyIWG
+      Dmpv97B1UzZv7HGSPvgbjD8uSwhNEml9/5kCIOxnwTlAamoq3d3d815/8OABfX19cw/GisUp
+      kXp6iOC730FPDQAQ7L+FTs7EUXEcgK6Bcc7Vt9HVP8bBHZv4/tf340lyobqvEHzChpUK++Uk
+      S7GgBQMwPj5Od3c3SqnHhkFOp3PmG9qy0FrH5JTIyHDz3MUPgLYIddRy19jN2SstuJ0OTr5Q
+      zl9+YQ+OR9qmfJWEUnIe/7Mwsytb/MK6288QK2PBq6KgoIC0tLR5c4C8vDzy8vJiWgFqpBeC
+      MxkiASaUhz8EdnDzVjmVxiB/8fKeJx7daXgySXrp+wTO/xhCkzMvmk5c1W/g2FgTs/aKxLZg
+      AKanp5mamnrysmEMV0fMzM30Vb7Nmdo79JmbOLw9lx+e+upTb74xDAPn1lN4N2wh0vo+RAI4
+      Nu3DsUlKEsSTLRiA4eHhuWFOPJYCtdaMTAZo7h7m8u0eQpEqTn7zC1T6nDi8Wc98ARuGgSOn
+      Qia84pktGAC32829e/fmzQFWWsRSfNzaz/n6VgBO7Cvn7a/ULFh3L0QszAuAUorx8XGqq6tx
+      OGIzdJj0h/jwZgeXGrso25jN68d3UrghTTaeRNzNC8DQ0BChUIiOjg727t27Yj9Ia03PwARn
+      61to6x3l4I4i/u6bhx67vVCIeJtXCqGUYmJiAoD09Kc/2+ZppRARS3GzuY/zV9twmAYn9pVT
+      VZIrwxyxJszrAUzTpLGxEYADBw4sa1hiKcVPflNLbqaXN0/sojBn9WuGhHjUvABYloXH42F4
+      eHjZH+4wTf721f3ybS/WrHlX5uTkJJOTk2RlZa3IpFQufrGWzbs6PR4PU1NTXLt2bd6O78jI
+      CE1NTXR2dvLw4cO4NVKIWFmwHFopteDJjx6Ph6GhIbxeL8PDwzEphhMinhYMQHFxMUVFRfOG
+      QLNDI5fLRVJSUkyK4YSIJzkfQNiazFCFrUkAhK1JAIStSQCErUkAhK1JAIStSQCErUkAhK1F
+      fUrko/cJyx1cItFFFYCRkRFaWlrIyMhAKUVlZWWs2iVEXEQVgOTkZCzLmqsBUkpJMZxIaFEF
+      IBAIzD0069EgSDGcSFRSDCdsTVaBhK1JAIStSQCErUkAhK1JAIStSQCErUkAhK1JAIStRbWF
+      GwwGmZycnDslcvawPCESVVQBiEQitLe343a7yc3NJT09HaUUlmXFqn1CxFRUAejt7SUzM5O0
+      tDR6enrIy8vDeMpB1kKsZVHVAoVCISKRyNzJMUlJSVILJBJaVD2A2+3G7ZYTXcT6IatAwtYk
+      AMLWJADC1iQAwtYkAMLWJADC1iQAwtYkAMLWotoIGx0dZWhoiLS0NJRS5Ofnx6pdQsRFVAHw
+      er10dnbO/bs8GEskuqgC0N7eTmpq6tyFLw/GEoluSQ/Gmv0jhmFIMZxIaEv66pbyZ7FeyCqQ
+      sDUJgLA1CYCwNQmAsDUJgLA1CYCwNQmAsDUJgLC1qDbCxsbGGB0dRWuN1+vF5/PFql1CxEVU
+      AUhPT2d4eBiXy8Xg4CA5OTlSDCcSWlQBGB8fx+/3k5SUREpKihTDiYQnp0QKW5NJsLA1CYCw
+      NQmAsDUJgLA1CYCwNQmAsDUJgLA1CYCwtai3cB/dN5Ob40Wii7oYrre3F5h5KFZVVVVMGiVE
+      vCypGG72WFR5MpxIdFEXwwFzVaBSDCcSnRTDCVuTVSBhaxIAYWsSAGFrEgBhaxIAYWsSAGFr
+      EgBhaxIAYWtLCsDo6CiDg4Mr3RYh4m5JNQzd3d1z5RBKqbnaICESzf8DrXgxr60O7i4AAAAA
+      SUVORK5CYII=
+    </thumbnail>
+    <thumbnail height='192' name='goals_diff_to_fouls' width='192'>
+      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
+      ASDRGAAS7T9sJ/uXKGmlogAAAABJRU5ErkJggg==
+    </thumbnail>
+    <thumbnail height='192' name='home_win_rate_vs_possession' width='192'>
+      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
+      aJsAAAAASUVORK5CYII=
+    </thumbnail>
+    <thumbnail height='192' name='pie_chart_location' width='192'>
+      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
+    </thumbnail>
+    <thumbnail height='192' name='shots_vs_win_percentage' width='192'>
+      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
+    </thumbnail>
+  </thumbnails>
+</workbook>
