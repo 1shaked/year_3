@@ -42,7 +42,7 @@ To explore and utilize this project, follow these steps:
      ```
    - Run the data processing script:
      ```bash
-     python data_processing.py
+     python preprocess.py
      ```
     - link to the running bi site link: https://bi-course.onrender.com/
 
@@ -74,14 +74,6 @@ This BI project is designed to provide insights through data processing and visu
 
 Contributions are welcome. Please fork the repository and create a pull request with your enhancements.
 
-## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-Special thanks to all contributors and the open-source community for their invaluable support.
-
----
 
 *Note: Ensure all scripts are executed in the correct sequence for optimal performance.* 
