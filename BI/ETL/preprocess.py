@@ -39,7 +39,7 @@ bins = np.arange(0, 101, 5)  # Create bins from 0% to 100% in increments of 5
 df['possession_bin'] = pd.cut(df['home_possession'], bins, right=False)
 
 # Calculate total games and wins for each possession bin
-game_data = df.groupby('possession_bin').size().reset_index(name='total_games')
+game_data = df.groupby('possession_bin', observed=False).size().reset_index(name='total_games')
 win_data = df[df['result'] == 'HW'].groupby('possession_bin').size().reset_index(name='home_wins')
 
 # Merge the two DataFrames
