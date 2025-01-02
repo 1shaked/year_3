@@ -7,10 +7,10 @@ This repository contains a comprehensive Business Intelligence (BI) project that
 The repository is organized into the following directories and files:
 
 - **ETL/**: Contains scripts for data processing and graph generation.
-  - *data_processing.py*: Processes raw data into a structured format.
-  - *graph_generation.py*: Creates visual representations of the data.
+  - *df_full.py*: Creates visual representations of the data, and do all the process on the data.
+  - *preprocess.py*: Processes raw data into a structured format minimized only the needed operation.
 
-- **server.py**: Hosts the dashboard server for data visualization.
+- **dash_app.py**: Hosts the dashboard server for data visualization.
 
 - **graphs/**: Stores all generated graphs for analysis.
 
@@ -44,6 +44,7 @@ To explore and utilize this project, follow these steps:
      ```bash
      python data_processing.py
      ```
+    - link to the running bi site link: https://bi-course.onrender.com/
 
 4. **Generate Graphs**:
    - Execute the graph generation script:
@@ -58,9 +59,9 @@ To explore and utilize this project, follow these steps:
      ```
    - Start the server:
      ```bash
-     python server.py
+     python dash_app.py
      ```
-   - Access the dashboard at `http://localhost:5000`.
+   - Access the dashboard at `http://localhost:8050`.
 
 6. **Explore Tableau Visualizations**:
    - Open `dashboard.twbx` in Tableau to interact with the data visualizations.
