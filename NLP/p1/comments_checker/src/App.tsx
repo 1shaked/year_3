@@ -120,7 +120,8 @@ export function CommentsChecker() {
       >
         Add Comment
       </button>
-      {mutation.isPending ? <CirclesWithBar
+      {mutation.isPending ? <div style={{ display: "grid" , placeItems: "center", height: "100px" }}>
+        <CirclesWithBar
         height="100"
         width="100"
         color="#4fa94d"
@@ -131,7 +132,8 @@ export function CommentsChecker() {
         wrapperStyle={{}}
         wrapperClass=""
         visible={true}
-  /> : comments.map((comment, i) => (
+  />
+      </div> : comments.map((comment, i) => (
     <div key={i} style={{ display: "flex", justifyContent: "center", gap: "1rem", marginBottom: "1rem" }}>
       <input
         style={{
@@ -164,9 +166,10 @@ export function CommentsChecker() {
       >
         Delete
       </button>
-      <div style={{ alignSelf: "center" }}>
-        {reviews?.at(i)?.label} {reviews?.at(i)?.probability?.toFixed(2)}
-      </div>
+      {reviews?.at(i) && <div style={{ alignSelf: "center" , padding: '1rem', borderRadius: '2rem' ,backgroundColor: (reviews?.at(i)?.probability ?? 0) > 0.5 ? 'green' : 'red' }}>
+        <b>{reviews?.at(i)?.label}</b> {reviews?.at(i)?.probability?.toFixed(2)}
+      </div>}
+      
     </div>
   ))}
       
