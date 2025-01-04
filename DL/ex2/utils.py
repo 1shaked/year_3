@@ -146,8 +146,9 @@ def eval_model(X_test, y_test, W1, b1, W2, b2):
     accuracy = np.mean(y_pred == y_test)
     return accuracy
 
-def save_model(W1, b1, W2, b2, batch_size, learning_rate, epochs  ,filename):
+def save_model(W1, b1, W2, b2, batch_size, learning_rate, epochs, losses  ,filename):
     with open(f'model_saved/{filename}', 'w') as f:
         f.write(json.dumps({
             'batch_size': batch_size, 'learning_rate': learning_rate, 'epochs': epochs,
+            'losses': losses,
             "W1": W1.tolist(), "b1": b1.tolist(), "W2": W2.tolist(), "b2": b2.tolist()}, indent=4))
