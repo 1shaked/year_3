@@ -1,150 +1,242 @@
 import {
   useQuery,
   useMutation,
-  useQueryClient,
   QueryClient,
   QueryClientProvider,
-} from '@tanstack/react-query'
-import { useState } from 'react'
+} from "@tanstack/react-query";
+import { useState } from "react";
 
-// Create a client
-const queryClient = new QueryClient()
+// Create a Query Client
+const queryClient = new QueryClient();
 
-function App() {
-  return (
-    // Provide the client to your App
-    <QueryClientProvider client={queryClient}>
-      <FashionList />
-    </QueryClientProvider>
-  )
-}
+export const MAPPING_VALUES_ARRAY = [
+  "T-shirt/top",
+  "Trouser",
+  "Pullover",
+  "Dress",
+  "Coat",
+  "Sandal",
+  "Shirt",
+  "Sneaker",
+  "Bag",
+  "ANkle boot",
+];
 
-export const MAPPING_VALUES = {
-  0: 'T-shirt/top',
-  1: 'Trouser',
-  2: 'Pullover',
-  3: 'Dress',
-  4: 'Coat',
-  5: 'Sandal',
-  6: 'Shirt',
-  7: 'Sneaker',
-  8: 'Bag',
-  9: 'Ankle boot',
-} 
-export const MAPPING_VALUES_ARRAY =[
-  'T-shirt/top',
-  'Trouser',
-  'Pullover',
-  'Dress',
-  'Coat',
-  'Sandal',
-  'Shirt',
-  'Sneaker',
-  'Bag',
-  'Ankle boot',
-]
-const url = 'http://127.0.0.1:8000'
+const url = "http://127.0.0.1:8000";
+
 interface FashionData {
-  'data': number[][],
-  'predictions': number[]
+  data: number[][];
+  predictions: number[];
 }
+
+interface ImageProps {
+  pixels: number[];
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1rem" }}>
+        <FashionList />
+      </div>
+    </QueryClientProvider>
+  );
+}
+
+// Component 1: FashionList
 function FashionList() {
-  const [imagesNumber, setImagesNumber] = useState(2)
-  const [model, setModel] = useState('LAST_TRAIN_MODEL.json')
+  const [imagesNumber, setImagesNumber] = useState(2);
+  const [model, setModel] = useState("LAST_TRAIN_MODEL.json");
+
   const get_models = useQuery({
-    queryKey: ['get_models'],
-    
+    queryKey: ["get_models"],
     queryFn: async () => {
-      const response = await fetch(`${url}/get_models/`)
-      const data = (await response.json()) as string[]
-      return data
+      const response = await fetch(`${url}/get_models/`);
+      const data = (await response.json()) as string[];
+      return data;
     },
-  })
-  const [predations, setPredictions] = useState<FashionData>({
+  });
+
+  const [predictions, setPredictions] = useState<FashionData>({
     data: [],
-    predictions: []
-  })
+    predictions: [],
+  });
+
   const images_mutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${url}/get_examples/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model: model,
-          number_of_samples: imagesNumber
+          number_of_samples: imagesNumber,
         }),
-      })
-      const data = (await response.json()) as FashionData
-      return data
+      });
+      const data = (await response.json()) as FashionData;
+      return data;
     },
     onSuccess: (data) => {
-      setPredictions(data)
+      setPredictions(data);
     },
-  })
+  });
+  const [search, setSearch] = useState("");
+
   return (
     <div>
-      <h2>Number of images you want</h2>
-      <input type="number" onChange={(e) => {
-        setImagesNumber(parseInt(e.target.value))
-      }} 
-      value={imagesNumber} />
-      <h2>Models</h2>
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        {get_models.data?.map((model, index) => (
-          <div key={index} onClick={() => {
-            setModel(model)
-          }}><DisplayModel model={model} /></div>
+      <h1 style={{ fontSize: "2rem", color: "rgba(255, 255, 255, 0.87)" }}>
+        Fashion MNIST Model Viewer
+      </h1>
+
+      
+
+      <div>
+        <h2 style={{ color: "rgba(255, 255, 255, 0.87)", marginBottom: "1rem" , display: "flex", gap: "2rem",
+          alignItems: "center"
+        }}>
+          <div style={{ fontSize: "4rem"}}>Models</div>
+          <input 
+          style={{ fontSize: "2rem" }}
+          type="text" placeholder="search model" value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }} />
+
+          <div>
+          <div style={{ marginBottom: "1.5rem" }}>
+        <label style={{ display: "block", marginBottom: "0.5rem" }}>
+          Number of Images:
+        </label>
+        <input
+      
+          type="number"
+          onChange={(e) => setImagesNumber(parseInt(e.target.value))}
+          value={imagesNumber}
+          style={{
+            padding: "0.5rem",
+            fontSize: "2rem",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            width: "100px",
+
+          }}
+        />
+      </div>
+          </div>
+        </h2>
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            overflowX: "auto",
+          }}
+        >
+          {get_models.data?.filter((v) => { return v.includes(search) }).map((model, index) => (
+            <div
+              key={index}
+              onClick={() => setModel(model)}
+              style={{
+                border: model === model ? "2px solid #646cff" : "1px solid #ccc",
+                padding: "1rem",
+                cursor: "pointer",
+                borderRadius: "8px",
+                backgroundColor: "#1a1a1a",
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+            >
+              <DisplayModel model={model} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => images_mutation.mutate()}
+        style={{
+          backgroundColor: "#646cff",
+          color: "#fff",
+          border: "none",
+          padding: "10px 20px",
+          fontSize: "16px",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginTop: "1rem",
+        }}
+      >
+        Fetch Images
+      </button>
+
+      <hr style={{ margin: "2rem 0", borderColor: "#ccc" }} />
+
+      <h2 style={{ color: "rgba(255, 255, 255, 0.87)" }}>Images</h2>
+      <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+        gap: "20px",
+      }}>
+        {predictions.data.map((image, index) => (
+          <div
+            key={index}
+            style={{
+              marginBottom: "20px",
+              padding: "10px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              backgroundColor: "#1a1a1a",
+            }}
+          >
+            <h3
+              style={{
+                marginBottom: "10px",
+                color: "white",
+                fontSize: "1.5rem",
+                textAlign: "center",
+              }}
+            >
+              {MAPPING_VALUES_ARRAY.at(predictions.predictions[index]) ?? "Error"}
+            </h3>
+            <div
+              
+            >
+              <Image pixels={image} />
+            </div>
+          </div>
         ))}
       </div>
-      <button type="button" onClick={() => images_mutation.mutate()}>
-        Fetch images
-      </button>
-      <hr />
-      <h2>Images</h2>
-      {predations.data.map((image, index) => (
-        <div key={index}>
-          {MAPPING_VALUES_ARRAY.at(predations.predictions[index]) ?? 'Error'}
-          predations - {JSON.stringify(predations.predictions[index])}
-          <br />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-            <Image pixels={image} />
-          </div>
-          
-        </div>
-      ))}
     </div>
-  )
+  );
 }
 
+// Component 2: DisplayModel
 export function DisplayModel({ model }: { model: string }) {
-  const parts = model.replace(".json", "").split("_"); // Remove .json and split by "_"
+  const parts = model.replace(".json", "").split("_");
 
-  // Extract each parameter
   const batchSize = parts[1];
   const learningRate = parts[2];
   const hiddenSize = parts[3];
   const epochs = parts[4];
-  return <div style={{ border: "1px solid black", padding: "1rem", cursor: "pointer" }}>
-    <h2>{model.replace('.json', '')}</h2>
-    <p>Batch size: {batchSize}</p>
-    <p>Learning rate: {learningRate}</p>
-    <p>Hidden size: {hiddenSize}</p>
-    <p>Epochs: {epochs}</p>
 
-  </div>
+  return (
+    <div>
+      <h3>{model.replace(".json", "")}</h3>
+      <p>Batch size: {batchSize}</p>
+      <p>Learning rate: {learningRate}</p>
+      <p>Hidden size: {hiddenSize}</p>
+      <p>Epochs: {epochs}</p>
+    </div>
+  );
 }
 
-interface ImageProps {
-  pixels: number[]
-}
+// Component 3: Image
 function Image({ pixels }: ImageProps) {
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(28, 10px)", // Each image is 28x28 grid
+        gridTemplateColumns: "repeat(28, 10px)",
         gridGap: "1px",
       }}
     >
@@ -154,12 +246,10 @@ function Image({ pixels }: ImageProps) {
           style={{
             width: "10px",
             height: "10px",
-            backgroundColor: `rgb(${pixel}, ${pixel}, ${pixel})`, // 1 = black, 0 = white
+            backgroundColor: `rgb(${pixel}, ${pixel}, ${pixel})`,
           }}
         ></div>
       ))}
     </div>
   );
 }
-
-export default App
