@@ -13,7 +13,6 @@ def train_best_model():
     b1 = data['b1']
     W2 = data['W2']
     b2 = data['b2']
-    import pdb; pdb.set_trace()
     batch_size = data['batch_size']
     learning_rate = data['learning_rate']
     epochs = data['epochs']
@@ -35,7 +34,6 @@ def run_best_model():
     W2 = data['W2']
     b2 = data['b2']
     df = pd.read_csv('test.csv')
-    import pdb; pdb.set_trace()
     X_test = df.values.tolist()
     _, _, _, y_pred = forward_propagation(X_test, W1, b1, W2, b2)
     y_pred = np.argmax(y_pred, axis=1)
