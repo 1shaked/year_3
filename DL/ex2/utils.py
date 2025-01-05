@@ -85,6 +85,24 @@ def one_hot_encode(y, num_classes):
     one_hot[np.arange(m), y] = 1
     return one_hot
 
+def get_data(output_size, batch_size):
+    df = pd.read_csv('train.csv')
+    data = df.to_dict(orient='records')
+    train_data, test_data = split_data(data)
+    X_train , y_train = get_x_and_labels(train_data)
+    X_test , y_test = get_x_and_labels(test_data)
+    X_train = np.array(X_train)
+    y_train = np.array(y_train)
+    X_test = np.array(X_test)
+    y_test = np.array(y_test)
+    X_train = normalize(X_train)
+    X_test = normalize(X_test)
+    X_train_batches , y_train_batches = split_to_batches(X_train, y_train, batch_size)
+    X_train_batches = np.array(X_train_batches)
+    y_train_batches = np.array(y_train_batches)
+    y_train_batches_one_hot = np.array([one_hot_encode(batch, output_size) for batch in y_train_batches])
+    
+    return X_train_batches ,y_train_batches_one_hot, X_test, y_test
 
 def train_neural_network_with_batches(X_train_batches, y_train_batches, hidden_size, learning_rate, epochs, output_size, init_params=None):
     input_size = X_train_batches.shape[2]
@@ -137,7 +155,7 @@ def split_to_batches(X, y, batch_size):
 
 def normalize(X):
     X = np.array(X)
-    X = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
+    X = (X - np.mean(X, axis=0)) / (np.std(X, axis=0) + 0.000_001)
     return X
 
 def eval_model(X_test, y_test, W1, b1, W2, b2):
