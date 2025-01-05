@@ -45,7 +45,7 @@ export default function App() {
 
 // Component 1: FashionList
 function FashionList() {
-  const [imagesNumber, setImagesNumber] = useState(2);
+  const [imagesNumber, setImagesNumber] = useState(10);
   const [model, setModel] = useState("LAST_TRAIN_MODEL.json");
 
   const get_models = useQuery({
