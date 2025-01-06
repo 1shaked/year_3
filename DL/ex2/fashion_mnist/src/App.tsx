@@ -5,6 +5,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { useState } from "react";
+import { Blocks, Hourglass } from "react-loader-spinner";
 
 // Create a Query Client
 const queryClient = new QueryClient();
@@ -132,6 +133,16 @@ function FashionList() {
             overflowX: "auto",
           }}
         >
+          {get_models.isLoading && <div>
+            <Blocks
+              height="80"
+              width="80"
+              color="#4fa94d"
+              ariaLabel="blocks-loading"
+              wrapperStyle={{}}
+              wrapperClass="blocks-wrapper"
+              visible={true}
+              /></div>}
           {get_models.data?.filter((v) => { return v.includes(search) }).map((model, index) => (
             <div
               key={index}
@@ -171,6 +182,15 @@ function FashionList() {
       <hr style={{ margin: "2rem 0", borderColor: "#ccc" }} />
 
       <h2 style={{ color: "rgba(255, 255, 255, 0.87)" }}>Images</h2>
+      {images_mutation.isPending && <Hourglass
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="hourglass-loading"
+        wrapperStyle={{}}
+        wrapperClass=""
+        colors={['#306cce', '#72a1ed']}
+      />}
       <div
       style={{
         display: "grid",
