@@ -22,8 +22,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
-# app.mount("/static", StaticFiles(directory="public"), name="static")
-# app.mount("/assets", StaticFiles(directory="public/assets"), name="assets")
+app.mount("/static", StaticFiles(directory="public"), name="static")
+app.mount("/assets", StaticFiles(directory="public/assets"), name="assets")
 
 # Define the request schema
 class PredictRequest(BaseModel):

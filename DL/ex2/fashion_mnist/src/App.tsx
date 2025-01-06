@@ -22,7 +22,7 @@ export const MAPPING_VALUES_ARRAY = [
   "ANkle boot",
 ];
 
-const url = "http://127.0.0.1:8000";
+const url = 'https://dl-fashion-mnist.onrender.com' //"http://127.0.0.1:8000";
 
 interface FashionData {
   data: number[][];
