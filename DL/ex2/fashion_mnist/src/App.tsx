@@ -143,12 +143,12 @@ function FashionList() {
               wrapperClass="blocks-wrapper"
               visible={true}
               /></div>}
-          {get_models.data?.filter((v) => { return v.includes(search) }).map((model, index) => (
+          {get_models.data?.filter((v) => { return v.includes(search) }).map((model_map, index) => (
             <div
               key={index}
-              onClick={() => setModel(model)}
+              onClick={() => setModel(model_map)}
               style={{
-                border: model === model ? "2px solid #646cff" : "1px solid #ccc",
+                border: model_map === model ? "4px solid #646cff" : "1px solid #ccc",
                 padding: "1rem",
                 cursor: "pointer",
                 borderRadius: "8px",
@@ -156,7 +156,7 @@ function FashionList() {
                 transition: "transform 0.2s, box-shadow 0.2s",
               }}
             >
-              <DisplayModel model={model} />
+              <DisplayModel model={model_map} />
             </div>
           ))}
         </div>
