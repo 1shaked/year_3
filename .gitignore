@@ -11,3 +11,4 @@ NLP/glove.6B/glove.6B.200d.txt
 NLP/p1/glove.6B.100d.txt
 *.pyc
 DL/ex2/train.csv
+OrgBehavior/e3/data/*
