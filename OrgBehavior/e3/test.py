@@ -249,80 +249,58 @@ def process_audio_files(data_folder):
 # Example Usage
 data_folder = "data"  # Replace with your data folder path
 results = process_audio_files(data_folder)
-
-
-
-# %%
-
-# # Print results
-# for i,result in enumerate(results):
-#     if i == 10:
-#         break
-#     print(result)
-
-# %%
-# import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.DataFrame(results)
+df.to_csv("audio_compression_results.csv", index=False)
 
-df = pd.read_csv('audio_compression_results.csv')
-# Convert to DataFrame
-# df = pd.DataFrame(results)
+# # %%
+# # Calculate averages
+# avg_compression_size = {
+#     "RLE": df["rle_compressed_size"].mean(),
+#     "Huffman": df["huffman_compressed_size"].mean(),
+#     "LZW": df["lzw_compressed_size"].mean(),
+# }
+# avg_compression_time = {
+#     "RLE": df["rle_time"].mean(),
+#     "Huffman": df["huffman_time"].mean(),
+#     "LZW": df["lzw_time"].mean(),
+# }
 
+# # %%
 
-# %%
-df.head()
-# df["lzw_compressed_size"]
+# # Plot 1: Average Compression Size
+# plt.bar(avg_compression_size.keys(), avg_compression_size.values())
+# plt.title("Average Compression Size per Algorithm")
+# plt.ylabel("Size (Bytes)")
+# plt.xlabel("Algorithm")
+# plt.show()
 
-# %%
-# df.to_csv("audio_compression_results.csv", index=False)
-
-# %%
-# Calculate averages
-avg_compression_size = {
-    "RLE": df["rle_compressed_size"].mean(),
-    "Huffman": df["huffman_compressed_size"].mean(),
-    "LZW": df["lzw_compressed_size"].mean(),
-}
-avg_compression_time = {
-    "RLE": df["rle_time"].mean(),
-    "Huffman": df["huffman_time"].mean(),
-    "LZW": df["lzw_time"].mean(),
-}
-
-# %%
-
-# Plot 1: Average Compression Size
-plt.bar(avg_compression_size.keys(), avg_compression_size.values())
-plt.title("Average Compression Size per Algorithm")
-plt.ylabel("Size (Bytes)")
-plt.xlabel("Algorithm")
-plt.show()
-
-# %%
-# Plot 2: Average Compression Time
-plt.bar(avg_compression_time.keys(), avg_compression_time.values())
-plt.title("Average Compression Time per Algorithm")
-plt.ylabel("Time (Seconds)")
-plt.xlabel("Algorithm")
-plt.show()
+# # %%
+# # Plot 2: Average Compression Time
+# plt.bar(avg_compression_time.keys(), avg_compression_time.values())
+# plt.title("Average Compression Time per Algorithm")
+# plt.ylabel("Time (Seconds)")
+# plt.xlabel("Algorithm")
+# plt.show()
 
 
-# %%
+# # %%
 
 
-# %%
+# # %%
 
 
-# %%
+# # %%
 
 
-# %%
+# # %%
 
 
-# %%
+# # %%
 
 
-# %%
+# # %%
 
 
 
