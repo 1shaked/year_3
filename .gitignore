@@ -13,3 +13,4 @@ NLP/p1/glove.6B.100d.txt
 DL/ex2/train.csv
 OrgBehavior/e3/data/*
 OrgBehavior/e3/read_data.ipynb
+OrgBehavior/e3/audio_compression_results.csv
