@@ -35,10 +35,6 @@ def run_model():
         train_path='train',
         batch_size=50,
     )
-    print("train_comments", train_comments)
-    print("val_comments", val_comments)
-    print("test_comments", test_comments)
-    print("test_labels", test_labels)
     # Flatten train_comments
     train_texts = [text for batch in train_comments for text in batch[0]]
     train_labels = [label for batch in train_comments for label in batch[1]]
