@@ -1,52 +1,44 @@
-# %%
 from transformers import pipeline
 from transformers import AutoTokenizer
 import torch
 # import numpy as np
 import pandas as pd
 from transformers import TrainingArguments, Trainer
-# %%
 import os
-from utils_classes import load_and_process_comments
+from utils_classes import CommentsDataset, load_and_process_comments
 from transformers import AutoModelForSequenceClassification
 
 # Set the environment variable
-os.environ["MKL_SERVICE_FORCE_INTEL"] = "1"
+os.environ["MKL_SERVICE_FORCE_INTEL"] = "1" # need for mac m1 , you may not need this
 
-
-
-# Load tokenizer for the model
-
-# %%
 # Check PyTorch version
 print("PyTorch version:", torch.__version__)
-# Check MPS availability
-if torch.backends.mps.is_available():
-    print("MPS is available and will be used for acceleration!")
+device = torch.device("cpu")  # Use CPU
+# Check for GPU (CUDA) on Windows/Linux
+if torch.cuda.is_available():
+    device = torch.device("cuda")  # Use NVIDIA GPU (CUDA)
+    print("CUDA is available! Using GPU for acceleration.")
+# Check for MPS on macOS
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")  # Use Metal Performance Shaders (MPS)
+    print("MPS is available! Using GPU for acceleration.")
+# Fallback to CPU
 else:
-    print("MPS is not available. Running on CPU.")
+    print("No GPU available. Using CPU.")
 
-if torch.backends.mps.is_available():
-    device = torch.device("mps")  # Use MPS (Metal GPU)
-else:
-    device = torch.device("cpu")  # Fallback to CPU
-
-print(torch.cuda.is_available())  # Returns True if a GPU is available
-print(torch.cuda.device_count())  # Number of GPUs
-
-# Check if MPS is available
-device = 0 if torch.backends.mps.is_available() else -1
-print(f"Using device: {'MPS' if device == 0 else 'CPU'}")
-
-model="distilbert-base-uncased-finetuned-sst-2-english"
+model= 'distilbert-base-uncased' # "distilbert-base-uncased-finetuned-sst-2-english"
 
 def run_model():
-    sentiment_pipeline = pipeline("sentiment-analysis", model=model, device=device)
+    # sentiment_pipeline = pipeline("sentiment-analysis", model=model, device=device)
     tokenizer = AutoTokenizer.from_pretrained(model)
     train_comments, val_comments, test_comments, test_labels = load_and_process_comments(
         train_path='train',
         batch_size=50,
     )
+    print("train_comments", train_comments)
+    print("val_comments", val_comments)
+    print("test_comments", test_comments)
+    print("test_labels", test_labels)
     # Flatten train_comments
     train_texts = [text for batch in train_comments for text in batch[0]]
     train_labels = [label for batch in train_comments for label in batch[1]]
@@ -59,7 +51,7 @@ def run_model():
     train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=512)
     test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=512)
     model_new = AutoModelForSequenceClassification.from_pretrained(
-        "distilbert-base-uncased", 
+        model, 
         num_labels=2  # Adjust `num_labels` based on your dataset (e.g., binary classification)
     )
     training_args = TrainingArguments(
@@ -85,5 +77,6 @@ def run_model():
     trainer.train()
 
 
-
+if __name__ == "__main__":
+    run_model()
 
