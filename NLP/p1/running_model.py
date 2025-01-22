@@ -28,12 +28,12 @@ else:
 
 model= 'distilbert-base-uncased' # "distilbert-base-uncased-finetuned-sst-2-english"
 
-def run_model():
+def train_model(model , batch_size=50):
     # sentiment_pipeline = pipeline("sentiment-analysis", model=model, device=device)
     tokenizer = AutoTokenizer.from_pretrained(model)
     train_comments, val_comments, test_comments, test_labels = load_and_process_comments(
         train_path='train',
-        batch_size=50,
+        batch_size=batch_size,
     )
     # Flatten train_comments
     train_texts = [text for batch in train_comments for text in batch[0]]
@@ -41,17 +41,19 @@ def run_model():
     # Flatten test_comments
     test_texts = [text for batch in test_comments for text in batch[0]]
     test_labels = [label for batch in test_comments for label in batch[1]]
-    train_dataset = CommentsDataset(train_encodings, train_labels)
-    test_dataset = CommentsDataset(test_encodings, test_labels)
+    
     # Tokenize training and test data
     train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=512)
     test_encodings = tokenizer(test_texts, truncation=True, padding=True, max_length=512)
+
+    train_dataset = CommentsDataset(train_encodings, train_labels)
+    test_dataset = CommentsDataset(test_encodings, test_labels)
     model_new = AutoModelForSequenceClassification.from_pretrained(
         model, 
         num_labels=2  # Adjust `num_labels` based on your dataset (e.g., binary classification)
-    )
+    ).to(device)
     training_args = TrainingArguments(
-        output_dir="./results",          # Directory to save the model
+        output_dir=f"./output/{model}",          # Directory to save the model
         eval_strategy="epoch",          # Evaluate after each epoch (updated argument)
         learning_rate=2e-5,             # Learning rate
         per_device_train_batch_size=16, # Batch size for training
@@ -71,8 +73,9 @@ def run_model():
         tokenizer=tokenizer,
     )
     trainer.train()
+    print("Training completed!")
 
 
 if __name__ == "__main__":
-    run_model()
+    train_model(model)
 
