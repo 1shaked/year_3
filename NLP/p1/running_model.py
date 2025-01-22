@@ -26,10 +26,9 @@ elif torch.backends.mps.is_available():
 else:
     print("No GPU available. Using CPU.")
 
-model= 'distilbert-base-uncased' # "distilbert-base-uncased-finetuned-sst-2-english"
+# model= 'distilbert-base-uncased' # "distilbert-base-uncased-finetuned-sst-2-english"
 
 def train_model(model , batch_size=50):
-    # sentiment_pipeline = pipeline("sentiment-analysis", model=model, device=device)
     tokenizer = AutoTokenizer.from_pretrained(model)
     train_comments, val_comments, test_comments, test_labels = load_and_process_comments(
         train_path='train',
@@ -77,5 +76,6 @@ def train_model(model , batch_size=50):
 
 
 if __name__ == "__main__":
-    train_model(model)
+    train_model('distilbert-base-uncased')
+    train_model('siebert/sentiment-roberta-large-english')
 
