@@ -307,3 +307,19 @@ def load_and_process_comments(train_path='train', batch_size=50, train_size=0.8)
     test_labels = labels[train_len:]
 
     return train_comments, val_comments, test_comments, test_labels
+
+
+
+class CommentsDataset(torch.utils.data.Dataset):
+    def __init__(self, encodings, labels):
+        self.encodings = encodings
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+        item["labels"] = torch.tensor(self.labels[idx])
+        return item
+
