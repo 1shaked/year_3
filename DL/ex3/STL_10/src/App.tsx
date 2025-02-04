@@ -1,0 +1,407 @@
+// import { useState } from "react";
+// import reactLogo from "./assets/react.svg";
+// import "./App.css";
+// import {
+//   useQuery,
+//   useMutation,
+//   useQueryClient,
+//   QueryClient,
+//   QueryClientProvider,
+// } from "@tanstack/react-query";
+
+// // Create a client
+// const queryClient = new QueryClient();
+
+// function App() {
+//   return (
+//     <div className="App">
+//       <QueryClientProvider client={queryClient}>
+//         <ReportPage />
+//       </QueryClientProvider>
+//     </div>
+//   );
+// }
+
+// export default App;
+
+// import { Puff } from "react-loader-spinner";
+
+// export function ReportPage() {
+//   const get_models = useQuery({
+//     queryKey: ["get_models"],
+//     queryFn: async () => {
+//       // const response = await fetch('/api/get_models')
+//       // return await response.json()
+//       return {
+//         models: [
+//           { name: "model1", lr: 0.01, weight_decay: 0 },
+//           { name: "model2", lr: 0.001, weight_decay: 0.01 },
+//         ],
+//       };
+//     },
+//   });
+//   const [selectedModel, setSelectedModel] = useState<string[]>([]);
+
+//   return (
+//     <div className="">
+//       <div className="">Report</div>
+//       <div className="">
+//         {get_models.isLoading ? (
+//           <Puff
+//             visible={true}
+//             height="80"
+//             width="80"
+//             color="#4fa94d"
+//             ariaLabel="puff-loading"
+//             wrapperStyle={{}}
+//             wrapperClass=""
+//           />
+//         ) : (
+//           <div className="grid grid-cols-3 gap-4">
+//             {get_models?.data?.models.map((model) => (
+//               <div
+//                 key={model.name}
+//                 className={`border-4 transition-all p-4 cursor-pointer ${
+//                   selectedModel?.includes(model.name)
+//                     ? " border-emerald-600"
+//                     : ""
+//                 }`}
+//                 onClick={() =>
+//                   setSelectedModel(
+//                     selectedModel?.includes(model.name)
+//                       ? selectedModel.filter((m) => m !== model.name)
+//                       : [...(selectedModel || []), model.name]
+//                   )
+//                 }
+//               >
+//                 <div>
+//                   Name: <b>{model.name}</b>
+//                 </div>
+//                 <div>
+//                   Learning Rate: <b>{model.lr}</b>
+//                 </div>
+//                 <div>
+//                   Weight Decay: <b>{model.weight_decay}</b>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//       <div className="grid grid-cols-3 gap-4">
+//         {selectedModel.map((model) => (
+//           <div key={model} className="border-4 p-4 ">
+//             <DisplayModel
+//               key={model}
+//               model={{ name: model, lr: 0.01, weight_decay: 0 }}
+//             />
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
+
+// interface DisplayModelProps {
+//   model: {
+//     name: string;
+//     lr: number;
+//     weight_decay: number;
+//   };
+// }
+
+// import Plot from "react-plotly.js";
+
+// export function DisplayModel(props: DisplayModelProps) {
+//   const get_model_data = useQuery({
+//     queryKey: ["get_model_data", props.model.name],
+//     queryFn: async () => {
+//       // const response = await fetch(`/api/get_model_data/${props.model.name}`)
+//       // return await response.json()
+//       //         { acc: 0.1, train_losses: [0.1,1,2], val_losses: [0.1,1,2], train_accuracies: [0.1,1,2], val_accuracies: [0.1,1,2], epochs: 3, loss: 0.1, lr: 0.01, wd: 0.01},        { acc: 0.1, train_losses: [0.1,1,2], val_losses: [0.1,1,2], train_accuracies: [0.1,1,2], val_accuracies: [0.1,1,2], epochs: 3, loss: 0.1, lr: 0.01, wd: 0.01},
+
+//       return {
+//         acc: 0.1,
+//         train_losses: [150, 100, 50],
+//         val_losses: [200, 100, 75],
+//         train_accuracies: [0.1, 0.2, 0.8],
+//         val_accuracies: [0.2, 0.5, 0.7],
+//         epochs: 3,
+//         loss: 0.1,
+//         lr: 0.01,
+//         wd: 0.01,
+//       };
+//     },
+//   });
+//   return (
+//     <div className="">
+//       {get_model_data.isLoading || get_model_data.data === undefined ? (
+//         <></>
+//       ) : (
+//         <>
+//           <Plot
+//             data={[
+//               {
+//                 x: Array.from(
+//                   { length: get_model_data.data.epochs },
+//                   (_, i) => i + 1
+//                 ),
+//                 y: get_model_data.data.train_losses,
+//                 type: "scatter",
+//                 mode: "lines+markers",
+//                 marker: { color: "red" },
+//                 name: "Train Losses",
+//               },
+//               {
+//                 type: "bar",
+//                 x: Array.from(
+//                   { length: get_model_data.data.epochs },
+//                   (_, i) => i + 1
+//                 ),
+//                 y: get_model_data.data.val_losses,
+//                 marker: { color: "blue" },
+//                 name: "Val Losses",
+//               },
+//             ]}
+//             layout={{
+//               width: 320,
+//               height: 320,
+//               title: { text: "Losses" },
+//             }}
+//           />
+//         </>
+//       )}
+//     </div>
+//   );
+// }
+import { useState } from "react";
+import "./App.css";
+import {
+  useQuery,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+
+// Create a client
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <QueryClientProvider client={queryClient}>
+        <ReportPage />
+      </QueryClientProvider>
+    </div>
+  );
+}
+
+export default App;
+
+import { Puff } from "react-loader-spinner";
+import { API_BASE_URL } from "./const";
+
+export function ReportPage() {
+  const get_models = useQuery({
+    queryKey: ["get_models"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE_URL}/get_models`)
+      const data = (await res.json()) as { file: string, name: string, lr: number, weight_decay: number}[] 
+      return {
+        models: data,
+      };
+    },
+  });
+
+  const [selectedModel, setSelectedModel] = useState<string[]>([]);
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-center text-gray-800">Report</h1>
+      {API_BASE_URL}
+      <div>
+        {get_models.isLoading ? (
+          <div className="flex justify-center items-center">
+            <Puff
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              ariaLabel="puff-loading"
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-6">
+            {get_models?.data?.models.map((model) => (
+              <div key={model.name}>
+                <div
+                  className={`p-6 border rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer ${
+                    selectedModel?.includes(model.file)
+                      ? "bg-emerald-100 border-emerald-600"
+                      : "bg-white"
+                  }`}
+                  onClick={() =>
+                    setSelectedModel(
+                      selectedModel?.includes(model.file)
+                        ? selectedModel.filter((m) => m !== model.file)
+                        : [...(selectedModel || []), model.file]
+                    )
+                  }
+                >
+                  <h2 className="text-lg font-bold text-gray-800">
+                    {model.name}
+                  </h2>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-600">
+                      <span className="font-semibold">Learning Rate:</span>{" "}
+                      {model.lr}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <span className="font-semibold">Weight Decay:</span>{" "}
+                      {model.weight_decay}
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-2">
+                  {selectedModel.includes(model.file) ? (
+                    <>
+                      <div className="p-6 border rounded-lg shadow-md bg-white">
+                        <DisplayModel
+                          key={model.file}
+                          model={{
+                            name: model.name,
+                            lr: model.lr,
+                            weight_decay: model.weight_decay,
+                            file: model.file,
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface DisplayModelProps {
+  model: {
+    name: string;
+    lr: number;
+    weight_decay: number;
+    file: string;
+  };
+}
+
+import Plot from "react-plotly.js";
+
+export function DisplayModel(props: DisplayModelProps) {
+  const get_model_data = useQuery({
+    queryKey: ["get_model_data", props.model.name],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE_URL}/get_model/${props.model.file}`)
+      const data = (await res.json()) as { acc: number, train_losses: number[], val_losses: number[], train_accuracies: number[], val_accuracies: number[], epochs: number, loss: number, lr: number, wd: number}
+      return data;
+    },
+  });
+
+  return (
+    <div className="space-y-4">
+      {get_model_data.isLoading || get_model_data.data === undefined ? (
+        <div className="flex justify-center items-center">
+          <Puff
+            visible={true}
+            height="80"
+            width="80"
+            color="#4fa94d"
+            ariaLabel="loading"
+          />
+        </div>
+      ) : (
+        <>
+          <h3 className="text-lg font-bold text-gray-800">
+            {props.model.name} - Losses
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <Plot
+              data={[
+                {
+                  x: Array.from(
+                    { length: get_model_data.data.epochs },
+                    (_, i) => i + 1
+                  ),
+                  y: get_model_data.data.train_losses,
+                  type: "scatter",
+                  mode: "lines+markers",
+                  marker: { color: "red" },
+                  name: "Train",
+                },
+                {
+                  type: "bar",
+                  x: Array.from(
+                    { length: get_model_data.data.epochs },
+                    (_, i) => i + 1
+                  ),
+                  y: get_model_data.data.val_losses,
+                  marker: { color: "blue" },
+                  name: "Val",
+                },
+              ]}
+              layout={{
+                width: 400,
+                height: 400,
+                title: { text: "Losses" },
+                legend: {
+                  x: 1,
+                  y: 0,
+                  orientation: "v",
+                },
+              }}
+            />
+            {/* acc graph */}
+            <Plot
+              data={[
+                {
+                  x: Array.from(
+                    { length: get_model_data.data.epochs },
+                    (_, i) => i + 1
+                  ),
+                  y: get_model_data.data.train_accuracies,
+                  type: "scatter",
+                  mode: "lines+markers",
+                  marker: { color: "red" },
+                  name: "Train",
+                },
+                {
+                  type: "bar",
+                  x: Array.from(
+                    { length: get_model_data.data.epochs },
+                    (_, i) => i + 1
+                  ),
+                  y: get_model_data.data.val_accuracies,
+                  marker: { color: "blue" },
+                  name: "Val",
+                },
+              ]}
+              layout={{
+                width: 460,
+                height: 460,
+                title: { text: "Accuracies" },
+                legend: {
+                  x: 1,
+                  y: 0,
+                  orientation: "v",
+                },
+              }}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
