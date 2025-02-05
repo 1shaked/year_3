@@ -1,23 +1,9 @@
-
-
-
-import json
 from fastapi.responses import FileResponse
-import numpy as np
-import pandas as pd
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, random_split
-from torchvision import datasets, transforms
-import matplotlib.pyplot as plt
-from utils_func import train_model, LogisticRegression, save_model ,FullyConnected, CNN, MobileNetV2FeatureExtractor, MobileNetV2FineTuned
 import os
 # Set device (use MPS for Mac M1, fallback to CUDA or CPU)
 device = torch.device("mps") if torch.backends.mps.is_available() else (
