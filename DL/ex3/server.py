@@ -29,7 +29,11 @@ def extract_values_from_file(name: str):
     name_file = name.split("_")[0]
     lr = name.split("_lr_")[1].split('_')[0]
 
-    wd = name.split("_")[-1].split(".")[0]
+    wd_arr = name.split("_")[-1].split(".")
+    if len(wd_arr) > 1 and wd_arr[1] != "pth":
+        wd = f'{wd_arr[0]}.{wd_arr[1]}'
+    else:
+        wd = wd_arr[0]
     return {"name": name_file, "lr": lr, "weight_decay": wd, "file": name}
 @app.get("/get_models")
 async def get_models():
