@@ -27,9 +27,9 @@ app.mount("/assets", StaticFiles(directory="public/assets"), name="assets")
 def extract_values_from_file(name: str):
     # file_name = f"./models/{name_file}_lr_{lr}_wd_{wd}.pth"
     name_file = name.split("_")[0]
-    lr = float(name.split("_lr_")[1].split('_')[0])
+    lr = name.split("_lr_")[1].split('_')[0]
 
-    wd = float(name.split("_")[-1].split(".")[0])
+    wd = name.split("_")[-1].split(".")[0]
     return {"name": name_file, "lr": lr, "weight_decay": wd, "file": name}
 @app.get("/get_models")
 async def get_models():
