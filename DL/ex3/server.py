@@ -12,8 +12,7 @@ device = torch.device("mps") if torch.backends.mps.is_available() else (
 print(f"Using device: {device}")
 
 
-app = FastAPI(
-)
+app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
