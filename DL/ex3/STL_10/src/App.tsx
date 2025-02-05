@@ -147,9 +147,21 @@ export function DisplayModel(props: DisplayModelProps) {
         </div>
       ) : (
         <>
+        <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold text-gray-800">
-            {props.model.name} - Losses
+            {props.model.name}
           </h3>
+          <div>
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">Loss:</span>{" "}
+              {Number(get_model_data.data.loss).toFixed(4)}
+            </p>
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">Accuracy:</span>{" "}
+              {get_model_data.data.acc * 100}%
+            </p>
+          </div>
+        </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <Plot
               data={[
