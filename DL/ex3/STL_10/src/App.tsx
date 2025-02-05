@@ -29,7 +29,7 @@ export function ReportPage() {
     queryKey: ["get_models"],
     queryFn: async () => {
       const res = await fetch(`${API_BASE_URL}/get_models`)
-      const data = (await res.json()) as { file: string, name: string, lr: number, weight_decay: number}[] 
+      const data = (await res.json()) as { file: string, name: string, lr: number, weight_decay: string}[] 
       return {
         models: data,
       };
@@ -40,8 +40,7 @@ export function ReportPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-center text-gray-800">Report</h1>
-      {API_BASE_URL}
+      <h1 className="text-2xl font-bold text-center text-gray-800">Report- STL-10 (<a target="_blank" className=" text-blue-500" href="https://github.com/1shaked/year_3/tree/main/DL/ex3">github</a>)</h1>
       <div>
         {get_models.isLoading ? (
           <div className="flex justify-center items-center">
@@ -54,7 +53,7 @@ export function ReportPage() {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {get_models?.data?.models.map((model) => (
               <div key={model.name}>
                 <div
@@ -117,7 +116,7 @@ interface DisplayModelProps {
   model: {
     name: string;
     lr: number;
-    weight_decay: number;
+    weight_decay: string;
     file: string;
   };
 }
@@ -151,7 +150,7 @@ export function DisplayModel(props: DisplayModelProps) {
           <h3 className="text-lg font-bold text-gray-800">
             {props.model.name} - Losses
           </h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <Plot
               data={[
                 {
@@ -177,7 +176,7 @@ export function DisplayModel(props: DisplayModelProps) {
                 },
               ]}
               layout={{
-                width: 400,
+                width: 350,
                 height: 400,
                 title: { text: "Losses" },
                 legend: {
@@ -213,8 +212,8 @@ export function DisplayModel(props: DisplayModelProps) {
                 },
               ]}
               layout={{
-                width: 460,
-                height: 460,
+                width: 350,
+                height: 400,
                 title: { text: "Accuracies" },
                 legend: {
                   x: 1,
