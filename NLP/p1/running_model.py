@@ -72,7 +72,12 @@ def train_model(model , batch_size=50):
         tokenizer=tokenizer,
     )
     trainer.train()
+    trainer.save_model(f"./output/{model}")
     print("Training completed!")
+    results = trainer.evaluate()
+    # save the evaluation results
+    df = pd.DataFrame([results])
+    df.to_csv(f"./eval/{model}.csv", index=False)
 
 
 if __name__ == "__main__":

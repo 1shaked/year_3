@@ -1,6 +1,6 @@
 # %%
 from transformers import pipeline
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import numpy as np
 import pandas as pd
@@ -15,7 +15,6 @@ else:
 # Check if MPS is available
 device = 0 if torch.backends.mps.is_available() else -1
 print(f"Using device: {'MPS' if device == 0 else 'CPU'}")
-
 
 def prepData(tokenizer):
     train_comments, val_comments, test_comments, test_labels = load_and_process_comments(
@@ -38,6 +37,11 @@ def prepData(tokenizer):
 
 def trainModel(model: str, saved_model: str, evaluation_results: str):
     tokenizer = AutoTokenizer.from_pretrained(model)
+    model_new = AutoModelForSequenceClassification.from_pretrained(
+        model, 
+        num_labels=2  # Adjust `num_labels` based on your dataset (e.g., binary classification)
+    )
+    model_new.to(device)
     train_dataset, test_dataset = prepData(tokenizer)
 
     training_args = TrainingArguments(
@@ -55,13 +59,12 @@ def trainModel(model: str, saved_model: str, evaluation_results: str):
     )
 
     trainer = Trainer(
-        model=model,
+        model=model_new,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
         tokenizer=tokenizer,
     )
-
     trainer.train()
     trainer.save_model(f"{saved_model}.pt")
     # evaluate the model
