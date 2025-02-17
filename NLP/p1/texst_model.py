@@ -4,19 +4,36 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import numpy as np
 import pandas as pd
-from transformers import TrainingArguments, Trainer
+from transformers import TrainingArguments, Trainer, EvalPrediction
 from utils_classes import load_and_process_comments, CommentsDataset
+from datasets import load_metric
 
+# Load accuracy metric from Hugging Face
+accuracy_metric = load_metric("accuracy")
+
+def compute_metrics(eval_pred: EvalPrediction):
+    """
+    Compute accuracy for evaluation.
+    
+    Args:
+        eval_pred (EvalPrediction): Predictions from the model.
+
+    Returns:
+        dict: Dictionary containing accuracy.
+    """
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)  # Convert logits to predicted class
+    return accuracy_metric.compute(predictions=predictions, references=labels)
 if torch.backends.mps.is_available():
     device = torch.device("mps")  # Use MPS (Metal GPU)
 else:
     device = torch.device("cpu")  # Fallback to CPU
 
 # Check if MPS is available
-device = 0 if torch.backends.mps.is_available() else -1
-print(f"Using device: {'MPS' if device == 0 else 'CPU'}")
+# device = 0 if torch.backends.mps.is_available() else -1
+print(f"Using device: {device}")
 
-def prepData(tokenizer):
+def prep_data(tokenizer):
     train_comments, val_comments, test_comments, test_labels = load_and_process_comments(
         train_path='train',
         batch_size=50,
@@ -35,14 +52,14 @@ def prepData(tokenizer):
     test_dataset = CommentsDataset(test_encodings, test_labels)
     return train_dataset, test_dataset
 
-def trainModel(model: str, saved_model: str, evaluation_results: str):
+def train_model(model: str, saved_model: str, evaluation_results: str):
     tokenizer = AutoTokenizer.from_pretrained(model)
     model_new = AutoModelForSequenceClassification.from_pretrained(
         model, 
         num_labels=2  # Adjust `num_labels` based on your dataset (e.g., binary classification)
     )
     model_new.to(device)
-    train_dataset, test_dataset = prepData(tokenizer)
+    train_dataset, test_dataset = prep_data(tokenizer)
 
     training_args = TrainingArguments(
         output_dir="./results",          # Directory to save the model
@@ -64,6 +81,7 @@ def trainModel(model: str, saved_model: str, evaluation_results: str):
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
         tokenizer=tokenizer,
+        compute_metrics=compute_metrics,
     )
     trainer.train()
     trainer.save_model(f"{saved_model}.pt")
@@ -72,3 +90,41 @@ def trainModel(model: str, saved_model: str, evaluation_results: str):
     # save the evaluation results
     df = pd.DataFrame([results])
     df.to_csv(f"{evaluation_results}.csv", index=False)
+
+def load_model_from_checkpoint(checkpoint_path: str):
+    """
+    Loads a trained model and tokenizer from a specific checkpoint.
+
+    Args:
+        checkpoint_path (str): Path to the checkpoint directory.
+
+    Returns:
+        model (torch.nn.Module): Loaded model ready for inference.
+        tokenizer (AutoTokenizer): Tokenizer associated with the model.
+    """
+    print(f"Loading model from checkpoint: {checkpoint_path}")
+
+    # Load model
+    model = AutoModelForSequenceClassification.from_pretrained(checkpoint_path)
+    model.to(device)  # Move to GPU if available
+
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint_path)
+
+    return model, tokenizer
+
+def eval_model(path: str, evaluation_results: str):
+    model, tokenizer = load_model_from_checkpoint(path)
+    _, test_dataset = prep_data(tokenizer)
+    trainer = Trainer(
+        model=model,
+        tokenizer=tokenizer,
+        compute_metrics=compute_metrics,
+    )
+    results = trainer.evaluate(test_dataset)
+    # Save results to CSV
+    df = pd.DataFrame([results])
+    df.to_csv(f"{evaluation_results}.csv", index=False)
+
+
+eval_model('./output/distilbert-base-uncased/checkpoint-5625', './results/evaluation_results_distilbert-base-uncased')
