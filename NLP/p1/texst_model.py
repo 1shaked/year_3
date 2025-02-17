@@ -1,5 +1,3 @@
-# %%
-from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import numpy as np
@@ -7,6 +5,22 @@ import pandas as pd
 from transformers import TrainingArguments, Trainer, EvalPrediction
 from utils_classes import load_and_process_comments, CommentsDataset
 from datasets import load_metric
+from transformers import AutoTokenizer
+import torch.nn.utils.prune as prune
+from onnxruntime.quantization import quantize_dynamic, QuantType
+import onnx
+
+if torch.backends.mps.is_available():
+    device = torch.device("mps")  # Use MPS (Metal GPU)
+elif torch.backends.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")  # Fallback to CPU
+
+# Check if MPS is available
+# device = 0 if torch.backends.mps.is_available() else -1
+print(f"Using device: {device}")
+
 
 # Load accuracy metric from Hugging Face
 accuracy_metric = load_metric("accuracy")
@@ -24,14 +38,7 @@ def compute_metrics(eval_pred: EvalPrediction):
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)  # Convert logits to predicted class
     return accuracy_metric.compute(predictions=predictions, references=labels)
-if torch.backends.mps.is_available():
-    device = torch.device("mps")  # Use MPS (Metal GPU)
-else:
-    device = torch.device("cpu")  # Fallback to CPU
 
-# Check if MPS is available
-# device = 0 if torch.backends.mps.is_available() else -1
-print(f"Using device: {device}")
 
 def prep_data(tokenizer):
     train_comments, val_comments, test_comments, test_labels = load_and_process_comments(
@@ -127,4 +134,89 @@ def eval_model(path: str, evaluation_results: str):
     df.to_csv(f"{evaluation_results}.csv", index=False)
 
 
-eval_model('./output/distilbert-base-uncased/checkpoint-5625', './results/evaluation_results_distilbert-base-uncased')
+def to_onnx_model(path_from: str, onnx_path: str, quantized_onnx_path: str = None):
+    """
+    Converts a trained Hugging Face model checkpoint to ONNX format using a batch of inputs.
+
+    Args:
+        path_from (str): Path to the checkpoint directory.
+        onnx_path (str): Path where the ONNX model should be saved.
+    """
+    # Load model and tokenizer from checkpoint
+    model = AutoModelForSequenceClassification.from_pretrained(path_from)
+    tokenizer = AutoTokenizer.from_pretrained(path_from)
+
+    if torch.cuda.is_available():
+        model.to("cuda")
+    else:
+        # Move model to CPU, because mac doesn't support ONNX with MPS
+        model.to("cpu")
+    model.eval()  # Set the model to evaluation mode
+
+    # Prepare data
+    train_dataset, _ = prep_data(tokenizer)
+    # increase it if you can
+    batch_size = 50
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=False)
+    batch = next(iter(train_loader))
+
+    # Extract input_ids and attention_mask
+    input_ids = batch['input_ids']
+    attention_mask = batch['attention_mask']
+    # prune the model
+    apply_pruning(model, amount=0.15)
+    # Export the model to ONNX
+    torch.onnx.export(
+        model,  # Model being run
+        (input_ids, attention_mask),  # Model inputs as a tuple
+        onnx_path,  # Where to save the model
+        export_params=True,  # Store the trained parameter weights inside the model file
+        opset_version=14,  # ONNX version to export the model to
+        do_constant_folding=True,  # Whether to execute constant folding for optimization
+        input_names=["input_ids", "attention_mask"],  # The model's input names
+        output_names=["output"],  # The model's output name
+        dynamic_axes={
+            "input_ids": {0: "batch_size"},  # Variable length axes
+            "attention_mask": {0: "batch_size"},
+            "output": {0: "batch_size"},
+        },
+    )
+    print(f"✅ Model successfully exported to ONNX format at: {onnx_path}")
+
+    # Load the ONNX model
+    onnx_model = onnx.load(onnx_path)
+
+    # Apply dynamic quantization to the ONNX model
+    quantize_dynamic(
+        model_input=onnx_model,
+        model_output=quantized_onnx_path,
+        weight_type=QuantType.QInt8,
+    )
+    print(f"✅ Quantized ONNX model saved at: {quantized_onnx_path}")
+
+def apply_pruning(model, amount=0.2):
+    """
+    Apply global unstructured pruning to the model.
+
+    Args:
+        model (nn.Module): The neural network model to be pruned.
+        amount (float): The proportion of connections to prune (0 < amount < 1).
+    """
+    parameters_to_prune = []
+    for name, module in model.named_modules():
+        if isinstance(module, torch.nn.Linear):
+            parameters_to_prune.append((module, 'weight'))
+
+    # Apply global pruning
+    prune.global_unstructured(
+        parameters_to_prune,
+        pruning_method=prune.L1Unstructured,
+        amount=amount,
+    )
+
+    # Remove pruning reparameterization to maintain sparsity
+    for module, _ in parameters_to_prune:
+        prune.remove(module, 'weight')
+
+# eval_model('./output/distilbert-base-uncased/checkpoint-5625', './results/evaluation_results_distilbert-base-uncased')
+to_onnx_model('./output/distilbert-base-uncased/checkpoint-5625', './results/distilbert-base-uncased.onnx')
