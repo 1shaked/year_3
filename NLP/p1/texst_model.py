@@ -9,6 +9,8 @@ from transformers import AutoTokenizer
 import torch.nn.utils.prune as prune
 from onnxruntime.quantization import quantize_dynamic, QuantType
 import onnx
+import onnxruntime as ort
+from sklearn.metrics import accuracy_score
 
 if torch.backends.mps.is_available():
     device = torch.device("mps")  # Use MPS (Metal GPU)
@@ -132,6 +134,63 @@ def eval_model(path: str, evaluation_results: str):
     # Save results to CSV
     df = pd.DataFrame([results])
     df.to_csv(f"{evaluation_results}.csv", index=False)
+
+def eval_onnx_model(onnx_path: str, evaluation_results: str):
+    """
+    Evaluates an ONNX model's performance on a test dataset.
+
+    Args:
+        onnx_path (str): Path to the ONNX model file.
+        evaluation_results (str): Path to save the evaluation results CSV.
+    """
+    # Load the ONNX model
+    onnx_model = onnx.load(onnx_path)
+    onnx.checker.check_model(onnx_model)
+
+    # Initialize ONNX Runtime session
+    ort_session = ort.InferenceSession(onnx_path)
+
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+
+    # Prepare test data
+    _, test_dataset = prep_data(tokenizer)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=16, shuffle=False)
+
+    all_labels = []
+    all_predictions = []
+
+    # Iterate over the test data
+    for batch in test_loader:
+        input_ids = batch['input_ids'].numpy()
+        attention_mask = batch['attention_mask'].numpy()
+        labels = batch['labels'].numpy()
+
+        # Run inference
+        ort_inputs = {
+            'input_ids': input_ids,
+            'attention_mask': attention_mask
+        }
+        ort_outs = ort_session.run(None, ort_inputs)
+        logits = ort_outs[0]
+
+        # Get predictions
+        predictions = np.argmax(logits, axis=1)
+
+        all_labels.extend(labels)
+        all_predictions.extend(predictions)
+
+    # Compute accuracy
+    accuracy = accuracy_score(all_labels, all_predictions)
+
+    # Save results to CSV
+    results = {'accuracy': [accuracy]}
+    df = pd.DataFrame(results)
+    df.to_csv(evaluation_results, index=False)
+
+    print(f"Model evaluation completed. Accuracy: {accuracy:.4f}")
+    print(f"Results saved to {evaluation_results}")
+
 
 
 def to_onnx_model(path_from: str, onnx_path: str, quantized_onnx_path: str = None):
