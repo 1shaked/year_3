@@ -1,0 +1,4 @@
+eval_loss,eval_model_preparation_time,eval_accuracy,eval_runtime,eval_samples_per_second,eval_steps_per_second,model_memorry_footprint,num_parameters,model,short_name
+0.2591409683227539,0.003,0.9061333333333333,1325.6188,5.658,0.708,95504384,23874048,google-bert/bert-base-uncased,bert-base
+0.14825718104839325,0.003,0.9464,1151.3657,6.514,0.815,156157984,39037440,FacebookAI/roberta-base,facebook-roberta
+0.23282146453857422,0.0013,0.9182666666666667,590.5606,12.7,1.588,95420416,23854080,distilbert-base-uncased,distilbert
