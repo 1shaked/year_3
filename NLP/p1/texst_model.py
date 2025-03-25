@@ -277,5 +277,6 @@ def apply_pruning(model, amount=0.2):
     for module, _ in parameters_to_prune:
         prune.remove(module, 'weight')
 
+
 # eval_model('./output/distilbert-base-uncased/checkpoint-5625', './results/evaluation_results_distilbert-base-uncased')
-to_onnx_model('./output/distilbert-base-uncased/checkpoint-5625', './results/distilbert-base-uncased.onnx')
+# to_onnx_model('./output/distilbert-base-uncased/checkpoint-5625', './results/distilbert-base-uncased.onnx')
