@@ -13,9 +13,16 @@ def test_deepseek_model():
         batch_size=50,
     )
     answers = []
+    # test current results
+    with open('deepseek_answers.json', 'r') as f:
+        current_answers = js.load(f)
+        len_current = len(current_answers)
     for index, batch in enumerate(test_comments):
         comments ,labels = batch
         for inner_index, comment in enumerate(comments):
+            if len_current > 0:
+                len_current -= 1
+                continue
             answer = query_deepseek(f'''for the following movie review, tell in (0=negative, 1=positive) sentiment:
                 {comment}
 
@@ -24,7 +31,7 @@ def test_deepseek_model():
             answers.append([answer, actual_answer])
             # save the answer
             with open('deepseek_answers.json', 'w') as f:
-                f.write(js.dumps(answers))
+                f.write(js.dumps([*current_answers, *answers]))
         print(f"Batch {index} done")
     print(f"Accuracy: {sum(answers) / len(answers)}")
 
