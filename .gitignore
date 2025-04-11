@@ -22,3 +22,5 @@ OrgBehavior/e3/audio_compression_results.csv
 # *.docx
 NLP/p1/results/*
 NLP/p1/output/*
+design/SpotifyFeatures.csv
+process mining/ClicksData/BPI2016_Clicks_NOT_Logged_In.csv
