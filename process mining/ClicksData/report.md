@@ -5,6 +5,10 @@
 ### **Dataset Overview**
 - **Source**: [BPI Challenge 2016 (Clicks not logged in)](https://data.4tu.nl/articles/_/12708596/1)
 - **Submitting By**: Shaked Chen
+
+### **Dataset Description**
+This dataset contains web log data from the website of the Dutch public employment service (UWV). The data is collected from users who are not logged in. The dataset includes information about user interactions with the website, such as clicks and page views, along with metadata like timestamps and referrer URLs.
+The site is used by job seekers and employers to find job opportunities and post job vacancies. The data is anonymized to protect user privacy.
 ### 🧾 **Column Explanations**
 
 1. **SessionID**  
