@@ -3,5 +3,11 @@
         "anova",
         "pvalue",
         "tukey"
+    ],
+    "github.copilot.chat.commitMessageGeneration.instructions.instructions": [
+        "Generate a commit message that describes the changes made in the code. The message should be concise and informative, following conventional commit guidelines.",
+        "describes in short manner the changes in each file",
+        "If the change can not be read, beacuse of a file type like word, pdf, etc., then just write 'file changed'",
+        "Try to add emojis to the commit message to make it more engaging and visually appealing.",
     ]
 }
