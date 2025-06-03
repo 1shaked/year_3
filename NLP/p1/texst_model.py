@@ -1,11 +1,10 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer, EvalPrediction
 import torch
 import numpy as np
 import pandas as pd
-from transformers import TrainingArguments, Trainer, EvalPrediction
+# Removed redundant import, consolidated into a single line above
 from utils_classes import load_and_process_comments, CommentsDataset
 from datasets import load_metric
-from transformers import AutoTokenizer
 import torch.nn.utils.prune as prune
 from onnxruntime.quantization import quantize_dynamic, QuantType
 import onnx
@@ -277,6 +276,6 @@ def apply_pruning(model, amount=0.2):
     for module, _ in parameters_to_prune:
         prune.remove(module, 'weight')
 
-
+# This was is the is best text with spellinng mistakes
 # eval_model('./output/distilbert-base-uncased/checkpoint-5625', './results/evaluation_results_distilbert-base-uncased')
 # to_onnx_model('./output/distilbert-base-uncased/checkpoint-5625', './results/distilbert-base-uncased.onnx')
