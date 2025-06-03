@@ -83,6 +83,9 @@ function Quiz({ questions }: QuizProps) {
         <div style={{ fontSize: '1.2rem', marginBottom: 16, color: '#111' }}>
           Grade: <b>{grade}</b>
         </div>
+        <button onClick={() => window.location.reload()} style={{ marginBottom: 24, background: '#007bff', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 24px', fontSize: '1rem', cursor: 'pointer' }}>
+          Reset Test
+        </button>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {questions.map((q, idx) => {
             const userAnswer = answers[idx]
@@ -189,7 +192,7 @@ function Quiz({ questions }: QuizProps) {
 
 function QuizLoader({ questionCount }: { questionCount: number }) {
   const fetchQuestions = async (count: number): Promise<QuizQuestion[]> => {
-    const res = await fetch(`http://127.0.0.1:8000/api/questions?num_questions=${count}`)
+    const res = await fetch(`/api/questions?num_questions=${count}`)
     if (!res.ok) throw new Error('Failed to fetch questions')
     return res.json()
   }
