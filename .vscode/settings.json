@@ -9,5 +9,24 @@
         "describes in short manner the changes in each file",
         "If the change can not be read, beacuse of a file type like word, pdf, etc., then just write 'file changed'",
         "Try to add emojis to the commit message to make it more engaging and visually appealing.",
-    ]
+    ],
+    "github.copilot.chat.codeGeneration.instructions": [
+        { 
+            "text": "When explaing the code, try to be short and concise, focusing on the main functionality and purpose of the code.",
+        }
+    ], 
+    "github.copilot.chat.reviewSelection.instructions": [
+        {
+            "text": "When reviewing code, focus on the main functionality and purpose of the code. Provide constructive feedback and suggestions for improvement.",
+            "suggestions": [
+                "Check for edge cases and potential bugs.",
+                "Ensure code follows best practices and style guidelines.",
+                "Don't allow any spelling mistakes.",
+                "Consider performance implications of the code."
+            ]
+        },
+        {
+            "text": "if the file length exceeds 150 lines, don't allow it."
+        },
+    ],
 }
