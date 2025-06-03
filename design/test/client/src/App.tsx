@@ -32,7 +32,9 @@ function QuestionCountForm({ onSubmit }: { onSubmit: (count: number) => void }) 
           style={{ marginLeft: 8, fontSize: '1.5rem', width: 80, padding: '0.5rem' }}
         />
       </label>
-      <button type="submit" style={{ marginLeft: 12, fontSize: '1.1rem', padding: '0.5rem 1.2rem' }}>Start</button>
+      <div style={{ display: 'grid', justifyItems: 'center', marginTop: 16 }}>
+        <button type="submit" style={{ marginLeft: 12, fontSize: '2rem', padding: '0.5rem 1.2rem', color: 'green',  }}>Start</button>
+      </div>
       {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
     </form>
   )
