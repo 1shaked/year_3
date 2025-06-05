@@ -4,11 +4,15 @@
         "pvalue",
         "tukey"
     ],
-    "github.copilot.chat.commitMessageGeneration.instructions.instructions": [
-        "Generate a commit message that describes the changes made in the code. The message should be concise and informative, following conventional commit guidelines.",
-        "describes in short manner the changes in each file",
-        "If the change can not be read, beacuse of a file type like word, pdf, etc., then just write 'file changed'",
-        "Try to add emojis to the commit message to make it more engaging and visually appealing.",
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        {
+            "text": "When generating commit messages, focus on the main changes made in the code. Be concise and clear. Also include the type of change (e.g., 'fix', 'feat', 'docs', etc.), the affected files or components, and emojis to enhance readability.",
+            "suggestions": [
+                "Use imperative mood (e.g., 'Fix bug' instead of 'Fixed bug').",
+                "Keep it under 150 characters for the summary line.",
+                "If necessary, provide additional context in the body of the message."
+            ]
+        }
     ],
     "github.copilot.chat.codeGeneration.instructions": [
         { 
