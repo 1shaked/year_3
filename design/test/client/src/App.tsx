@@ -207,7 +207,7 @@ function Quiz({ questions }: QuizProps) {
 
 function QuizLoader({ questionCount }: { questionCount: number }) {
   const fetchQuestions = async (count: number): Promise<QuizQuestion[]> => {
-    const res = await fetch(`/api/questions?num_questions=${count}`)
+    const res = await fetch(`https://design-test-helper.onrender.com/api/questions?num_questions=${count}`)
     if (!res.ok) throw new Error('Failed to fetch questions')
     return res.json()
   }
