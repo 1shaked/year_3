@@ -22,15 +22,28 @@ STATION_PROCESS_TIME = {
     2: (3, 6),  # Station 2 min/max
     3: (4, 8),  # Station 3 min/max
 }
+PRODUCT_ID_X = 'x'
+PRODUCT_ID_Y = 'y'
+PRODUCT_ID_Z = 'z'
+PRODUCT_ID_FIRST = 1  # Product type 1
+PRODUCT_ID_SECOND = 2  # Product type 2
 PRODUCT_VOLUME = {
-    1: 1.0,
-    2: 1.5,
+    PRODUCT_ID_FIRST: 1.0,
+    PRODUCT_ID_SECOND: 1.5,
+    PRODUCT_ID_X: 2.0,  # Product x has a different volume
+    PRODUCT_ID_Y: 1.2,  # Product y has a different volume
+    PRODUCT_ID_Z: 1.8,  # Product z has a different volume
 }
 
-CUSTOMER_PROBABILITY_TO_ORDER = 0.2  # 20% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
+CUSTOMER_PROBABILITY_TO_ORDER = 0.6  # 60% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
 
 CUSTOMER_MIN_ORDER_QUANTITY = 3
 CUSTOMER_MAX_ORDER_QUANTITY = 10
+STATUS_WAITING = "waiting"
+STATUS_PROCESSING = "processing"
+STATUS_COMPLETED = "completed"
+
+# MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
 # =====================
 
 class SimulationManager:
@@ -64,29 +77,63 @@ class SimulationManager:
         self.stations = [station_one, station_two, station_three]
         # initialize the products types 
         product_one = ProductType(
-            product_id=1,
+            product_id=PRODUCT_ID_FIRST,
             processing_time_distributions={
                 1: random.uniform(*STATION_PROCESS_TIME[1]),  # Station 1
                 2: random.uniform(*STATION_PROCESS_TIME[2]),  # Station 2
                 3: random.uniform(*STATION_PROCESS_TIME[3])   # Station 3
             },
-            volume_per_unit=PRODUCT_VOLUME[1]
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_FIRST]
         )
         product_two = ProductType(
-            product_id=2,
+            product_id=PRODUCT_ID_SECOND,
             processing_time_distributions={
                 1: random.uniform(*STATION_PROCESS_TIME[1]),  # Station 1
                 2: random.uniform(*STATION_PROCESS_TIME[2]),  # Station 2
                 3: random.uniform(4, 10)   # Station 3 (custom for product 2)
             },
-            volume_per_unit=PRODUCT_VOLUME[2]
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_SECOND]
+        )
+
+        product_x = ProductType(
+            product_id=PRODUCT_ID_X,
+            processing_time_distributions={
+                1: random.uniform(*STATION_PROCESS_TIME[1]),  # Station 1
+                2: 0,  # Station 2
+                3: 0   # Station 3 (custom for product x)
+            },
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_X]
+        )
+        product_y = ProductType(
+            product_id=PRODUCT_ID_Y,
+            processing_time_distributions={
+                1: 0,  # Station 1
+                2: random.uniform(*STATION_PROCESS_TIME[2]),  # Station 2
+                3: 0   # Station 3 (custom for product y)
+            },
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Y]
+        )
+        product_z = ProductType(
+            product_id=PRODUCT_ID_Z,
+            processing_time_distributions={
+                1: 0,  # Station 1
+                2: 0,  # Station 2
+                3: random.uniform(*STATION_PROCESS_TIME[3])   # Station 3 (custom for product z)
+            },
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Z]
         )
         for i in range(SIMULATION_DAYS):
             # start by simulation for each day
             # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order of each product type
             self.init_customer_order_for_day(product_one, product_two)
-                
+            # print all the orders for the day
+            print(f"Day {i + 1} Orders:")
+            for customer in self.customers:
+                for order in customer.orders:
+                    print(f"Customer {customer.customer_id} ordered {order.quantity} of Product {order.product_type.product_id} (Order ID: {order.order_id})")
             
+
+            break
         
 
     def init_customer_order_for_day(self, product_one, product_two) -> None:
@@ -95,11 +142,13 @@ class SimulationManager:
         """
         for customer in self.customers:
             # to choose whether to order the first item
-            if random.random() < CUSTOMER_PROBABILITY_TO_ORDER:
+            v1 = random.random()
+            if v1 < CUSTOMER_PROBABILITY_TO_ORDER:
                 quantity = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
                 customer.place_order(product_one, quantity)
             # to choose whether to order the second item
-            if random.random() < CUSTOMER_PROBABILITY_TO_ORDER:
+            v2 = random.random()
+            if v2 < CUSTOMER_PROBABILITY_TO_ORDER:
                 quantity = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
                 customer.place_order(product_two, quantity)
 
@@ -115,7 +164,7 @@ class ProductType:
     """
     Represents a type of product with processing time distributions and volume per unit.
     """
-    def __init__(self, product_id: int, processing_time_distributions: Dict[int, Any], volume_per_unit: float):
+    def __init__(self, product_id: int | str, processing_time_distributions: Dict[int, Any], volume_per_unit: float):
         self.product_id = product_id
         self.processing_time_distributions = processing_time_distributions  # station_id -> distribution
         self.volume_per_unit = volume_per_unit
@@ -143,11 +192,11 @@ class ProductInstance:
     """
     Represents an instance of a product in the system.
     """
-    def __init__(self, product_type: ProductType, order_id: int, current_station_index: int = 0, status: str = "waiting"):
+    def __init__(self, product_type: ProductType, order_id: int | None, current_station_index: int = 0, status: str = STATUS_WAITING, amount: int = 1):
         self.product_type = product_type
         self.order_id = order_id
-        self.current_station_index = current_station_index
         self.status = status
+        self.amount = amount
 
     def advance_to_next_station(self):
         """Advance this product to the next station in its route."""
@@ -165,11 +214,14 @@ class Customer:
 
     def place_order(self, product_type: ProductType, quantity: int):
         """Place a new order for a product type."""
-        pass
+        order_id = len(self.orders) + 1  # Simple ID generation
+        due_time = self.max_lead_time  # Assuming due time is the max lead time for simplicity
+        order = Order(order_id, self, product_type, quantity, due_time)
+        self.orders.append(order)
 
     def is_order_late(self, order: 'Order', current_time: float) -> bool:
         """Check if an order is late."""
-        pass
+        return current_time > order.due_time
 
 class Order:
     """
@@ -216,23 +268,51 @@ class Inventory:
     Manages inventory, storage capacity, and holding costs.
     """
     def __init__(self, capacity_limit: float, holding_cost_per_unit: float):
-        self.stock: Dict[ProductType, int] = {}
-        self.volume_per_product: Dict[ProductType, float] = {}
+        # self.stock: Dict[ProductType, int] = { # THIS NEED TO BE CHANGE TO BE RANDOM GENERATED
+        #     PRODUCT_ID_FIRST: 0,  # Base inventory for product type 1
+        #     PRODUCT_ID_SECOND: 0,  # Base inventory for product type 2
+        #     PRODUCT_ID_X: 0,  # Base inventory for product x
+        #     PRODUCT_ID_Y: 0,  # Base inventory for product y
+        #     PRODUCT_ID_Z: 0   # Base inventory for product z
+        # }
+        self.items: List[ProductInstance] = []  # List of product instances in inventory
         self.total_volume = 0.0
         self.capacity_limit = capacity_limit
         self.holding_cost_per_unit = holding_cost_per_unit
 
+    def set_random_inventory(self, items: List[ProductInstance]):
+
+        self.items = items
+
+        self.calculate_total_volume()
+
+    def calculate_total_volume(self) -> float:
+        """Calculate the total volume of products in stock."""
+        total_volume = 0.0
+        for item in self.items:
+            total_volume += item.product_type.volume_per_unit * item.amount
+        self.total_volume = total_volume
+        if self.total_volume > self.capacity_limit:
+            raise ValueError("Total volume exceeds inventory capacity limit.")
+        return self.total_volume
+
     def add(self, product_instance: ProductInstance):
         """Add a product instance to inventory."""
-        pass
+        if not self.can_store(product_instance):
+            raise ValueError("Not enough space in inventory.")
+        self.items.append(product_instance)
+        self.calculate_total_volume()
 
     def remove(self, product_type: ProductType, quantity: int):
         """Remove a quantity of a product type from inventory."""
-        pass
+        pass  # Implement logic to remove product instances
 
     def can_store(self, product_instance: ProductInstance) -> bool:
         """Check if there is enough space to store the product instance."""
-        pass
+        product_volume = product_instance.product_type.volume_per_unit
+        if self.total_volume + product_volume > self.capacity_limit:
+            return False
+        return True
 
     def calculate_holding_cost(self, current_time: float) -> float:
         """Calculate the holding cost at the current time."""

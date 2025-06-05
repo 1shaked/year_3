@@ -14,4 +14,5 @@ from main import (
 # ...existing code...
 
 if __name__ == "__main__":
-    pass
+    sim = SimulationManager()
+    sim.initialize_entities()
