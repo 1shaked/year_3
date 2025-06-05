@@ -99,6 +99,13 @@ class SimulationManager:
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
 
+        self.producing_by_demand_only()
+
+    def producing_by_demand_only(self) -> None:
+        """
+        Produce products only based on the demand calculated from customer orders.
+        This method will be called after initializing the customers and their orders.
+        """
         for i in range(SIMULATION_DAYS):
             # start by simulation for each day
             # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order for each product type
@@ -109,9 +116,19 @@ class SimulationManager:
             stock_two = self.inventory.get_product_instances_by_type(self.product_two)
             demand_one = self.demand_for_product(self.product_one)
             demand_two = self.demand_for_product(self.product_two)
-            
+            # calculate how much product are needed to produce
+            needed_one = max(0, demand_one - stock_one)
+            needed_two = max(0, demand_two - stock_two)
+            # if there is demand order the needed amount from suppliers
+            if needed_one > 0:
+                for supplier in self.suppliers:
+                    # Place an order with the supplier for product one
+                    supplier.place_order(self.product_one, needed_one) 
+            if needed_two > 0:
+                for supplier in self.suppliers:
+                    # Place an order with the supplier for product two
+                    supplier.place_order(self.product_two, needed_two)
             break
-        
     def demand_for_product(self, product_type: ProductType) -> int:
         """
         Calculate the total demand for a specific product type based on customer orders.
