@@ -164,12 +164,19 @@ class SimulationManager:
             cheapest_supplier = self.find_cheapest_supplier(needed_ingredients)
             cheapest_supplier.place_order(needed_ingredients, self.time)
             # order the customers orders by the due date
-            orders = []
+            order_closest = None
+            client_closest = None
             for customer in self.customers:
-                for order in customer.orders:
-                    order.due_time
-                    
-
+                order = customer.get_closest_order()
+                if order:
+                    if not order_closest or order.due_time < order_closest.due_time:
+                        order_closest = order
+                        client_closest = customer
+            # check that we have enough ingredients to fulfill the closest order
+            if order_closest:
+                if not self.has_sufficient_ingredients(needed_ingredients):
+                    print(f"Insufficient ingredients to fulfill order {order_closest.order_id}.")
+                    continue
 
     def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]]) -> Supplier:
         """

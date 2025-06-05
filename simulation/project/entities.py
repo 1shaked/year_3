@@ -1,3 +1,4 @@
+import math
 from typing import Dict, List, Any, Optional, Tuple
 import random
 
@@ -69,7 +70,7 @@ class ProductInstance:
     """
     Represents an instance of a product in the system.
     """
-    def __init__(self, product_type: ProductType, order_id: int | None, current_station_index: int = 0, status: str = "waiting", amount: int = 1):
+    def __init__(self, product_type: ProductType, order_id: int | None, status: str = "waiting", amount: int = 1):
         self.product_type = product_type
         self.order_id = order_id
         self.status = status
@@ -78,6 +79,19 @@ class ProductInstance:
     def advance_to_next_station(self):
         """Advance this product to the next station in its route."""
         pass
+class Order:
+    """
+    Represents an order placed by a customer.
+    """
+    def __init__(self, order_id: int, products: List[Tuple[ProductType, int]], due_time: float, is_fulfilled: bool = False):
+        self.order_id = order_id
+        self.products = products
+        self.due_time = due_time
+        self.is_fulfilled = is_fulfilled
+
+    def mark_fulfilled(self):
+        """Mark the order as fulfilled."""
+        self.is_fulfilled = True
 
 class Customer:
     """
@@ -99,18 +113,15 @@ class Customer:
     def is_order_late(self, order: 'Order', current_time: float) -> bool:
         """Check if an order is late."""
         return current_time > order.due_time
+    
+    def get_closest_order(self) -> Order | None: 
+        """Get the closest order that is not yet fulfilled."""
+        due_date = math.inf
+        closest_order = None
+        for order in self.orders:
+            if not order.is_fulfilled:
+                if order.due_time < due_date:
+                    due_date = order.due_time
+                    closest_order = order
+        return closest_order
 
-class Order:
-    """
-    Represents an order placed by a customer.
-    """
-    def __init__(self, order_id: int, customer: Customer, products: List[Tuple[ProductType, int]], due_time: float, is_fulfilled: bool = False):
-        self.order_id = order_id
-        self.customer = customer
-        self.products = products
-        self.due_time = due_time
-        self.is_fulfilled = is_fulfilled
-
-    def mark_fulfilled(self):
-        """Mark the order as fulfilled."""
-        self.is_fulfilled = True
