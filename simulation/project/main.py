@@ -119,16 +119,7 @@ class SimulationManager:
             # calculate how much product are needed to produce
             needed_one = max(0, demand_one - stock_one)
             needed_two = max(0, demand_two - stock_two)
-            # if there is demand order the needed amount from suppliers
-            if needed_one > 0:
-                for supplier in self.suppliers:
-                    # Place an order with the supplier for product one
-                    supplier.place_order(self.product_one, needed_one) 
-            if needed_two > 0:
-                for supplier in self.suppliers:
-                    # Place an order with the supplier for product two
-                    supplier.place_order(self.product_two, needed_two)
-            break
+            
     def demand_for_product(self, product_type: ProductType) -> int:
         """
         Calculate the total demand for a specific product type based on customer orders.
