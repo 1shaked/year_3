@@ -1,9 +1,8 @@
 import math
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 import random
 from itertools import combinations
-from .entities import ProductType, Supplier, Station, ProductInstance, Customer, Order
-
+from entities import ProductType, Supplier, Station, ProductInstance, Customer
 # =====================
 # Simulation Constants
 # =====================
@@ -126,12 +125,12 @@ class SimulationManager:
 
     def initialize_entities(self):
         """Initialize all simulation entities (stations, products, etc.)."""
+        # initialize the products types
+        self.setup_products()
         self.setup_suppliers()
         self.setup_customers()
         self.simulation_days = SIMULATION_DAYS
         self.setup_stations()
-        # initialize the products types
-        self.setup_products()
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
 
@@ -155,15 +154,16 @@ class SimulationManager:
             # calculate how much product are needed to produce
             needed_one = max(0, demand_one - stock_one)
             needed_two = max(0, demand_two - stock_two)
+            ingredients = self.get_total_ingredients([(self.product_one , needed_one) , (self.product_two, needed_two)])
             # find the cheapest supplier for either the first or second product or both
-            cheapest_supplier = self.find_cheapest_supplier([self.product_one, self.product_two])
-            if cheapest_supplier:
-                if needed_one > 0:
-                    cheapest_supplier.place_order(self.product_one, needed_one)
-                if needed_two > 0:
-                    cheapest_supplier.place_order(self.product_two, needed_two)
+            # transform the ingredients into a list of product types and their quantities
+            
+            needed_ingredients = list(ingredients.items())
+            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients)
+            cheapest_supplier.place_order(needed_ingredients)
 
-    def find_cheapest_supplier(self, product_types: List[ProductType]) -> Supplier:
+
+    def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]]) -> Supplier:
         """
         Find the cheapest supplier for the given product types.
         """
@@ -173,12 +173,13 @@ class SimulationManager:
         cost = math.inf
         for supplier in self.suppliers:
             total_cost = 0
-            for product_type in product_types:
-                cost = supplier.sample_raw_material_cost(product_type)
-                total_cost += cost
+            for product_type, quantity in product_types:
+                cost_unit = supplier.sample_raw_material_cost(product_type)
+                total_cost += cost_unit * quantity
             if total_cost < cost:
                 cheapest_supplier = supplier
                 cost = total_cost
+            
         # TODO: check if we order from multiple suppliers
         
         return cheapest_supplier
@@ -203,7 +204,11 @@ class SimulationManager:
                 supplier_id=i,
                 lead_time=random.uniform(SUPPLIER_LEAD_TIME_MIN, SUPPLIER_LEAD_TIME_MAX),
                 fixed_order_cost=random.uniform(SUPPLIER_ORDER_COST_MIN, SUPPLIER_ORDER_COST_MAX),
-                raw_material_cost_distribution={}
+                raw_material_cost_distribution={
+                    self.product_x: random.uniform(0.5, 1.5),
+                    self.product_y: random.uniform(0.5, 1.5),
+                    self.product_z: random.uniform(0.5, 1.5)
+                }
             ) for i in range(num_suppliers)
         ]
 
@@ -318,3 +323,33 @@ class SimulationManager:
     def log_statistics(self):
         """Log or print simulation statistics."""
         pass
+
+
+    def product_ingredients(self, product_type: ProductType , quantity: int = 1) -> Dict[ProductType, int]:
+        """
+        Get the ingredients required for each product type.
+        Only for product_one and product_two, as they are the main products.
+        """
+        v = {
+            self.product_one: {(self.product_x, 1), (self.product_y, 1)},
+            self.product_two: {(self.product_x, 0.5), (self.product_y, 0.5), (self.product_z, 0.75)},
+        }.get(product_type, {})
+        ingredients = {}
+        for ingredient, amount in v:
+            if ingredient not in ingredients:
+                ingredients[ingredient] = 0
+            ingredients[ingredient] += amount * quantity
+        return ingredients
+
+    def get_total_ingredients(self, products: List[Tuple[ProductType, int]]) -> Dict[ProductType, int]:
+        """
+        Get the total ingredients required for a list of product instances.
+        """
+        total_ingredients = {}
+        for product, quantity in products:
+            ingredients = self.product_ingredients(product, quantity)
+            for ingredient, amount in ingredients.items():
+                if ingredient not in total_ingredients:
+                    total_ingredients[ingredient] = 0
+                total_ingredients[ingredient] += amount
+        return total_ingredients

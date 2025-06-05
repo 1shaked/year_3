@@ -31,12 +31,18 @@ class Supplier:
         """Sample the raw material cost for a product type."""
         dist = self.raw_material_cost_distribution.get(product_type)
         if dist:
-            return dist.sample()
+            return dist
         raise ValueError(f"No cost distribution for product type {product_type}")
 
-    def place_order(self, product_type: ProductType, quantity: int):
+    def place_order(self, product_types: List[tuple[ProductType, int]]):
         """Place an order for raw materials."""
-        pass
+        order_cost = self.fixed_order_cost
+
+        for product_type, quantity in product_types:
+            material_cost = self.sample_raw_material_cost(product_type)
+            order_cost += material_cost * quantity
+
+        return order_cost
 
     def deliver_materials(self, current_time: float):
         """Deliver materials at the given time."""
