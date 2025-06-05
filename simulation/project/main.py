@@ -42,7 +42,8 @@ CUSTOMER_MAX_ORDER_QUANTITY = 10
 STATUS_WAITING = "waiting"
 STATUS_PROCESSING = "processing"
 STATUS_COMPLETED = "completed"
-
+INVENTORY_CAPACITY_LIMIT = 100.0  # Example capacity limit for inventory
+HOLDING_COST_PER_UNIT = 1.0  # Example holding cost per unit
 # MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
 # =====================
 
@@ -75,22 +76,22 @@ class SimulationManager:
         station_two = Station(station_id=2)
         station_three = Station(station_id=3)
         self.stations = [station_one, station_two, station_three]
-        # initialize the products types 
+        # initialize the products types (product one and product two are the end product say they no need to be processed in all stations, product x, y and z are custom products that are processed only in one station)
         product_one = ProductType(
             product_id=PRODUCT_ID_FIRST,
             processing_time_distributions={
-                1: random.uniform(*STATION_PROCESS_TIME[1]),  # Station 1
-                2: random.uniform(*STATION_PROCESS_TIME[2]),  # Station 2
-                3: random.uniform(*STATION_PROCESS_TIME[3])   # Station 3
+                1: 0,  # Station 1
+                2: 0,  # Station 2
+                3: 0   # Station 3
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_FIRST]
         )
         product_two = ProductType(
             product_id=PRODUCT_ID_SECOND,
             processing_time_distributions={
-                1: random.uniform(*STATION_PROCESS_TIME[1]),  # Station 1
-                2: random.uniform(*STATION_PROCESS_TIME[2]),  # Station 2
-                3: random.uniform(4, 10)   # Station 3 (custom for product 2)
+                1: 0,  # Station 1
+                2: 0,  # Station 2
+                3: 0   # Station 3 (custom for product 2)
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_SECOND]
         )
@@ -122,6 +123,13 @@ class SimulationManager:
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Z]
         )
+
+        # create the base inventory for the products
+        self.inventory = Inventory(
+            capacity_limit=INVENTORY_CAPACITY_LIMIT,  
+            holding_cost_per_unit=HOLDING_COST_PER_UNIT 
+        )
+
         for i in range(SIMULATION_DAYS):
             # start by simulation for each day
             # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order of each product type
