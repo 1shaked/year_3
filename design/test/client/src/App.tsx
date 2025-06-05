@@ -78,12 +78,25 @@ function Quiz({ questions }: QuizProps) {
   if (current >= questions.length) {
     const correctCount = answers.filter((ans, idx) => ans === questions[idx].correct_index).length;
     const grade = ((correctCount / questions.length) * 100).toFixed(1);
+    let emoji = '';
+    const gradeNum = parseFloat(grade);
+    if (gradeNum >= 90) {
+      emoji = '🏆';
+    } else if (gradeNum >= 75) {
+      emoji = '😃';
+    } else if (gradeNum >= 60) {
+      emoji = '🙂';
+    } else if (gradeNum >= 40) {
+      emoji = '😐';
+    } else {
+      emoji = '😢';
+    }
     return (
       <div style={{ maxWidth: 700, margin: '2rem auto', background: '#f6f6f6', padding: 24, borderRadius: 12 }}>
         <h2 style={{ color: '#111' }}>Quiz Complete!</h2>
         <h3 style={{ color: '#111' }}>Report</h3>
         <div style={{ fontSize: '1.2rem', marginBottom: 16, color: '#111' }}>
-          Grade: <b>{grade}</b>
+          Grade: <b>{grade}</b> <span>{emoji}</span>
         </div>
         <button onClick={() => window.location.reload()} style={{ marginBottom: 24, background: '#007bff', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 24px', fontSize: '1rem', cursor: 'pointer' }}>
           Reset Test
