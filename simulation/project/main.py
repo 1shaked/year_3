@@ -1,5 +1,7 @@
+import math
 from typing import Dict, List, Optional, Any
 import random
+from itertools import combinations
 
 # =====================
 # Simulation Constants
@@ -56,6 +58,7 @@ PRODUCT_Y_BASE_INVENTORY_HIGH = 10
 PRODUCT_Z_BASE_INVENTORY_LOW = 1
 PRODUCT_Z_BASE_INVENTORY_HIGH = 10
 # MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
+
 # =====================
 class ProductType:
     """
@@ -72,6 +75,32 @@ class ProductType:
         if dist:
             return dist.sample()
         raise ValueError(f"No distribution for station {station_id}")
+
+class Supplier:
+    """
+    Represents a supplier of raw materials.
+    """
+    def __init__(self, supplier_id: int, lead_time: float, fixed_order_cost: float, raw_material_cost_distribution: Dict[ProductType, Any]):
+        self.supplier_id = supplier_id
+        self.lead_time = lead_time
+        self.fixed_order_cost = fixed_order_cost
+        self.raw_material_cost_distribution = raw_material_cost_distribution
+
+    def sample_raw_material_cost(self, product_type: ProductType) -> float:
+        """Sample the raw material cost for a product type."""
+        dist = self.raw_material_cost_distribution.get(product_type)
+        if dist:
+            return dist.sample()
+        raise ValueError(f"No cost distribution for product type {product_type}")
+
+    def place_order(self, product_type: ProductType, quantity: int):
+        """Place an order for raw materials."""
+        pass
+
+    def deliver_materials(self, current_time: float):
+        """Deliver materials at the given time."""
+        pass
+
 
 class SimulationManager:
     """
@@ -119,7 +148,34 @@ class SimulationManager:
             # calculate how much product are needed to produce
             needed_one = max(0, demand_one - stock_one)
             needed_two = max(0, demand_two - stock_two)
-            
+            # find the cheapest supplier for either the first or second product or both
+            cheapest_supplier = self.find_cheapest_supplier([self.product_one, self.product_two])
+            if cheapest_supplier:
+                if needed_one > 0:
+                    cheapest_supplier.place_order(self.product_one, needed_one)
+                if needed_two > 0:
+                    cheapest_supplier.place_order(self.product_two, needed_two)
+
+    def find_cheapest_supplier(self, product_types: List[ProductType]) -> Supplier:
+        """
+        Find the cheapest supplier for the given product types.
+        """
+        # Logic to find the cheapest supplier
+        # check if We order only from one supplier everything
+        cheapest_supplier: Supplier = None
+        cost = math.inf
+        for supplier in self.suppliers:
+            total_cost = 0
+            for product_type in product_types:
+                cost = supplier.sample_raw_material_cost(product_type)
+                total_cost += cost
+            if total_cost < cost:
+                cheapest_supplier = supplier
+                cost = total_cost
+        # TODO: check if we order from multiple suppliers
+        
+        return cheapest_supplier
+
     def demand_for_product(self, product_type: ProductType) -> int:
         """
         Calculate the total demand for a specific product type based on customer orders.
@@ -320,30 +376,6 @@ class Order:
         """Mark the order as fulfilled."""
         self.is_fulfilled = True
 
-class Supplier:
-    """
-    Represents a supplier of raw materials.
-    """
-    def __init__(self, supplier_id: int, lead_time: float, fixed_order_cost: float, raw_material_cost_distribution: Dict[ProductType, Any]):
-        self.supplier_id = supplier_id
-        self.lead_time = lead_time
-        self.fixed_order_cost = fixed_order_cost
-        self.raw_material_cost_distribution = raw_material_cost_distribution
-
-    def sample_raw_material_cost(self, product_type: ProductType) -> float:
-        """Sample the raw material cost for a product type."""
-        dist = self.raw_material_cost_distribution.get(product_type)
-        if dist:
-            return dist.sample()
-        raise ValueError(f"No cost distribution for product type {product_type}")
-
-    def place_order(self, product_type: ProductType, quantity: int):
-        """Place an order for raw materials."""
-        pass
-
-    def deliver_materials(self, current_time: float):
-        """Deliver materials at the given time."""
-        pass
 
 class Inventory:
     """
