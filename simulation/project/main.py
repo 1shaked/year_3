@@ -26,6 +26,11 @@ PRODUCT_VOLUME = {
     1: 1.0,
     2: 1.5,
 }
+
+CUSTOMER_PROBABILITY_TO_ORDER = 0.2  # 20% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
+
+CUSTOMER_MIN_ORDER_QUANTITY = 3
+CUSTOMER_MAX_ORDER_QUANTITY = 10
 # =====================
 
 class SimulationManager:
@@ -77,9 +82,26 @@ class SimulationManager:
             volume_per_unit=PRODUCT_VOLUME[2]
         )
         for i in range(SIMULATION_DAYS):
-            # start by simulation
-            pass
-        pass
+            # start by simulation for each day
+            # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order of each product type
+            self.init_customer_order_for_day(product_one, product_two)
+                
+            
+        
+
+    def init_customer_order_for_day(self, product_one, product_two) -> None:
+        """
+        For each customer, randomly decide whether to place an order for each product type for the day.
+        """
+        for customer in self.customers:
+            # to choose whether to order the first item
+            if random.random() < CUSTOMER_PROBABILITY_TO_ORDER:
+                quantity = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
+                customer.place_order(product_one, quantity)
+            # to choose whether to order the second item
+            if random.random() < CUSTOMER_PROBABILITY_TO_ORDER:
+                quantity = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
+                customer.place_order(product_two, quantity)
 
     def advance_time_step(self):
         """Advance the simulation by one time step."""
