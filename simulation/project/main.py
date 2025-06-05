@@ -113,7 +113,7 @@ class SimulationManager:
     Manages the simulation loop, initializes entities, tracks time and performance.
     """
     def __init__(self):
-        pass
+        self.time : int = 0
         # ...existing code...
         # self.time = 0
         # self.entities = []
@@ -133,7 +133,7 @@ class SimulationManager:
         self.setup_stations()
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
-
+        
         self.producing_by_demand_only()
 
     def producing_by_demand_only(self) -> None:
@@ -142,6 +142,8 @@ class SimulationManager:
         This method will be called after initializing the customers and their orders.
         """
         for i in range(SIMULATION_DAYS):
+            self.time += 1  # Increment the time step for each day
+            print(f"Day {self.time}: Starting production cycle.")
             # start by simulation for each day
             # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order for each product type
             self.init_customer_order_for_day(self.product_one, self.product_two)
@@ -160,7 +162,13 @@ class SimulationManager:
             
             needed_ingredients = list(ingredients.items())
             cheapest_supplier = self.find_cheapest_supplier(needed_ingredients)
-            cheapest_supplier.place_order(needed_ingredients)
+            cheapest_supplier.place_order(needed_ingredients, self.time)
+            # order the customers orders by the due date
+            orders = []
+            for customer in self.customers:
+                for order in customer.orders:
+                    order.due_time
+                    
 
 
     def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]]) -> Supplier:
@@ -307,14 +315,15 @@ class SimulationManager:
         for customer in self.customers:
             # to choose whether to order the first item
             v1 = random.random()
-            if v1 < CUSTOMER_PROBABILITY_TO_ORDER:
-                quantity = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
-                customer.place_order(product_one, quantity)
-            # to choose whether to order the second item
             v2 = random.random()
-            if v2 < CUSTOMER_PROBABILITY_TO_ORDER:
-                quantity = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
-                customer.place_order(product_two, quantity)
+            q_1 = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
+            q_2 = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
+            if v1 < CUSTOMER_PROBABILITY_TO_ORDER and v2 >= CUSTOMER_PROBABILITY_TO_ORDER:
+                customer.place_order([(product_one, q_1)])
+            elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 >= CUSTOMER_PROBABILITY_TO_ORDER:
+                customer.place_order([(product_two, q_2)])
+            elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 < CUSTOMER_PROBABILITY_TO_ORDER:
+                customer.place_order([(product_one, q_1), (product_two, q_2)])
 
     def advance_time_step(self):
         """Advance the simulation by one time step."""
