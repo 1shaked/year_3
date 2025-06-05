@@ -44,6 +44,17 @@ STATUS_PROCESSING = "processing"
 STATUS_COMPLETED = "completed"
 INVENTORY_CAPACITY_LIMIT = 100.0  # Example capacity limit for inventory
 HOLDING_COST_PER_UNIT = 1.0  # Example holding cost per unit
+# Base inventory constants for each product
+PRODUCT_ONE_BASE_INVENTORY_LOW = 1
+PRODUCT_ONE_BASE_INVENTORY_HIGH = 10
+PRODUCT_TWO_BASE_INVENTORY_LOW = 1
+PRODUCT_TWO_BASE_INVENTORY_HIGH = 10
+PRODUCT_X_BASE_INVENTORY_LOW = 1
+PRODUCT_X_BASE_INVENTORY_HIGH = 10
+PRODUCT_Y_BASE_INVENTORY_LOW = 1
+PRODUCT_Y_BASE_INVENTORY_HIGH = 10
+PRODUCT_Z_BASE_INVENTORY_LOW = 1
+PRODUCT_Z_BASE_INVENTORY_HIGH = 10
 # MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
 # =====================
 
@@ -129,6 +140,14 @@ class SimulationManager:
             capacity_limit=INVENTORY_CAPACITY_LIMIT,  
             holding_cost_per_unit=HOLDING_COST_PER_UNIT 
         )
+        
+        self.inventory.set_random_inventory([
+            ProductInstance(product_type=product_one, order_id=None, amount=random.randint(PRODUCT_ONE_BASE_INVENTORY_LOW, PRODUCT_ONE_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=product_two, order_id=None, amount=random.randint(PRODUCT_TWO_BASE_INVENTORY_LOW, PRODUCT_TWO_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=product_x, order_id=None, amount=random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=product_y, order_id=None, amount=random.randint(PRODUCT_Y_BASE_INVENTORY_LOW, PRODUCT_Y_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=product_z, order_id=None, amount=random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
+        ])
 
         for i in range(SIMULATION_DAYS):
             # start by simulation for each day
