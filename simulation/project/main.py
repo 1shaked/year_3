@@ -2,7 +2,7 @@ import math
 from typing import Dict, List, Optional, Any, Tuple
 import random
 from itertools import combinations
-from entities import ProductType, Supplier, Station, ProductInstance, Customer
+from entities import Order, ProductType, Supplier, Station, ProductInstance, Customer
 # =====================
 # Simulation Constants
 # =====================
@@ -101,6 +101,17 @@ class Inventory:
     def calculate_holding_cost(self, current_time: float) -> float:
         pass
 
+    def check_capacity_for_product(self, product: ProductType, quantity: int) -> bool:
+        """Check if there is enough of a product in the stock"""
+        return self.get_product_instances_by_type(product) >= quantity
+    def has_sufficient_ingredients(self, ingredients: Dict[ProductType, int]) -> bool:
+        """
+        Check if the inventory has sufficient ingredients for the given product types and quantities.
+        """
+        for product_type, quantity in ingredients.items():
+            if self.get_product_instances_by_type(product_type) < quantity:
+                return False
+        return True
     def get_product_instances_by_type(self, product_type: ProductType, include_reserve: bool = False) -> int:
         count = 0
         for item in self.items:
@@ -340,6 +351,24 @@ class SimulationManager:
         """Log or print simulation statistics."""
         pass
 
+    def check_order_ingredients(self, order: Order) -> bool:
+        """Check if the ingredients for the order are available."""
+        for product_type, quantity in order.products:
+            ready_q = self.inventory.get_product_instances_by_type(product_type)
+            quantity = quantity - ready_q
+            if quantity > 0:
+                # we will need to check if we can generate the order now
+                needed_ingredients = self.product_ingredients(product_type, quantity)
+                have_ingredients = self.inventory.has_sufficient_ingredients(needed_ingredients)
+                # we need to subtract the amount we have in the inventory and then check how much we need to order
+                
+        needed_ingredients = self.get_total_ingredients(order.products)
+        # check if there is some combination of suppliers that can provide the needed ingredients
+        # first we subtract the current inventory of the products from the needed ingredients
+        for product_type, quantity in needed_ingredients.items():
+            current_inventory = self.inventory.get_product_instances_by_type(product_type)
+            needed_ingredients[product_type] = max(0, quantity - current_inventory)
+        return self.has_sufficient_ingredients(needed_ingredients)
 
     def product_ingredients(self, product_type: ProductType , quantity: int = 1) -> Dict[ProductType, int]:
         """
