@@ -2,6 +2,7 @@ import math
 from typing import Dict, List, Optional, Any
 import random
 from itertools import combinations
+from .entities import ProductType, Supplier, Station, ProductInstance, Customer, Order
 
 # =====================
 # Simulation Constants
@@ -60,47 +61,53 @@ PRODUCT_Z_BASE_INVENTORY_HIGH = 10
 # MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
 
 # =====================
-class ProductType:
+class Inventory:
     """
-    Represents a type of product with processing time distributions and volume per unit.
+    Manages inventory, storage capacity, and holding costs.
     """
-    def __init__(self, product_id: int | str, processing_time_distributions: Dict[int, Any], volume_per_unit: float):
-        self.product_id = product_id
-        self.processing_time_distributions = processing_time_distributions  # station_id -> distribution
-        self.volume_per_unit = volume_per_unit
+    def __init__(self, capacity_limit: float, holding_cost_per_unit: float):
+        self.items: List[ProductInstance] = []  # List of product instances in inventory
+        self.total_volume = 0.0
+        self.capacity_limit = capacity_limit
+        self.holding_cost_per_unit = holding_cost_per_unit
 
-    def sample_processing_time(self, station_id: int) -> float:
-        """Sample processing time for a given station."""
-        dist = self.processing_time_distributions.get(station_id)
-        if dist:
-            return dist.sample()
-        raise ValueError(f"No distribution for station {station_id}")
+    def set_random_inventory(self, items: List[ProductInstance]):
+        self.items = items
+        self.calculate_total_volume()
 
-class Supplier:
-    """
-    Represents a supplier of raw materials.
-    """
-    def __init__(self, supplier_id: int, lead_time: float, fixed_order_cost: float, raw_material_cost_distribution: Dict[ProductType, Any]):
-        self.supplier_id = supplier_id
-        self.lead_time = lead_time
-        self.fixed_order_cost = fixed_order_cost
-        self.raw_material_cost_distribution = raw_material_cost_distribution
+    def calculate_total_volume(self) -> float:
+        total_volume = 0.0
+        for item in self.items:
+            total_volume += item.product_type.volume_per_unit * item.amount
+        self.total_volume = total_volume
+        if self.total_volume > self.capacity_limit:
+            raise ValueError("Total volume exceeds inventory capacity limit.")
+        return self.total_volume
 
-    def sample_raw_material_cost(self, product_type: ProductType) -> float:
-        """Sample the raw material cost for a product type."""
-        dist = self.raw_material_cost_distribution.get(product_type)
-        if dist:
-            return dist.sample()
-        raise ValueError(f"No cost distribution for product type {product_type}")
+    def add(self, product_instance: ProductInstance):
+        if not self.can_store(product_instance):
+            raise ValueError("Not enough space in inventory.")
+        self.items.append(product_instance)
+        self.calculate_total_volume()
 
-    def place_order(self, product_type: ProductType, quantity: int):
-        """Place an order for raw materials."""
+    def remove(self, product_type: ProductType, quantity: int):
+        pass  # Implement logic to remove product instances
+
+    def can_store(self, product_instance: ProductInstance) -> bool:
+        product_volume = product_instance.product_type.volume_per_unit
+        if self.total_volume + product_volume > self.capacity_limit:
+            return False
+        return True
+
+    def calculate_holding_cost(self, current_time: float) -> float:
         pass
 
-    def deliver_materials(self, current_time: float):
-        """Deliver materials at the given time."""
-        pass
-
+    def get_product_instances_by_type(self, product_type: ProductType, include_reserve: bool = False) -> int:
+        count = 0
+        for item in self.items:
+            if item.product_type == product_type and (not include_reserve or item.order_id is None):
+                count += item.amount
+        return count
 
 class SimulationManager:
     """
@@ -310,154 +317,4 @@ class SimulationManager:
 
     def log_statistics(self):
         """Log or print simulation statistics."""
-        pass
-
-
-class Station:
-    """
-    Represents a processing station with a queue of products.
-    """
-    def __init__(self, station_id: int):
-        self.station_id = station_id
-        self.end_processing_time: float | None = None
-
-    def sample_processing_time(self, product_type: ProductType) -> float:
-        """Sample processing time for a product type at this station."""
-        return product_type.sample_processing_time(self.station_id)
-
-class ProductInstance:
-    """
-    Represents an instance of a product in the system.
-    """
-    def __init__(self, product_type: ProductType, order_id: int | None, current_station_index: int = 0, status: str = STATUS_WAITING, amount: int = 1):
-        self.product_type = product_type
-        self.order_id = order_id
-        self.status = status
-        self.amount = amount
-
-    def advance_to_next_station(self):
-        """Advance this product to the next station in its route."""
-        pass
-
-class Customer:
-    """
-    Represents a customer who places orders.
-    """
-    def __init__(self, customer_id: int, max_lead_time: float, order_cost: float):
-        self.customer_id = customer_id
-        self.max_lead_time = max_lead_time
-        self.order_cost = order_cost
-        self.orders: List[Order] = []
-
-    def place_order(self, product_type: ProductType, quantity: int):
-        """Place a new order for a product type."""
-        order_id = len(self.orders) + 1  # Simple ID generation
-        due_time = self.max_lead_time  # Assuming due time is the max lead time for simplicity
-        order = Order(order_id, self, product_type, quantity, due_time)
-        self.orders.append(order)
-
-    def is_order_late(self, order: 'Order', current_time: float) -> bool:
-        """Check if an order is late."""
-        return current_time > order.due_time
-
-class Order:
-    """
-    Represents an order placed by a customer.
-    """
-    def __init__(self, order_id: int, customer: Customer, product_type: ProductType, quantity: int, due_time: float, is_fulfilled: bool = False):
-        self.order_id = order_id
-        self.customer = customer
-        self.product_type = product_type
-        self.quantity = quantity
-        self.due_time = due_time
-        self.is_fulfilled = is_fulfilled
-
-    def mark_fulfilled(self):
-        """Mark the order as fulfilled."""
-        self.is_fulfilled = True
-
-
-class Inventory:
-    """
-    Manages inventory, storage capacity, and holding costs.
-    """
-    def __init__(self, capacity_limit: float, holding_cost_per_unit: float):
-        # self.stock: Dict[ProductType, int] = { # THIS NEED TO BE CHANGE TO BE RANDOM GENERATED
-        #     PRODUCT_ID_FIRST: 0,  # Base inventory for product type 1
-        #     PRODUCT_ID_SECOND: 0,  # Base inventory for product type 2
-        #     PRODUCT_ID_X: 0,  # Base inventory for product x
-        #     PRODUCT_ID_Y: 0,  # Base inventory for product y
-        #     PRODUCT_ID_Z: 0   # Base inventory for product z
-        # }
-        self.items: List[ProductInstance] = []  # List of product instances in inventory
-        self.total_volume = 0.0
-        self.capacity_limit = capacity_limit
-        self.holding_cost_per_unit = holding_cost_per_unit
-
-    def set_random_inventory(self, items: List[ProductInstance]):
-
-        self.items = items
-
-        self.calculate_total_volume()
-
-    def calculate_total_volume(self) -> float:
-        """Calculate the total volume of products in stock."""
-        total_volume = 0.0
-        for item in self.items:
-            total_volume += item.product_type.volume_per_unit * item.amount
-        self.total_volume = total_volume
-        if self.total_volume > self.capacity_limit:
-            raise ValueError("Total volume exceeds inventory capacity limit.")
-        return self.total_volume
-
-    def add(self, product_instance: ProductInstance):
-        """Add a product instance to inventory."""
-        if not self.can_store(product_instance):
-            raise ValueError("Not enough space in inventory.")
-        self.items.append(product_instance)
-        self.calculate_total_volume()
-
-    def remove(self, product_type: ProductType, quantity: int):
-        """Remove a quantity of a product type from inventory."""
-        pass  # Implement logic to remove product instances
-
-    def can_store(self, product_instance: ProductInstance) -> bool:
-        """Check if there is enough space to store the product instance."""
-        product_volume = product_instance.product_type.volume_per_unit
-        if self.total_volume + product_volume > self.capacity_limit:
-            return False
-        return True
-
-    def calculate_holding_cost(self, current_time: float) -> float:
-        """Calculate the holding cost at the current time."""
-        pass
-    def get_product_instances_by_type(self, product_type: ProductType, include_reserve: bool = False) -> int:
-        """Get all product instances of a specific type."""
-        count = 0
-        for item in self.items:
-            if item.product_type == product_type and (not include_reserve or item.order_id is None):
-                count += item.amount
-        return count
-class PricingTable:
-    """
-    Stores price per unit for each product type.
-    """
-    def __init__(self, price_per_unit: Dict[ProductType, float]):
-        self.price_per_unit = price_per_unit
-
-    def get_price(self, product_type: ProductType) -> float:
-        """Get the price per unit for a product type."""
-        return self.price_per_unit.get(product_type, 0.0)
-
-class Event:
-    """
-    Represents an event in an event-based simulation.
-    """
-    def __init__(self, time: float, event_type: str, associated_entities: Optional[List[Any]] = None):
-        self.time = time
-        self.event_type = event_type
-        self.associated_entities = associated_entities or []
-
-    def execute(self):
-        """Execute the event's logic."""
         pass
