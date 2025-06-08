@@ -27,3 +27,5 @@ process mining/ClicksData/BPI2016_Clicks_NOT_Logged_In.csv
 dama mining/Final project Part 1/churn_dataset_train.csv
 design/SpotifyFeatures.xlsx
 data mining/Final project Part 1/churn_dataset_train.csv
+data mining/Final project Part 2/churn_dataset_test.csv
+data mining/Final project Part 2/churn_dataset_train.csv
