@@ -61,6 +61,9 @@ PRODUCT_Y_BASE_INVENTORY_LOW = 1
 PRODUCT_Y_BASE_INVENTORY_HIGH = 10
 PRODUCT_Z_BASE_INVENTORY_LOW = 1
 PRODUCT_Z_BASE_INVENTORY_HIGH = 10
+STATION_ONE_ID = 1
+STATION_TWO_ID = 2
+STATION_THREE_ID = 3
 # MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
 
 # =====================
@@ -259,9 +262,9 @@ class SimulationManager:
         """
         Initialize the stations for the simulation.
         """
-        station_one = Station(station_id=1)
-        station_two = Station(station_id=2)
-        station_three = Station(station_id=3)
+        station_one = Station(station_id=STATION_ONE_ID)
+        station_two = Station(station_id=STATION_TWO_ID)
+        station_three = Station(station_id=STATION_THREE_ID)
         self.stations = [station_one, station_two, station_three]
 
     def setup_products(self) -> None:
