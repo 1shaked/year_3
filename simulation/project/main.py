@@ -82,6 +82,7 @@ class Inventory:
         self.calculate_total_volume()
 
     def calculate_total_volume(self) -> float:
+        # TODO: if there is an overflow normalize the volume
         total_volume = 0.0
         for item in self.items:
             total_volume += item.product_type.volume_per_unit * item.amount
@@ -151,7 +152,7 @@ class SimulationManager:
         self.setup_stations()
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
-        
+        # simulation days loop
         self.producing_by_demand_only()
 
     def producing_by_demand_only(self) -> None:
@@ -194,12 +195,14 @@ class SimulationManager:
             if order_closest:
                 if not self.has_sufficient_ingredients(needed_ingredients):
                     print(f"Insufficient ingredients to fulfill order {order_closest.order_id}.")
+                    # TODO: need to start the production process
                     continue
 
     def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]]) -> Supplier:
         """
         Find the cheapest supplier for the given product types.
         """
+        # TODO: check also with the customer lead time to see if this supplier can deliver in time
         # Logic to find the cheapest supplier
         # check if We order only from one supplier everything
         cheapest_supplier: Supplier = None
@@ -328,9 +331,9 @@ class SimulationManager:
         self.inventory.set_random_inventory([
             ProductInstance(product_type=self.product_one, order_id=None, amount=random.randint(PRODUCT_ONE_BASE_INVENTORY_LOW, PRODUCT_ONE_BASE_INVENTORY_HIGH)),
             ProductInstance(product_type=self.product_two, order_id=None, amount=random.randint(PRODUCT_TWO_BASE_INVENTORY_LOW, PRODUCT_TWO_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_x, order_id=None, amount=random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_y, order_id=None, amount=random.randint(PRODUCT_Y_BASE_INVENTORY_LOW, PRODUCT_Y_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_z, order_id=None, amount=random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
+            ProductInstance(product_type=self.product_x,   order_id=None, amount=random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_y,   order_id=None, amount=random.randint(PRODUCT_Y_BASE_INVENTORY_LOW, PRODUCT_Y_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_z,   order_id=None, amount=random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
         ])
 
     def init_customer_order_for_day(self, product_one, product_two) -> None:
