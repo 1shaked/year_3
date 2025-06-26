@@ -20,15 +20,15 @@ CUSTOMER_LEAD_TIME_MAX = 5.0
 CUSTOMER_ORDER_COST_MIN = 10.0
 CUSTOMER_ORDER_COST_MAX = 30.0
 STATION_PROCESS_TIME = {
-    1: (2, 5),  # Station 1 min/max
-    2: (3, 6),  # Station 2 min/max
-    3: (4, 8),  # Station 3 min/max
+    1: 3,  # Station 1 min/max
+    2: 4,  # Station 2 min/max
+    3: 4,  # Station 3 min/max
 }
 PRODUCT_ID_X = 'x'
 PRODUCT_ID_Y = 'y'
 PRODUCT_ID_Z = 'z'
-PRODUCT_ID_FIRST = 1  # Product type 1
-PRODUCT_ID_SECOND = 2  # Product type 2
+PRODUCT_ID_FIRST = 'A'  # Product type 1
+PRODUCT_ID_SECOND = 'B'  # Product type 2
 PRODUCT_VOLUME = {
     PRODUCT_ID_FIRST: 1.0,
     PRODUCT_ID_SECOND: 1.5,
@@ -38,7 +38,11 @@ PRODUCT_VOLUME = {
 }
 
 CUSTOMER_PROBABILITY_TO_ORDER = 0.6  # 60% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
-
+RAW_MATERIAL_COST = {
+    PRODUCT_ID_X: [6.0, 8.0],  
+    PRODUCT_ID_Y: [8.0, 10.0], 
+    PRODUCT_ID_Z: [9.0, 11.0], 
+}
 CUSTOMER_MIN_ORDER_QUANTITY = 3
 CUSTOMER_MAX_ORDER_QUANTITY = 10
 STATUS_WAITING = "waiting"
@@ -231,9 +235,9 @@ class SimulationManager:
                 lead_time=random.uniform(SUPPLIER_LEAD_TIME_MIN, SUPPLIER_LEAD_TIME_MAX),
                 fixed_order_cost=random.uniform(SUPPLIER_ORDER_COST_MIN, SUPPLIER_ORDER_COST_MAX),
                 raw_material_cost_distribution={
-                    self.product_x: random.uniform(0.5, 1.5),
-                    self.product_y: random.uniform(0.5, 1.5),
-                    self.product_z: random.uniform(0.5, 1.5)
+                    self.product_x: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_X]),
+                    self.product_y: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_Y]),
+                    self.product_z: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_Z])
                 }
             ) for i in range(num_suppliers)
         ]
@@ -285,7 +289,7 @@ class SimulationManager:
         self.product_x = ProductType(
             product_id=PRODUCT_ID_X,
             processing_time_distributions={
-                1: random.uniform(*STATION_PROCESS_TIME[1]),  # Station 1
+                1: random.expovariate(STATION_PROCESS_TIME[1]),  # Station 1
                 2: 0,  # Station 2
                 3: 0   # Station 3 (custom for product x)
             },
@@ -295,7 +299,7 @@ class SimulationManager:
             product_id=PRODUCT_ID_Y,
             processing_time_distributions={
                 1: 0,  # Station 1
-                2: random.uniform(*STATION_PROCESS_TIME[2]),  # Station 2
+                2: random.expovariate(STATION_PROCESS_TIME[2]),  # Station 2
                 3: 0   # Station 3 (custom for product y)
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Y]
@@ -305,7 +309,7 @@ class SimulationManager:
             processing_time_distributions={
                 1: 0,  # Station 1
                 2: 0,  # Station 2
-                3: random.uniform(*STATION_PROCESS_TIME[3])   # Station 3 (custom for product z)
+                3: random.expovariate(STATION_PROCESS_TIME[3])   # Station 3 (custom for product z)
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Z]
         )
