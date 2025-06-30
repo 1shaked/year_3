@@ -64,6 +64,8 @@ PRODUCT_Z_BASE_INVENTORY_HIGH = 10
 STATION_ONE_ID = 1
 STATION_TWO_ID = 2
 STATION_THREE_ID = 3
+
+
 # MIN_INITIAL_INVENTORY = 5  # Minimum initial inventory for each product type
 
 # =====================
@@ -175,7 +177,7 @@ class SimulationManager:
             # calculate how much product are needed to produce
             needed_one = max(0, demand_one - stock_one)
             needed_two = max(0, demand_two - stock_two)
-            ingredients = self.get_total_ingredients([(self.product_one , needed_one) , (self.product_two, needed_two)])
+            ingredients = self.get_tree_from_products_list([(self.product_one , needed_one) , (self.product_two, needed_two)])
             # find the cheapest supplier for either the first or second product or both
             # transform the ingredients into a list of product types and their quantities
             
@@ -353,26 +355,22 @@ class SimulationManager:
             elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 < CUSTOMER_PROBABILITY_TO_ORDER:
                 customer.place_order([(product_one, q_1), (product_two, q_2)])
 
-    def advance_time_step(self):
-        """Advance the simulation by one time step."""
-        pass
-
     def log_statistics(self):
         """Log or print simulation statistics."""
         pass
 
-    def check_order_ingredients(self, order: Order) -> bool:
+    def check_order_components(self, order: Order) -> bool:
         """Check if the ingredients for the order are available."""
         for product_type, quantity in order.products:
             ready_q = self.inventory.get_product_instances_by_type(product_type)
             quantity = quantity - ready_q
             if quantity > 0:
                 # we will need to check if we can generate the order now
-                needed_ingredients = self.product_ingredients(product_type, quantity)
+                needed_ingredients = self.product_tree(product_type, quantity)
                 have_ingredients = self.inventory.has_sufficient_ingredients(needed_ingredients)
                 # we need to subtract the amount we have in the inventory and then check how much we need to order
                 
-        needed_ingredients = self.get_total_ingredients(order.products)
+        needed_ingredients = self.get_tree_from_products_list(order.products)
         # check if there is some combination of suppliers that can provide the needed ingredients
         # first we subtract the current inventory of the products from the needed ingredients
         for product_type, quantity in needed_ingredients.items():
@@ -380,14 +378,14 @@ class SimulationManager:
             needed_ingredients[product_type] = max(0, quantity - current_inventory)
         return self.has_sufficient_ingredients(needed_ingredients)
 
-    def product_ingredients(self, product_type: ProductType , quantity: int = 1) -> Dict[ProductType, int]:
+    def product_tree(self, product_type: ProductType , quantity: int = 1) -> Dict[ProductType, int]:
         """
         Get the ingredients required for each product type.
         Only for product_one and product_two, as they are the main products.
         """
         v = {
-            self.product_one: {(self.product_x, 1), (self.product_y, 1)},
-            self.product_two: {(self.product_x, 0.5), (self.product_y, 0.5), (self.product_z, 0.75)},
+            self.product_one: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
+            self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
         }.get(product_type, {})
         ingredients = {}
         for ingredient, amount in v:
@@ -396,13 +394,13 @@ class SimulationManager:
             ingredients[ingredient] += amount * quantity
         return ingredients
 
-    def get_total_ingredients(self, products: List[Tuple[ProductType, int]]) -> Dict[ProductType, int]:
+    def get_tree_from_products_list(self, products: List[Tuple[ProductType, int]]) -> Dict[ProductType, int]:
         """
         Get the total ingredients required for a list of product instances.
         """
         total_ingredients = {}
         for product, quantity in products:
-            ingredients = self.product_ingredients(product, quantity)
+            ingredients = self.product_tree(product, quantity)
             for ingredient, amount in ingredients.items():
                 if ingredient not in total_ingredients:
                     total_ingredients[ingredient] = 0
