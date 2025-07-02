@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&#x1f9fe; Neural Network Classifier &ndash; Report</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="-neural-network-classifier--report">🧾 Neural Network Classifier – Report</h2>
+<p>📈 <strong>StandardScaler Features</strong></p>
+<hr>
+<h3 id="1-objective">1. <strong>Objective</strong></h3>
+<p>The goal of this model is to classify companies as <strong>financially weak (class 0)</strong> or <strong>financially strong (class 1)</strong> based on financial ratios, using a <strong>neural network</strong> trained on <strong>standardized features</strong>.</p>
+<hr>
+<h3 id="2-preprocessing-steps">2. <strong>Preprocessing Steps</strong></h3>
+<ul>
+<li>
+<p><strong>Standard Scaling</strong>:</p>
+<ul>
+<li><code>StandardScaler().fit_transform()</code> on <code>X_train</code></li>
+<li><code>StandardScaler().transform()</code> on <code>X_test</code></li>
+</ul>
+</li>
+<li>
+<p>This ensured that both training and test sets were standardized consistently using only training statistics.</p>
+</li>
+</ul>
+<hr>
+<h3 id="3-model-configuration">3. <strong>Model Configuration</strong></h3>
+<ul>
+<li><strong>Model</strong>: <code>MLPClassifier</code></li>
+<li><strong>Hidden Layers</strong>: (12, 8)</li>
+<li><strong>Activation</strong>: ReLU</li>
+<li><strong>Optimizer</strong>: Adam</li>
+<li><strong>Max Iterations</strong>: 1000</li>
+<li><strong>Train/Test Split</strong>: 80/20 with stratification</li>
+</ul>
+<hr>
+<h3 id="4-performance-metrics">4. <strong>Performance Metrics</strong></h3>
+<h4 id="-classification-report">📊 Classification Report</h4>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1-score</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0 (Weak)</strong></td>
+<td>0.94</td>
+<td>0.81</td>
+<td>0.87</td>
+<td>57</td>
+</tr>
+<tr>
+<td><strong>1 (Strong)</strong></td>
+<td>0.93</td>
+<td>0.98</td>
+<td>0.95</td>
+<td>140</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Accuracy</strong>: <strong>92.89%</strong></li>
+<li><strong>Macro Avg F1-score</strong>: 0.91</li>
+<li><strong>Weighted Avg F1-score</strong>: 0.93</li>
+</ul>
+<h4 id="-confusion-matrix">📌 Confusion Matrix</h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted Weak</th>
+<th>Predicted Strong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actual Weak</strong></td>
+<td>46</td>
+<td>11</td>
+</tr>
+<tr>
+<td><strong>Actual Strong</strong></td>
+<td>3</td>
+<td>137</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="5-roc-curve-and-auc">5. <strong>ROC Curve and AUC</strong></h3>
+<ul>
+<li><strong>AUC Score</strong>: <strong>0.98</strong></li>
+</ul>
+<p><img src="nn.png" alt="ROC Curve"></p>
+<p><em>Interpretation</em>: The near-perfect AUC confirms the model’s excellent ability to distinguish between weak and strong companies across all thresholds.</p>
+<hr>
+<h3 id="6-conclusion">6. <strong>Conclusion</strong></h3>
+<p>This version of the neural network—trained on <strong>standardized features</strong>—achieved the <strong>best overall performance</strong> among all tested models.</p>
+<h4 id="-strengths">✅ Strengths:</h4>
+<ul>
+<li>Very high accuracy, recall, and precision for both classes</li>
+<li>AUC = 0.98 indicates excellent probability calibration</li>
+<li>Correctly identified <strong>81% of weak</strong> and <strong>98% of strong</strong> companies</li>
+<li>There is a worry for overfitting, as the model performed exceptionally well on the training set.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

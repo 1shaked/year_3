@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&#x1f9fe; &ast;&ast;Decision Tree Classifier Report&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="-decision-tree-classifier-report">🧾 <strong>Decision Tree Classifier Report</strong></h2>
+<h3 id="1-objective">1. <strong>Objective</strong></h3>
+<p>This section presents the application of a <strong>Decision Tree Classifier</strong> to analyze financial data of companies and predict their financial resilience. The target variable is <code>Grade</code>, where:</p>
+<ul>
+<li><code>1</code> = Weak financial resilience</li>
+<li><code>2</code> = Strong financial resilience</li>
+</ul>
+<p>The goal is to identify which financial ratios most effectively predict the target class, and to evaluate the model's performance on unseen data.</p>
+<hr>
+<h3 id="2-features-used">2. <strong>Features Used</strong></h3>
+<p>The model was trained on the following financial ratios:</p>
+<ul>
+<li>Gross Profit</li>
+<li>Current Ratio</li>
+<li>Quick Ratio</li>
+<li>Inventory Months</li>
+<li>Cash Flow to Sales</li>
+<li>Obligators Months</li>
+<li>Self-Capital to Total Assets</li>
+<li>Short\Long-Term Obligations</li>
+<li>Additional Sales This Year / Sales Previous Year</li>
+</ul>
+<hr>
+<h3 id="3-model-training">3. <strong>Model Training</strong></h3>
+<ul>
+<li>The dataset was split into training (80%) and testing (20%) subsets.</li>
+<li>A <code>DecisionTreeClassifier</code> from scikit-learn was trained using default parameters.</li>
+<li>No normalization or scaling was applied, as decision trees do not require feature scaling.</li>
+</ul>
+<hr>
+<h3 id="4-feature-importance">4. <strong>Feature Importance</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Importance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gross Profit</td>
+<td>0.378</td>
+</tr>
+<tr>
+<td>Current Ratio</td>
+<td>0.376</td>
+</tr>
+<tr>
+<td>Inventory Months</td>
+<td>0.156</td>
+</tr>
+<tr>
+<td>Cash Flow to Sales</td>
+<td>0.047</td>
+</tr>
+<tr>
+<td>Quick Ratio</td>
+<td>0.029</td>
+</tr>
+<tr>
+<td>Obligators Months</td>
+<td>0.015</td>
+</tr>
+<tr>
+<td>Self-Capital to Total Assets</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>Short\Long-Term Obligations</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>Additional Sales This Year / Sales Last Year</td>
+<td>0.000</td>
+</tr>
+</tbody>
+</table>
+<p><img src="tree_visualization.png" alt="Decision Tree Visualization">
+🔍 <em>Conclusion</em>: The most important predictors are <strong>Gross Profit</strong> and <strong>Current Ratio</strong>, which together account for over 75% of the model’s decision-making.</p>
+<hr>
+<h3 id="5-tree-visualization">5. <strong>Tree Visualization</strong></h3>
+<p>A plot of the decision tree reveals a hierarchical decision process:</p>
+<ul>
+<li>The <strong>root node</strong> splits on <code>Current Ratio ≤ 4.5</code></li>
+<li>The left branch further splits based on <code>Gross Profit</code> and <code>Quick Ratio</code>, leading to the identification of weak companies</li>
+<li>The right branch (Current Ratio &gt; 4.5) mostly leads to strong companies, further evaluated by <code>Cash Flow to Sales</code> and <code>Obligators Months</code></li>
+</ul>
+<p>The tree reflects intuitive financial logic, such as associating <strong>low liquidity</strong> and <strong>low profit margins</strong> with financial weakness.</p>
+<hr>
+<h3 id="6-model-evaluation">6. <strong>Model Evaluation</strong></h3>
+<h4 id="-classification-report">📉 Classification Report</h4>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1-Score</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 (Weak)</td>
+<td>0.68</td>
+<td>0.34</td>
+<td>0.45</td>
+<td>50</td>
+</tr>
+<tr>
+<td>2 (Strong)</td>
+<td>0.81</td>
+<td>0.95</td>
+<td>0.87</td>
+<td>147</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Accuracy</strong>: 79.2%</li>
+<li><strong>Macro Avg F1-Score</strong>: 0.66</li>
+<li><strong>Weighted Avg F1-Score</strong>: 0.77</li>
+</ul>
+<h4 id="-confusion-matrix">📊 Confusion Matrix</h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Predicted Weak</th>
+<th>Predicted Strong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actual Weak</strong></td>
+<td>17</td>
+<td>33</td>
+</tr>
+<tr>
+<td><strong>Actual Strong</strong></td>
+<td>8</td>
+<td>139</td>
+</tr>
+</tbody>
+</table>
+<h4 id="-insights">✅ Insights:</h4>
+<ul>
+<li>The model is <strong>highly effective at identifying strong companies</strong> (recall = 95%).</li>
+<li>It <strong>struggles to detect weak companies</strong>, correctly identifying only 34% of them.</li>
+<li>There is a <strong>bias toward the majority class (strong)</strong>, possibly due to class imbalance.</li>
+</ul>
+<hr>
+<h3 id="7-conclusion">7. <strong>Conclusion</strong></h3>
+<p>The Decision Tree model provides <strong>interpretable rules</strong> and performs well overall. However, its limited sensitivity to the minority class (financially weak companies) may present risks in real-world applications where detecting financially vulnerable firms is critical. Future improvements could include:</p>
+<ul>
+<li>Using <strong>class balancing techniques</strong> (e.g., SMOTE)</li>
+<li>Applying <strong>cost-sensitive learning</strong></li>
+<li>Comparing results with alternative models (Logistic Regression, Neural Network)</li>
+</ul>
+
+            
+            
+        </body>
+        </html>
