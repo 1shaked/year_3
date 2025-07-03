@@ -1,8 +1,48 @@
 import { useState, useEffect } from 'react'
-import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
+import { Provider as JotaiProvider, useAtom } from 'jotai'
 import './App.css'
+import { selectedTopicIdAtom } from './state'
+
 
 const queryClient = new QueryClient()
+
+const isDev = import.meta.env.MODE === 'development'
+const API_BASE = isDev ? 'http://127.0.0.1:8000' : ''
+
+function TopicSelect() {
+  const [selectedTopicId, setSelectedTopicId] = useAtom(selectedTopicIdAtom)
+  const { data: topics, isLoading, isError, error } = useQuery<{ id: number; name: string }[], Error>({
+    queryKey: ['topics'],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/topics`)
+      if (!res.ok) throw new Error('Failed to fetch topics')
+      return res.json()
+    },
+  })
+
+  if (isLoading) return <div>Loading topics...</div>
+  if (isError) return <div style={{ color: 'red' }}>Error: {error?.message}</div>
+  if (!topics || !topics.length) return <div>No topics found.</div>
+
+  return (
+    <div style={{ margin: '1rem 0' }}>
+      <label style={{ fontSize: '1.1rem', marginRight: 8 }}>
+        Select Topic:
+        <select
+          value={selectedTopicId ?? ''}
+          onChange={e => setSelectedTopicId(e.target.value ? Number(e.target.value) : null)}
+          style={{ marginLeft: 8, fontSize: '1.1rem', padding: '0.3rem 0.7rem' }}
+        >
+          <option value="">-- Choose a topic --</option>
+          {topics.map(t => (
+            <option key={t.id} value={t.id}>{t.name}</option>
+          ))}
+        </select>
+      </label>
+    </div>
+  )
+}
 
 function QuestionCountForm({ onSubmit }: { onSubmit: (count: number) => void }) {
   const [input, setInput] = useState('')
@@ -20,23 +60,26 @@ function QuestionCountForm({ onSubmit }: { onSubmit: (count: number) => void }) 
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ margin: '2rem 0' }}>
-      <label style={{ fontSize: '1.1rem' }}>
-        Number of questions (1-20):
-        <input
-          type="number"
-          min={1}
-          max={20}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          style={{ marginLeft: 8, fontSize: '1.5rem', width: 80, padding: '0.5rem' }}
-        />
-      </label>
-      <div style={{ display: 'grid', justifyItems: 'center', marginTop: 16 }}>
-        <button type="submit" style={{ marginLeft: 12, fontSize: '2rem', padding: '0.5rem 1.2rem', color: 'green',  }}>Start</button>
-      </div>
-      {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
-    </form>
+    <>
+      <TopicSelect />
+      <form onSubmit={handleSubmit} style={{ margin: '2rem 0' }}>
+        <label style={{ fontSize: '1.1rem' }}>
+          Number of questions (1-20):
+          <input
+            type="number"
+            min={1}
+            max={20}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            style={{ marginLeft: 8, fontSize: '1.5rem', width: 80, padding: '0.5rem' }}
+          />
+        </label>
+        <div style={{ display: 'grid', justifyItems: 'center', marginTop: 16 }}>
+          <button type="submit" style={{ marginLeft: 12, fontSize: '2rem', padding: '0.5rem 1.2rem', color: 'green',  }}>Start</button>
+        </div>
+        {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
+      </form>
+    </>
   )
 }
 
@@ -206,8 +249,10 @@ function Quiz({ questions }: QuizProps) {
 }
 
 function QuizLoader({ questionCount }: { questionCount: number }) {
+  const [selectedTopicId] = useAtom(selectedTopicIdAtom)
   const fetchQuestions = async (count: number): Promise<QuizQuestion[]> => {
-    const res = await fetch(`https://design-test-helper.onrender.com/api/questions?num_questions=${count}`)
+    if (!selectedTopicId) throw new Error('Please select a topic')
+    const res = await fetch(`${API_BASE}/api/questions?num_questions=${count}&topic_id=${selectedTopicId}`)
     if (!res.ok) throw new Error('Failed to fetch questions')
     return res.json()
   }
@@ -233,13 +278,15 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="App">
-        {questionCount === null ? (
-          <QuestionCountForm onSubmit={setQuestionCount} />
-        ) : (
-          <QuizLoader questionCount={questionCount} />
-        )}
-      </div>
+      <JotaiProvider>
+        <div className="App">
+          {questionCount === null ? (
+            <QuestionCountForm onSubmit={setQuestionCount} />
+          ) : (
+            <QuizLoader questionCount={questionCount} />
+          )}
+        </div>
+      </JotaiProvider>
     </QueryClientProvider>
   )
 }
