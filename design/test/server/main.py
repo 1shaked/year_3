@@ -49,17 +49,23 @@ app.add_middleware(
 #     return {"error": "index.html not found"}
 
 @app.get("/api/questions")
-def get_random_questions(num_questions: int = Query(5, gt=0, le=20)) -> List[Dict]:
+def get_random_questions(
+    num_questions: int = Query(5, gt=0, le=20),
+    topic_id: int = Query(..., description="ID of the topic to filter questions by")
+) -> List[Dict]:
     """
-    Get a random set of questions and their shuffled options from the database.
+    Get a random set of questions and their shuffled options from the database, filtered by topic.
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    # Get all question ids
-    cursor.execute("SELECT id FROM questions")
+    # Get all question ids for the given topic
+    cursor.execute("SELECT id FROM questions WHERE topic_id = ?", (topic_id,))
     question_ids = [row[0] for row in cursor.fetchall()]
     if len(question_ids) < num_questions:
         num_questions = len(question_ids)
+    if not question_ids:
+        conn.close()
+        return []
     selected_ids = random.sample(question_ids, num_questions)
     questions = []
     for qid in selected_ids:
@@ -83,5 +89,17 @@ def get_random_questions(num_questions: int = Query(5, gt=0, le=20)) -> List[Dic
     random.shuffle(questions)
     conn.close()
     return questions
+
+@app.get("/api/topics")
+def get_topics() -> List[Dict]:
+    """
+    Get a list of all topics (id and name).
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name FROM topics")
+    topics = [{"id": row[0], "name": row[1]} for row in cursor.fetchall()]
+    conn.close()
+    return topics
 
 
