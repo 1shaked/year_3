@@ -5,6 +5,7 @@ from pm4py.visualization.process_tree import visualizer as pt_visualizer
 from pm4py.algo.discovery.alpha import algorithm as alpha_miner
 from pm4py.algo.discovery.heuristics import algorithm as heuristics_miner
 from pm4py.algo.discovery.inductive import algorithm as inductive_miner
+import plotly.graph_objects as go
 
 from pm4py.visualization.petri_net import visualizer as pn_visualizer
 from pm4py.algo.filtering.log.variants import variants_filter
@@ -176,3 +177,49 @@ def display_most_common_actions_from_df(df_logs, top_n=10, action_col='PAGE_NAME
 
 
 
+def plot_counts(data_counts, column_name, trend_line=True, top_n=0):
+    counts = data_counts[column_name]
+    sorted_items = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+
+    top_n = min(top_n, len(sorted_items)) if top_n > 0 else len(sorted_items)
+    top_items = sorted_items[:top_n]
+    labels, values = zip(*top_items)
+
+    total = sum(counts.values())
+    percentages = [round((v / total) * 100, 1) for v in values]
+    percentage_labels = [f'{p}%' for p in percentages]
+
+    fig = go.Figure()
+
+    # Bar chart with percentage text
+    fig.add_trace(go.Bar(
+        x=[str(label) for label in labels],
+        y=values,
+        name='Counts',
+        marker_color='royalblue',
+        text=percentage_labels,
+        textposition='inside',
+        texttemplate='%{text}'
+    ))
+
+    if trend_line:
+        # Trend line
+        fig.add_trace(go.Scatter(
+            x=labels,
+            y=values,
+            mode='lines+markers',
+        name='Trend Line',
+        line=dict(color='orange', width=2),
+        marker=dict(size=6)
+        ))
+
+    fig.update_layout(
+        title=f'Top {top_n} Counts for {column_name}',
+        xaxis_title='Values',
+        yaxis_title='Counts',
+        template='plotly_white',
+        uniformtext_minsize=8,
+        uniformtext_mode='hide'
+    )
+
+    fig.show()
