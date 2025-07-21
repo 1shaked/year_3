@@ -19,6 +19,7 @@ CUSTOMER_LEAD_TIME_MIN = 1.0
 CUSTOMER_LEAD_TIME_MAX = 5.0
 CUSTOMER_ORDER_COST_MIN = 10.0
 CUSTOMER_ORDER_COST_MAX = 30.0
+WORKING_DAY_LENGTH = 8   # 8 hours 
 STATION_PROCESS_TIME = {
     1: 3,  # Station 1 min/max
     2: 4,  # Station 2 min/max
@@ -114,6 +115,14 @@ class Inventory:
     def check_capacity_for_product(self, product: ProductType, quantity: int) -> bool:
         """Check if there is enough of a product in the stock"""
         return self.get_product_instances_by_type(product) >= quantity
+    
+    def check_if_components_in_stock(self, order: Order) -> bool:
+        """Check if the ingredients for the order are available."""        
+        needed_ingredients = self.get_tree_from_products_list(order.products)
+        
+        return self.has_sufficient_ingredients(needed_ingredients)
+    
+
     def has_sufficient_ingredients(self, ingredients: Dict[ProductType, int]) -> bool:
         """
         Check if the inventory has sufficient ingredients for the given product types and quantities.
@@ -128,7 +137,50 @@ class Inventory:
             if item.product_type == product_type and (not include_reserve or item.order_id is None):
                 count += item.amount
         return count
-
+    
+    def pull_resource_from_stock(self, product_type: ProductType, quantity: int) -> Optional[ProductInstance]:
+        """
+        Pull a resource from the stock if available.
+        Returns the pulled product instance or None if not enough stock.
+        """
+        for item in self.items:
+            if item.product_type == product_type and item.amount >= quantity:
+                item.amount -= quantity
+                if item.amount == 0:
+                    self.items.remove(item)
+                self.calculate_total_volume()
+                return item
+            else: 
+                raise ValueError(f"Not enough stock for {product_type.product_id}. Requested: {quantity}, Available: {item.amount}")
+        return None
+    def pull_resources_from_stock_by_order(self, order: Order) -> List[ProductInstance]:
+        """
+        Pull resources from stock based on the order.
+        Returns a list of pulled product instances.
+        """
+        pulled_items = []
+        for product_type, quantity in order.products:
+            item = self.pull_resource_from_stock(product_type, quantity)
+            if item:
+                pulled_items.append(item)
+            else:
+                raise ValueError(f"Not enough stock to fulfill order for {product_type.product_id}.")
+        return pulled_items
+    
+    def check_if_has_in_stock(self, product_type: ProductType, quantity: int) -> bool:
+        """
+        Check if the inventory has sufficient stock of a specific product type.
+        """
+        return self.get_product_instances_by_type(product_type) >= quantity
+    
+    def check_if_order_in_stock(self, order: Order) -> bool:
+        """
+        Check if the inventory has sufficient stock to fulfill an order.
+        """
+        for product_type, quantity in order.products:
+            if not self.check_if_has_in_stock(product_type, quantity):
+                return False
+        return True
 class SimulationManager:
     """
     Manages the simulation loop, initializes entities, tracks time and performance.
@@ -200,11 +252,26 @@ class SimulationManager:
             # producing the products
             # start with the closest order
             closest_lead_time = self.get_closest_order_lead_time(False)
-            while closest_lead_time is not None:
+            closest_order = self.get_closest_order_lead_time(False)
+            time = 0
+            while closest_lead_time is not None and time < WORKING_DAY_LENGTH:
                 print(f"Closest lead time for orders: {closest_lead_time}")
+                is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order)
+                if is_order_in_stock:
+                    self.inventory.pull_resources_from_stock_by_order(closest_order)
+                    closest_order.mark_fulfilled()
+                    continue
+
+                has_components_in_stock = self.inventory.check_if_components_in_stock(closest_order)
+                if has_components_in_stock:
+                    self.inventory.pull_resources_from_stock_by_order(closest_order)
+                    # TODO: start producing the products
+                
                 # start producing the products
-                if not self.check_order_components(closest_lead_time):
-                    print(f"Insufficient ingredients to fulfill order with lead time {closest_lead_time}.")
+                # if not self.check_order_components(closest_lead_time):
+                #     print(f"Insufficient ingredients to fulfill order with lead time {closest_lead_time}.")
+
+
             if closest_lead_time is None:
                 print("No orders to fulfill today.")
                 continue
@@ -390,25 +457,7 @@ class SimulationManager:
     def log_statistics(self):
         """Log or print simulation statistics."""
         pass
-
-    def check_order_components(self, order: Order) -> bool:
-        """Check if the ingredients for the order are available."""
-        for product_type, quantity in order.products:
-            ready_q = self.inventory.get_product_instances_by_type(product_type)
-            quantity = quantity - ready_q
-            if quantity > 0:
-                # we will need to check if we can generate the order now
-                needed_ingredients = self.product_tree(product_type, quantity)
-                have_ingredients = self.inventory.has_sufficient_ingredients(needed_ingredients)
-                # we need to subtract the amount we have in the inventory and then check how much we need to order
-                
-        needed_ingredients = self.get_tree_from_products_list(order.products)
-        # check if there is some combination of suppliers that can provide the needed ingredients
-        # first we subtract the current inventory of the products from the needed ingredients
-        for product_type, quantity in needed_ingredients.items():
-            current_inventory = self.inventory.get_product_instances_by_type(product_type)
-            needed_ingredients[product_type] = max(0, quantity - current_inventory)
-        return self.has_sufficient_ingredients(needed_ingredients)
+    
 
     def product_tree(self, product_type: ProductType , quantity: int = 1) -> Dict[ProductType, int]:
         """

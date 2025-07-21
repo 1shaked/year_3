@@ -113,16 +113,16 @@ class Customer:
         order = Order(order_id, products, due_time)
         self.orders.append(order)
 
-    def is_order_late(self, order: 'Order', current_time: float) -> bool:
+    def is_order_late(self, order: Order, current_time: float) -> bool:
         """Check if an order is late."""
         return current_time > order.due_time
     
-    def get_closest_order(self) -> Order | None: 
+    def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None: 
         """Get the closest order that is not yet fulfilled."""
         due_date = math.inf
         closest_order = None
         for order in self.orders:
-            if order.status == WAITING:
+            if order.status == WAITING or not filter_by_waiting:
                 if order.due_time < due_date:
                     due_date = order.due_time
                     closest_order = order
