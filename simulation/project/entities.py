@@ -2,6 +2,9 @@ import math
 from typing import Dict, List, Any, Optional, Tuple
 import random
 
+WAITING = 'WAITING'
+INGREDIENTS_ORDERED = 'INGREDIENTS_ORDERED'
+FULFILLED = 'FULFILLED'
 class ProductType:
     """
     Represents a type of product with processing time distributions and volume per unit.
@@ -83,15 +86,15 @@ class Order:
     """
     Represents an order placed by a customer.
     """
-    def __init__(self, order_id: int, products: List[Tuple[ProductType, int]], due_time: float, is_fulfilled: bool = False):
+    def __init__(self, order_id: int, products: List[Tuple[ProductType, int]], due_time: float, status: str = 'WAITING'):
         self.order_id = order_id
         self.products = products
         self.due_time = due_time
-        self.is_fulfilled = is_fulfilled
+        self.status = WAITING  # Order status can be 'WAITING', 'INGREDIENTS_ORDERED', 'FULFILLED', etc.
 
     def mark_fulfilled(self):
         """Mark the order as fulfilled."""
-        self.is_fulfilled = True
+        self.status = FULFILLED
 
 class Customer:
     """
@@ -119,7 +122,7 @@ class Customer:
         due_date = math.inf
         closest_order = None
         for order in self.orders:
-            if not order.is_fulfilled:
+            if order.status == WAITING:
                 if order.due_time < due_date:
                     due_date = order.due_time
                     closest_order = order
