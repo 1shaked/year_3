@@ -1,6 +1,5 @@
 import math
 from typing import Dict, List, Any, Optional, Tuple
-import random
 
 WAITING = 'WAITING'
 INGREDIENTS_ORDERED = 'INGREDIENTS_ORDERED'
