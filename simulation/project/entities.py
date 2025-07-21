@@ -110,7 +110,7 @@ class Customer:
         """Place a new order for a product type."""
         order_id = len(self.orders) + 1  # Simple ID generation
         due_time = self.max_lead_time  # Assuming due time is the max lead time for simplicity
-        order = Order(order_id, self, products, due_time)
+        order = Order(order_id, products, due_time)
         self.orders.append(order)
 
     def is_order_late(self, order: 'Order', current_time: float) -> bool:

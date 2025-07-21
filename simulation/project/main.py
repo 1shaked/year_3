@@ -157,11 +157,11 @@ class SimulationManager:
         # simulation days loop
         self.producing_by_demand_only()
 
-    def get_closest_order_lead_time(self) -> float | None:
+    def get_closest_order_lead_time(self, filter_by_waiting: True) -> float | None:
         due_date = math.inf
         for customer in self.customers:
             order = customer.get_closest_order()
-            if order and order.status == WAITING:
+            if order and (order.status == WAITING or not filter_by_waiting):
                 due_date = min(due_date, order.due_time)
         return due_date if due_date != math.inf else None
 
@@ -191,23 +191,41 @@ class SimulationManager:
             
             needed_ingredients = list(ingredients.items())
             closest_lead_time = self.get_closest_order_lead_time()
-            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients, closest_lead_time )
+            cheapest_supplier = None
+            count = 0
+            while cheapest_supplier is None:
+                cheapest_supplier = self.find_cheapest_supplier(needed_ingredients, closest_lead_time + count )
+                count += 1
             cheapest_supplier.place_order(needed_ingredients, self.time)
+            # producing the products
+            # start with the closest order
+            closest_lead_time = self.get_closest_order_lead_time(False)
+            while closest_lead_time is not None:
+                print(f"Closest lead time for orders: {closest_lead_time}")
+                # start producing the products
+                if not self.check_order_components(closest_lead_time):
+                    print(f"Insufficient ingredients to fulfill order with lead time {closest_lead_time}.")
+            if closest_lead_time is None:
+                print("No orders to fulfill today.")
+                continue
+
+
+
             # order the customers orders by the due date
-            order_closest = None
-            client_closest = None
-            for customer in self.customers:
-                order = customer.get_closest_order()
-                if order:
-                    if not order_closest or order.due_time < order_closest.due_time:
-                        order_closest = order
-                        client_closest = customer
-            # check that we have enough ingredients to fulfill the closest order
-            if order_closest:
-                if not self.has_sufficient_ingredients(needed_ingredients):
-                    print(f"Insufficient ingredients to fulfill order {order_closest.order_id}.")
-                    # TODO: need to start the production process
-                    continue
+            # order_closest = None
+            # client_closest = None
+            # for customer in self.customers:
+            #     order = customer.get_closest_order()
+            #     if order:
+            #         if not order_closest or order.due_time < order_closest.due_time:
+            #             order_closest = order
+            #             client_closest = customer
+            # # check that we have enough ingredients to fulfill the closest order
+            # if order_closest:
+            #     if not self.has_sufficient_ingredients(needed_ingredients):
+            #         print(f"Insufficient ingredients to fulfill order {order_closest.order_id}.")
+            #         # TODO: need to start the production process
+            #         continue
 
     def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]], max_lead_time) -> Supplier:
         """
@@ -241,8 +259,10 @@ class SimulationManager:
             for order in customer.orders:
                 if order.status != WAITING: # because it either fulfilled or ingredients ordered
                     continue  
-                if order.product_type == product_type:
-                    total_demand += order.quantity
+                for product_object in order.products:
+                    product, quantity = product_object
+                    if product == product_type:
+                        total_demand += quantity
         return total_demand
     def setup_suppliers(self) -> None:
         """
@@ -252,8 +272,8 @@ class SimulationManager:
         self.suppliers = [
             Supplier(
                 supplier_id=i,
-                lead_time=random.uniform(SUPPLIER_LEAD_TIME_MIN, SUPPLIER_LEAD_TIME_MAX),
-                fixed_order_cost=random.uniform(SUPPLIER_ORDER_COST_MIN, SUPPLIER_ORDER_COST_MAX),
+                lead_time=random.randint(SUPPLIER_LEAD_TIME_MIN, SUPPLIER_LEAD_TIME_MAX),
+                fixed_order_cost=random.randint(SUPPLIER_ORDER_COST_MIN, SUPPLIER_ORDER_COST_MAX),
                 raw_material_cost_distribution={
                     self.product_x: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_X]),
                     self.product_y: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_Y]),
