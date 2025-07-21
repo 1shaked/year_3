@@ -2,7 +2,7 @@ import math
 from typing import Dict, List, Optional, Any, Tuple
 import random
 from itertools import combinations
-from entities import Order, ProductType, Supplier, Station, ProductInstance, Customer
+from entities import WAITING, Order, ProductType, Supplier, Station, ProductInstance, Customer
 # =====================
 # Simulation Constants
 # =====================
@@ -157,6 +157,14 @@ class SimulationManager:
         # simulation days loop
         self.producing_by_demand_only()
 
+    def get_closest_order_lead_time(self) -> float | None:
+        due_date = math.inf
+        for customer in self.customers:
+            order = customer.get_closest_order()
+            if order and order.status == WAITING:
+                due_date = min(due_date, order.due_time)
+        return due_date if due_date != math.inf else None
+
     def producing_by_demand_only(self) -> None:
         """
         Produce products only based on the demand calculated from customer orders.
@@ -182,7 +190,8 @@ class SimulationManager:
             # transform the ingredients into a list of product types and their quantities
             
             needed_ingredients = list(ingredients.items())
-            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients)
+            closest_lead_time = self.get_closest_order_lead_time()
+            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients, closest_lead_time )
             cheapest_supplier.place_order(needed_ingredients, self.time)
             # order the customers orders by the due date
             order_closest = None
@@ -200,16 +209,17 @@ class SimulationManager:
                     # TODO: need to start the production process
                     continue
 
-    def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]]) -> Supplier:
+    def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]], max_lead_time) -> Supplier:
         """
         Find the cheapest supplier for the given product types.
         """
-        # TODO: check also with the customer lead time to see if this supplier can deliver in time
         # Logic to find the cheapest supplier
         # check if We order only from one supplier everything
         cheapest_supplier: Supplier = None
         cost = math.inf
         for supplier in self.suppliers:
+            if supplier.lead_time > max_lead_time:
+                continue
             total_cost = 0
             for product_type, quantity in product_types:
                 cost_unit = supplier.sample_raw_material_cost(product_type)
@@ -229,6 +239,8 @@ class SimulationManager:
         total_demand = 0
         for customer in self.customers:
             for order in customer.orders:
+                if order.status != WAITING: # because it either fulfilled or ingredients ordered
+                    continue  
                 if order.product_type == product_type:
                     total_demand += order.quantity
         return total_demand
