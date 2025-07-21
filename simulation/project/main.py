@@ -116,12 +116,20 @@ class Inventory:
         """Check if there is enough of a product in the stock"""
         return self.get_product_instances_by_type(product) >= quantity
     
-    def check_if_components_in_stock(self, order: Order) -> bool:
-        """Check if the ingredients for the order are available."""        
-        needed_ingredients = self.get_tree_from_products_list(order.products)
-        
-        return self.has_sufficient_ingredients(needed_ingredients)
     
+
+    # def get_tree_from_products_list(self, products: List[Tuple[ProductType, int]]) -> Dict[ProductType, int]:
+    #     """
+    #     Get the total ingredients required for a list of product instances.
+    #     """
+    #     total_ingredients = {}
+    #     for product, quantity in products:
+    #         ingredients = self.product_tree(product, quantity)
+    #         for ingredient, amount in ingredients.items():
+    #             if ingredient not in total_ingredients:
+    #                 total_ingredients[ingredient] = 0
+    #             total_ingredients[ingredient] += amount
+    #     return total_ingredients
 
     def has_sufficient_ingredients(self, ingredients: Dict[ProductType, int]) -> bool:
         """
@@ -209,13 +217,28 @@ class SimulationManager:
         # simulation days loop
         self.producing_by_demand_only()
 
-    def get_closest_order_lead_time(self, filter_by_waiting: True) -> float | None:
+    def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
         due_date = math.inf
         for customer in self.customers:
             order = customer.get_closest_order()
             if order and (order.status == WAITING or not filter_by_waiting):
                 due_date = min(due_date, order.due_time)
         return due_date if due_date != math.inf else None
+    
+    def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None:
+        """
+        Get the closest order that is not yet fulfilled.
+        If filter_by_waiting is True, only consider orders that are waiting.
+        """
+        due_date = math.inf
+        closest_order = None
+        for customer in self.customers:
+            order = customer.get_closest_order(filter_by_waiting)
+            if order and (order.status == WAITING or not filter_by_waiting):
+                if order.due_time < due_date:
+                    due_date = order.due_time
+                    closest_order = order
+        return closest_order
 
     def producing_by_demand_only(self) -> None:
         """
@@ -252,7 +275,7 @@ class SimulationManager:
             # producing the products
             # start with the closest order
             closest_lead_time = self.get_closest_order_lead_time(False)
-            closest_order = self.get_closest_order_lead_time(False)
+            closest_order = self.get_closest_order(False)
             time = 0
             while closest_lead_time is not None and time < WORKING_DAY_LENGTH:
                 print(f"Closest lead time for orders: {closest_lead_time}")
@@ -262,14 +285,34 @@ class SimulationManager:
                     closest_order.mark_fulfilled()
                     continue
 
-                has_components_in_stock = self.inventory.check_if_components_in_stock(closest_order)
+                has_components_in_stock = self.check_if_components_in_stock(closest_order)
                 if has_components_in_stock:
                     self.inventory.pull_resources_from_stock_by_order(closest_order)
                     # TODO: start producing the products
-                
-                # start producing the products
-                # if not self.check_order_components(closest_lead_time):
-                #     print(f"Insufficient ingredients to fulfill order with lead time {closest_lead_time}.")
+                    for product_type, quantity in closest_order.products:
+                        # get the ingredients for the product type
+                        process_times = []
+                        ingredients = self.product_tree(product_type, quantity)
+                        for ingredient, amount in ingredients.items():
+                            # process the ingredient on the station
+                            if ingredient == self.product_x:
+                                station = self.stations[0]  # Assuming we start with the first station
+                                process_time = station.sample_processing_time(ingredient)
+                                process_times.append(process_time )
+                            elif ingredient == self.product_y:
+                                station = self.stations[1]
+                                process_time = station.sample_processing_time(ingredient)
+                                process_times.append(process_time)
+                            elif ingredient == self.product_z:
+                                station = self.stations[2]
+                                process_time = station.sample_processing_time(ingredient)
+                                process_times.append(process_time)
+                        if max(process_times) + time <= WORKING_DAY_LENGTH:
+                            time += max(process_times)
+                            print(f"Processing {quantity} of {product_type.product_id} at stations with times: {process_times}")
+                        else:
+                            print(f"Not enough time to process {quantity} of {product_type.product_id} today. Remaining time: {WORKING_DAY_LENGTH - time}")
+                            break
 
 
             if closest_lead_time is None:
@@ -357,8 +400,8 @@ class SimulationManager:
         self.customers = [
             Customer(
                 customer_id=i,
-                max_lead_time=random.uniform(CUSTOMER_LEAD_TIME_MIN, CUSTOMER_LEAD_TIME_MAX),
-                order_cost=random.uniform(CUSTOMER_ORDER_COST_MIN, CUSTOMER_ORDER_COST_MAX)
+                max_lead_time=random.randint(CUSTOMER_LEAD_TIME_MIN, CUSTOMER_LEAD_TIME_MAX),
+                order_cost=random.randint(CUSTOMER_ORDER_COST_MIN, CUSTOMER_ORDER_COST_MAX)
             ) for i in range(num_customers)
         ]
 
@@ -487,3 +530,10 @@ class SimulationManager:
                     total_ingredients[ingredient] = 0
                 total_ingredients[ingredient] += amount
         return total_ingredients
+    
+    def check_if_components_in_stock(self, order: Order) -> bool:
+        """Check if the ingredients for the order are available."""        
+        needed_ingredients = self.get_tree_from_products_list(order.products)
+        
+        return self.has_sufficient_ingredients(needed_ingredients)
+    
