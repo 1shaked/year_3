@@ -1,9 +1,17 @@
 import math
 from typing import Dict, List, Any, Optional, Tuple
+from typing import Union
+
+from main import PRODUCT_ID_Z, STATUS_COMPLETED, STATUS_PROCESSING, STATUS_WAITING
 
 WAITING = 'WAITING'
 INGREDIENTS_ORDERED = 'INGREDIENTS_ORDERED'
 FULFILLED = 'FULFILLED'
+
+# STATION_ID_X = 'PRODUCT_X'
+# STATION_ID_Y = 'PRODUCT_Y'
+# STATION_ID_Z = f'{STATION_ID_X}_{STATION_ID_Y}_PRODUCT_Z'
+
 class ProductType:
     """
     Represents a type of product with processing time distributions and volume per unit.
@@ -56,23 +64,15 @@ class Supplier:
         """Deliver materials at the given time."""
         pass
 
-class Station:
-    """
-    Represents a processing station with a queue of products.
-    """
-    def __init__(self, station_id: int):
-        self.station_id = station_id
-        self.end_processing_time: float | None = None
-
-    def sample_processing_time(self, product_type: ProductType) -> float:
-        """Sample processing time for a product type at this station."""
-        return product_type.sample_processing_time(self.station_id)
 
 class ProductInstance:
     """
     Represents an instance of a product in the system.
     """
-    def __init__(self, product_type: ProductType, order_id: int | None, status: str = "waiting", amount: int = 1):
+    def __init__(self, product_type: ProductType, order_id: int | None, status: str = STATUS_WAITING, amount: int = 1):
+        '''
+        The status can be (STATUS_WAITING STATUS_PROCESSING, STATUS_COMPLETED)
+        '''
         self.product_type = product_type
         self.order_id = order_id
         self.status = status
@@ -81,6 +81,79 @@ class ProductInstance:
     def advance_to_next_station(self):
         """Advance this product to the next station in its route."""
         pass
+class Station:
+    """
+    Represents a processing station with a queue of products.
+    """
+    def __init__(self, station_id: int):
+        self.station_id = station_id
+        # the queue holds tuples of (ProductInstance, processing_time)
+        self.queue: List[(ProductInstance, float)] = []
+        self.working_item_index: Optional[int] = None  # Index of the currently processing item, if any
+
+
+    def get_item_in_queue(self, index: int) -> Tuple[ProductInstance, float ] | None:
+        """Get the current queue of product instances."""
+        if 0 <= index < len(self.queue):
+            return self.queue[index]
+        return None
+    
+    def start_processing(self, index) -> float:
+        self.queue[index][0].status = STATUS_PROCESSING
+        self.working_item_index = index
+        return self.queue[index][1]
+    
+    def decrement_processing_time(self, index: int, time: float) -> Tuple[ProductInstance | None, float]:
+        """Decrement the processing time of the product instance at the given index."""
+        if 0 <= index < len(self.queue):
+            product_instance, processing_time = self.queue[index]
+            new_processing_time = max(0, processing_time - time)
+            self.queue[index] = (product_instance, new_processing_time)
+            if new_processing_time == 0:
+                product_instance.status = STATUS_COMPLETED
+                self.working_item_index = None
+            return product_instance , new_processing_time
+        return None , 0.0
+    
+    def decrement_processing_time_for_working_item(self, time: float) -> Tuple[ProductInstance | None, float]:
+        """Decrement the processing time of the currently working item."""
+        if self.working_item_index is not None:
+            return self.decrement_processing_time(self.working_item_index, time)
+        return None, 0.0
+
+    def sample_processing_time(self, product_type: ProductType) -> float:
+        """Sample processing time for a product type at this station."""
+        return product_type.sample_processing_time(self.station_id)
+
+    def add_to_queue(self, product_instance: ProductInstance) -> float:
+        """Add a product instance to the station's queue."""
+        processing_time = self.sample_processing_time(product_instance.product_type)
+        self.queue.append((product_instance, processing_time))
+        # self.queue.sort(key=lambda x: x[1])
+        return processing_time
+
+    def check_can_be_processed(self, product: ProductType) -> bool:
+        '''
+        This will be needed for the product type z
+        '''
+        if product.product_id == PRODUCT_ID_Z:
+            # we need to check that product x and y are processed before product z
+
+            pass
+        # Check if the product can be processed at this station
+        pass
+
+    def pop_from_queue(self, index=0) -> Optional[Tuple[ProductInstance, float]]:
+        """Pop the next product instance from the queue."""
+        if self.queue:
+            product_instance, processed_time = self.queue.pop(index)
+            return product_instance, processed_time
+        return None
+    
+    def can_be_processed(self, ) -> bool:
+        '''This function check if the station have all the resources to process the product in the queue'''
+        pass
+    
 class Order:
     """
     Represents an order placed by a customer.
