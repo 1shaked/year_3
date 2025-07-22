@@ -1,0 +1,62 @@
+import random
+
+
+SIMULATION_DAYS = 30
+SUPPLIER_COUNT_MIN = 1
+SUPPLIER_COUNT_MAX = 5
+CUSTOMER_COUNT_MIN = 5
+CUSTOMER_COUNT_MAX = 12
+SUPPLIER_LEAD_TIME_MIN = 3.0
+SUPPLIER_LEAD_TIME_MAX = 7.0
+SUPPLIER_ORDER_COST_MIN = 20.0
+SUPPLIER_ORDER_COST_MAX = 60.0
+CUSTOMER_LEAD_TIME_MIN = 1.0
+CUSTOMER_LEAD_TIME_MAX = 5.0
+CUSTOMER_ORDER_COST_MIN = 10.0
+CUSTOMER_ORDER_COST_MAX = 30.0
+WORKING_DAY_LENGTH = 8   # 8 hours 
+STATION_PROCESS_TIME = {
+    1: random.randint(3, 6),  # Station 1 min/max
+    2: random.randint(4, 6),  # Station 2 min/max
+    3: random.randint(4, 6),  # Station 3 min/max
+}
+PRODUCT_ID_X = 'x'
+PRODUCT_ID_Y = 'y'
+PRODUCT_ID_Z = 'z'
+PRODUCT_ID_FIRST = 'A'  # Product type 1
+PRODUCT_ID_SECOND = 'B'  # Product type 2
+PRODUCT_VOLUME = {
+    PRODUCT_ID_FIRST: 1.0,
+    PRODUCT_ID_SECOND: 1.5,
+    PRODUCT_ID_X: 2.0,  # Product x has a different volume
+    PRODUCT_ID_Y: 1.2,  # Product y has a different volume
+    PRODUCT_ID_Z: 1.8,  # Product z has a different volume
+}
+
+CUSTOMER_PROBABILITY_TO_ORDER = 0.6  # 60% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
+RAW_MATERIAL_COST = {
+    PRODUCT_ID_X: [6.0, 8.0],  
+    PRODUCT_ID_Y: [8.0, 10.0], 
+    PRODUCT_ID_Z: [9.0, 11.0], 
+}
+CUSTOMER_MIN_ORDER_QUANTITY = 3
+CUSTOMER_MAX_ORDER_QUANTITY = 10
+STATUS_WAITING = "waiting"
+STATUS_PROCESSING = "processing"
+STATUS_COMPLETED = "completed"
+INVENTORY_CAPACITY_LIMIT = 100_000_000.0  # Example capacity limit for inventory
+HOLDING_COST_PER_UNIT = 1.0  # Example holding cost per unit
+# Base inventory constants for each product
+PRODUCT_ONE_BASE_INVENTORY_LOW = 1
+PRODUCT_ONE_BASE_INVENTORY_HIGH = 10
+PRODUCT_TWO_BASE_INVENTORY_LOW = 1
+PRODUCT_TWO_BASE_INVENTORY_HIGH = 10
+PRODUCT_X_BASE_INVENTORY_LOW = 1
+PRODUCT_X_BASE_INVENTORY_HIGH = 10
+PRODUCT_Y_BASE_INVENTORY_LOW = 1
+PRODUCT_Y_BASE_INVENTORY_HIGH = 10
+PRODUCT_Z_BASE_INVENTORY_LOW = 1
+PRODUCT_Z_BASE_INVENTORY_HIGH = 10
+STATION_ONE_ID = 1
+STATION_TWO_ID = 2
+STATION_THREE_ID = 3

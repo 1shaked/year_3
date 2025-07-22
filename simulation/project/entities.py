@@ -1,8 +1,7 @@
 import math
-from typing import Dict, List, Any, Optional, Tuple
-from typing import Union
+from typing import Dict, List, Any, Optional, Tuple, Union
+from consts import *
 
-from main import PRODUCT_ID_Z, STATUS_COMPLETED, STATUS_PROCESSING, STATUS_WAITING
 
 WAITING = 'WAITING'
 INGREDIENTS_ORDERED = 'INGREDIENTS_ORDERED'
