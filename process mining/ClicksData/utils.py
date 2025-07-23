@@ -12,8 +12,6 @@ from pm4py.algo.filtering.log.variants import variants_filter
 from pm4py.algo.filtering.log.variants.variants_filter import filter_variants_top_k
 from pm4py.discovery import discover_petri_net_inductive
 from pm4py.statistics.variants.log import get as variants_module
-from pm4py.conformance import precision_alignments
-from pm4py.conformance import fitness_token_based_replay
 from pm4py.conformance import precision_token_based_replay, precision_alignments, fitness_token_based_replay, fitness_alignments
 
 FILE = 'BPI2016_Clicks_NOT_Logged_In.csv'
@@ -83,23 +81,23 @@ def display_most_common_actions(data_counts, col, x, top_n=10, action_col='PAGE_
     pn_gviz = pn_visualizer.apply(net, im, fm)
     pn_visualizer.view(pn_gviz)
 
-    print("\n🔍 Conformance Checking Results:\n")
+    # print("\n🔍 Conformance Checking Results:\n")
 
-    # Token-based Fitness
-    fitness_tok = fitness_token_based_replay(filtered_log, net, im, fm)
-    print("🎯 Token-based Fitness:", fitness_tok)
+    # # Token-based Fitness
+    # fitness_tok = fitness_token_based_replay(filtered_log, net, im, fm)
+    # print("🎯 Token-based Fitness:", fitness_tok)
 
-    # Alignment-based Fitness
-    fitness_align = fitness_alignments(filtered_log, net, im, fm)
-    print("🎯 Alignment-based Fitness:", fitness_align)
+    # # Alignment-based Fitness
+    # fitness_align = fitness_alignments(filtered_log, net, im, fm)
+    # print("🎯 Alignment-based Fitness:", fitness_align)
 
-    # Token-based Precision
-    precision_tok = precision_token_based_replay(filtered_log, net, im, fm)
-    print("🎯 Token-based Precision:", precision_tok    )
+    # # Token-based Precision
+    # precision_tok = precision_token_based_replay(filtered_log, net, im, fm)
+    # print("🎯 Token-based Precision:", precision_tok    )
 
-    # Alignment-based Precision
-    precision_align = precision_alignments(filtered_log, net, im, fm)
-    print("🎯 Alignment-based Precision:", precision_align)
+    # # Alignment-based Precision
+    # precision_align = precision_alignments(filtered_log, net, im, fm)
+    # print("🎯 Alignment-based Precision:", precision_align)
 
     return filtered_log, pt_gviz, pn_gviz
 
@@ -155,23 +153,23 @@ def display_most_common_actions_from_df(df_logs, top_n=10, action_col='PAGE_NAME
     pn_visualizer.view(pn_gviz)
 
 
-    print("\n🔍 Conformance Checking Results:\n")
+    # print("\n🔍 Conformance Checking Results:\n")
 
-    # Token-based Fitness
-    fitness_tok = fitness_token_based_replay(filtered_log, net, im, fm)
-    print("🎯 Token-based Fitness:", fitness_tok)
+    # # Token-based Fitness
+    # fitness_tok = fitness_token_based_replay(filtered_log, net, im, fm)
+    # print("🎯 Token-based Fitness:", fitness_tok)
 
-    # Alignment-based Fitness
-    fitness_align = fitness_alignments(filtered_log, net, im, fm)
-    print(f"🎯 Alignment-based Fitness: {fitness_align}")
+    # # Alignment-based Fitness
+    # fitness_align = fitness_alignments(filtered_log, net, im, fm)
+    # print(f"🎯 Alignment-based Fitness: {fitness_align}")
 
-    # Token-based Precision
-    precision_tok = precision_token_based_replay(filtered_log, net, im, fm)
-    print(f"🎯 Token-based Precision: {precision_tok}")
+    # # Token-based Precision
+    # precision_tok = precision_token_based_replay(filtered_log, net, im, fm)
+    # print(f"🎯 Token-based Precision: {precision_tok}")
 
-    # Alignment-based Precision
-    precision_align = precision_alignments(filtered_log, net, im, fm)
-    print(f"🎯 Alignment-based Precision: {precision_align}")
+    # # Alignment-based Precision
+    # precision_align = precision_alignments(filtered_log, net, im, fm)
+    # print(f"🎯 Alignment-based Precision: {precision_align}")
 
     return tree , filtered_log, pt_gviz, pn_gviz
 
@@ -223,3 +221,17 @@ def plot_counts(data_counts, column_name, trend_line=True, top_n=0):
     )
 
     fig.show()
+
+
+def convert_df_to_log(df, case_id='SessionID', activity_key='service_detail_transform', timestamp_key='TIMESTAMP'):
+    """
+    Convert a DataFrame to a PM4Py log format.
+    """
+    collapsed_df = dataframe_utils.convert_timestamp_columns_in_df(df.rename(columns={
+        case_id: 'case:concept:name',
+        activity_key: 'concept:name',
+        timestamp_key: 'time:timestamp'
+    }, ))
+    event_log = log_converter.apply(collapsed_df, variant=log_converter.Variants.TO_EVENT_LOG)
+
+    return event_log
