@@ -238,7 +238,16 @@ class SimulationManager:
             # start by simulation for each day
             # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order for each product type
             self.init_customer_order_for_day(self.product_one, self.product_two)
-            
+            # update the inventory based on the suppliers orders received, (by the due date)
+            # TODO: 
+            for supplier in self.suppliers:
+                for order in supplier.orders:
+                    if order['due_time'] == self.time:
+                        # add the products to the inventory
+                        for product_type, quantity in order['products']:
+                            product_instance = ProductInstance(product_type=product_type, order_id=None, amount=quantity)
+                            self.inventory.add(product_instance)
+
             # calculate how much product are needed left to produce to fulfill orders
             stock_one = self.inventory.get_product_instances_by_type(self.product_one)
             stock_two = self.inventory.get_product_instances_by_type(self.product_two)
