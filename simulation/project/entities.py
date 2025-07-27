@@ -3,9 +3,6 @@ from typing import Dict, List, Any, Optional, Tuple, Union
 from consts import *
 
 
-WAITING = 'WAITING'
-INGREDIENTS_ORDERED = 'INGREDIENTS_ORDERED'
-FULFILLED = 'FULFILLED'
 
 # STATION_ID_X = 'PRODUCT_X'
 # STATION_ID_Y = 'PRODUCT_Y'
@@ -15,10 +12,11 @@ class ProductType:
     """
     Represents a type of product with processing time distributions and volume per unit.
     """
-    def __init__(self, product_id: int | str, processing_time_distributions: Dict[int, Any], volume_per_unit: float):
+    def __init__(self, product_id: int | str, processing_time_distributions: Dict[int, Any], volume_per_unit: float, cost: float = 0.0):
         self.product_id = product_id
         self.processing_time_distributions = processing_time_distributions  # station_id -> distribution
         self.volume_per_unit = volume_per_unit
+        self.cost = cost  # Cost per unit of this product type
 
     def sample_processing_time(self, station_id: int) -> float:
         """Sample processing time for a given station."""
@@ -68,18 +66,29 @@ class ProductInstance:
     """
     Represents an instance of a product in the system.
     """
-    def __init__(self, product_type: ProductType, order_id: int | None, status: str = STATUS_WAITING, amount: int = 1):
+    def __init__(self, product_type: ProductType, order_id: int | None, status: str = INGREDIENTS_WAITING, amount: int = 1):
         '''
-        The status can be (STATUS_WAITING STATUS_PROCESSING, STATUS_COMPLETED)
+        The status can be (INGREDIENTS_WAITING, INGREDIENTS_ORDERED, FULFILLED)
         '''
         self.product_type = product_type
         self.order_id = order_id
         self.status = status
         self.amount = amount
 
+    def __str__(self):
+        """String representation of the product instance."""
+        return f"ProductInstance(product_id={self.product_type.product_id}, order_id={self.order_id}, status={self.status}, amount={self.amount})"
+
     def advance_to_next_station(self):
         """Advance this product to the next station in its route."""
         pass
+
+    def get_product_price(self) -> float:
+        """Get the price of this product instance."""
+        if self.product_type.cost == 0.0:
+            raise ValueError("Product type cost is not set.")
+        # Assuming the cost is per unit, multiply by the amount
+        return self.product_type.cost * self.amount
 class Station:
     """
     Represents a processing station with a queue of products.
@@ -98,7 +107,7 @@ class Station:
         return None
     
     def start_processing(self, index) -> float:
-        self.queue[index][0].status = STATUS_PROCESSING
+        self.queue[index][0].status = STATUS_PROCESSING_MACHINE
         self.working_item_index = index
         return self.queue[index][1]
     
@@ -109,7 +118,7 @@ class Station:
             new_processing_time = max(0, processing_time - time)
             self.queue[index] = (product_instance, new_processing_time)
             if new_processing_time == 0:
-                product_instance.status = STATUS_COMPLETED
+                product_instance.status = STATUS_COMPLETED_MACHINE
                 self.working_item_index = None
             return product_instance , new_processing_time
         return None , 0.0
@@ -157,15 +166,25 @@ class Order:
     """
     Represents an order placed by a customer.
     """
-    def __init__(self, order_id: int, products: List[Tuple[ProductType, int]], due_time: float, status: str = 'WAITING'):
+    def __init__(self, order_id: int, products: List[Tuple[ProductType, int]], due_time: float, status: str = INGREDIENTS_WAITING):
         self.order_id = order_id
         self.products = products
         self.due_time = due_time
-        self.status = WAITING  # Order status can be 'WAITING', 'INGREDIENTS_ORDERED', 'FULFILLED', etc.
+        self.status = INGREDIENTS_WAITING  # Order status can be 'WAITING', 'INGREDIENTS_ORDERED', 'FULFILLED', etc.
 
     def mark_fulfilled(self):
         """Mark the order as fulfilled."""
         self.status = FULFILLED
+
+    def calculate_order_cost(self) -> float:
+        for product, q in self.products:
+            if product.cost == 0.0:
+                raise ValueError("Product type cost is not set.")
+        return sum(product.cost * q for product, q in self.products)
+    
+    def __str__(self):
+        '''String representation of the order for logging purposes'''
+        return f"Order ID: {self.order_id}, \nProducts: {[(product.product_id, quantity) for product, quantity in self.products]}, \nDue Time: {self.due_time},\tStatus: {self.status}"
 
 class Customer:
     """
@@ -177,9 +196,9 @@ class Customer:
         self.order_cost = order_cost
         self.orders: List[Order] = []
 
-    def place_order(self, products: List[Tuple[ProductType, int]]):
+    def place_order(self, products: List[Tuple[ProductType, int]] , day: int) -> None:
         """Place a new order for a product type."""
-        order_id = len(self.orders) + 1  # Simple ID generation
+        order_id = f'{self.customer_id}_{day}_{len(self.orders) + 1}'  # Simple ID generation
         due_time = self.max_lead_time  # Assuming due time is the max lead time for simplicity
         order = Order(order_id, products, due_time)
         self.orders.append(order)
@@ -193,7 +212,7 @@ class Customer:
         due_date = math.inf
         closest_order = None
         for order in self.orders:
-            if order.status == WAITING or not filter_by_waiting:
+            if order.status == INGREDIENTS_WAITING or not filter_by_waiting:
                 if order.due_time < due_date:
                     due_date = order.due_time
                     closest_order = order

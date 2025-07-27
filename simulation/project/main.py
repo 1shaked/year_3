@@ -3,7 +3,7 @@ import random
 from typing import Dict, List, Optional, Any, Tuple
 from itertools import combinations
 from consts import *
-from entities import WAITING, Order, ProductType, Supplier, Station, ProductInstance, Customer
+from entities import INGREDIENTS_WAITING, Order, ProductType, Supplier, Station, ProductInstance, Customer
 # =====================
 # Simulation Constants
 # =====================
@@ -23,6 +23,13 @@ class Inventory:
         self.capacity_limit = capacity_limit
         self.holding_cost_per_unit = holding_cost_per_unit
         
+
+    def __str__(self):
+        '''String that will contain the inventory items'''
+        s = ''
+        for item in self.items:
+            s += f'{item.product_type.product_id} (Order ID: {item.order_id}, Amount: {item.amount})\n'
+        return s
 
     def set_random_inventory(self, items: List[ProductInstance]):
         self.items = items
@@ -48,6 +55,12 @@ class Inventory:
     def add(self, product_instance: ProductInstance):
         if not self.can_store(product_instance):
             raise ValueError("Not enough space in inventory.")
+        # before adding check if the product_instance already exists in the inventory with the same order_id and status
+        for item in self.items:
+            if item.product_type == product_instance.product_type and item.order_id == product_instance.order_id and item.status == product_instance.status:
+                item.amount += product_instance.amount
+                self.calculate_total_volume()
+                return
         self.items.append(product_instance)
         self.calculate_total_volume()
 
@@ -82,15 +95,16 @@ class Inventory:
     #             total_ingredients[ingredient] += amount
     #     return total_ingredients
 
-    def has_sufficient_ingredients(self, ingredients: Dict[ProductType, int], include_reserve: bool = False) -> bool:
+    def has_sufficient_ingredients(self, ingredients: Dict[ProductType, int], order_id: str| None , status: str | None) -> bool:
         """
         Check if the inventory has sufficient ingredients for the given product types and quantities.
         """
         for product_type, quantity in ingredients.items():
-            if self.get_product_instances_by_type(product_type, include_reserve) < quantity:
+            if self.get_product_instances_by_type(product_type, order_id=order_id, status=status) < quantity:
                 return False
         return True
-    def get_product_instances_by_type(self, product_type: ProductType, include_reserve: bool = False) -> int:
+
+    def get_product_instances_by_type(self, product_type: ProductType, order_id: str | None = None, status: str | None = INGREDIENTS_WAITING) -> int:
         '''
         Get the total number of product instances of a specific type.
         If include_reserve is True, it includes instances with order_id None (reserve stock).
@@ -98,7 +112,7 @@ class Inventory:
         '''
         count = 0
         for item in self.items:
-            if item.product_type == product_type and (not include_reserve or item.order_id is None):
+            if item.product_type == product_type and (order_id is None or item.order_id == order_id) and (status is None or item.status == status):
                 count += item.amount
         return count
     
@@ -126,42 +140,61 @@ class Inventory:
             if item.product_type == product_type and item.order_id == order_id and (status is None or item.status == status):
                 count += item.amount
         return count
-    
-    def pull_resource_from_stock(self, product_type: ProductType, quantity: int) -> Optional[ProductInstance]:
+
+    def pull_resource_from_stock(self, product_type: ProductType, quantity: int, order_id: str | None = None , status=INGREDIENTS_WAITING) -> Optional[ProductInstance]:
         """
         Pull a resource from the stock if available.
         Returns the pulled product instance or None if not enough stock.
         """
         for item in self.items:
-            if item.product_type == product_type and item.amount >= quantity:
+            if item.product_type == product_type and item.amount >= quantity and (order_id is None or item.order_id == order_id) and item.status == status:
                 item.amount -= quantity
                 if item.amount == 0:
                     self.items.remove(item)
                 self.calculate_total_volume()
-                return item
-            else: 
+                # create a copy of the item to return
+                pulled_item = ProductInstance(product_type=item.product_type, order_id=item.order_id, status=item.status, amount=quantity)
+                return pulled_item
+            elif item.amount < quantity: 
                 raise ValueError(f"Not enough stock for {product_type.product_id}. Requested: {quantity}, Available: {item.amount}")
         return None
-    def pull_resources_from_stock_by_order(self, order: Order) -> List[ProductInstance]:
+
+    def pull_resources_from_stock_by_order(self, order: Order, order_id: str | None = None, status: str = INGREDIENTS_WAITING) -> List[ProductInstance]:
         """
         Pull resources from stock based on the order.
         Returns a list of pulled product instances.
         """
         pulled_items = []
         for product_type, quantity in order.products:
-            item = self.pull_resource_from_stock(product_type, quantity)
+            item = self.pull_resource_from_stock(product_type, quantity, order_id=order_id, status=status)
             if item:
+                item.order_id = order.order_id  # Set the order ID for the pulled item
                 pulled_items.append(item)
             else:
                 raise ValueError(f"Not enough stock to fulfill order for {product_type.product_id}.")
         return pulled_items
-    
-    def check_if_has_in_stock(self, product_type: ProductType, quantity: int) -> bool:
+
+    def pull_resources_from_components_dict(self, components_dict: Dict[ProductType, int], order_id: str | None = None, status: str = INGREDIENTS_WAITING) -> List[ProductInstance]:
+        """
+        Pull resources from stock based on a components dictionary.
+        Returns a list of pulled product instances.
+        """
+        pulled_items = []
+        for product_type, quantity in components_dict.items():
+            item = self.pull_resource_from_stock(product_type, quantity, order_id=order_id, status=status)
+            if item:
+                item.order_id = None  # Set the order ID for the pulled item
+                pulled_items.append(item)
+            else:
+                raise ValueError(f"Not enough stock to fulfill request for {product_type.product_id}.")
+        return pulled_items
+
+    def check_if_has_in_stock(self, product_type: ProductType, quantity: int, order_id: str | None = None, status: str | None = INGREDIENTS_WAITING) -> bool:
         """
         Check if the inventory has sufficient stock of a specific product type.
         """
-        return self.get_product_instances_by_type(product_type) >= quantity
-    
+        return self.get_product_instances_by_type(product_type, order_id=order_id, status=status) >= quantity
+
     def check_if_order_in_stock(self, order: Order) -> bool:
         """
         Check if the inventory has sufficient stock to fulfill an order.
@@ -208,7 +241,7 @@ class SimulationManager:
         due_date = math.inf
         for customer in self.customers:
             order = customer.get_closest_order()
-            if order and (order.status == WAITING or not filter_by_waiting):
+            if order and (order.status == INGREDIENTS_WAITING or not filter_by_waiting):
                 due_date = min(due_date, order.due_time)
         return due_date if due_date != math.inf else None
     
@@ -221,7 +254,7 @@ class SimulationManager:
         closest_order = None
         for customer in self.customers:
             order = customer.get_closest_order(filter_by_waiting)
-            if order and (order.status == WAITING or not filter_by_waiting):
+            if order and (order.status == INGREDIENTS_WAITING or not filter_by_waiting):
                 if order.due_time < due_date:
                     due_date = order.due_time
                     closest_order = order
@@ -237,7 +270,7 @@ class SimulationManager:
             print(f"Day {self.time}: Starting production cycle.")
             # start by simulation for each day
             # each customer have a CUSTOMER_PROBABILITY_TO_ORDER chance to place an order for each product type
-            self.init_customer_order_for_day(self.product_one, self.product_two)
+            self.init_customer_order_for_day(self.product_one, self.product_two, i)
             # update the inventory based on the suppliers orders received, (by the due date)
             # TODO: 
             for supplier in self.suppliers:
@@ -273,26 +306,38 @@ class SimulationManager:
             closest_lead_time = self.get_closest_order_lead_time(False)
             closest_order = self.get_closest_order(False)
             time = 0
+            total_money = 0.0
+            orders_fulfilled = set()
             while closest_lead_time is not None and time < WORKING_DAY_LENGTH:
-                print(f"Closest lead time for orders: {closest_lead_time}")
-                is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order)
+                print(closest_order)
+                is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
+                print(self.inventory)
                 if is_order_in_stock:
-                    self.inventory.pull_resources_from_stock_by_order(closest_order)
+                    pulled_items = self.inventory.pull_resources_from_stock_by_order(closest_order, status=INGREDIENTS_WAITING)
+                    print(pulled_items)
                     closest_order.mark_fulfilled()
-                    closest_lead_time = self.get_closest_order_lead_time(False)
-                    closest_order = self.get_closest_order(False)
+                    if closest_order.order_id in orders_fulfilled:
+                        raise ValueError(f"Order {closest_order.order_id} is already fulfilled.")
+                    orders_fulfilled.add(closest_order.order_id)
+                    income = closest_order.calculate_order_cost()
+                    total_money += income
+                    closest_lead_time = self.get_closest_order_lead_time(True)
+                    closest_order = self.get_closest_order(True)
                     continue
 
-                has_components_in_stock = self.check_if_components_in_stock(closest_order)
+                has_components_in_stock = self.check_if_components_in_stock(closest_order, )
                 if not has_components_in_stock:
                     print(f"Not enough components in stock to fulfill order {closest_order.order_id}.")
-                    # Try to order missing components
-                    # TODO: implement the logic to order missing components
-                    self.order_missing_components(closest_order)
+                    closest_order.status = INGREDIENTS_ORDERED
+                    # get next closest order
+                    closest_lead_time = self.get_closest_order_lead_time(True)
+                    closest_order = self.get_closest_order(True)
+                    continue
 
                 # If we have components in stock, we can start producing
-                print(f"Order {closest_order.order_id} is ready to be processed.")
-                pulled_items = self.inventory.pull_resources_from_stock_by_order(closest_order)
+                print(closest_order)
+                components_dict = self.get_tree_from_products_list(closest_order.products)
+                pulled_items = self.inventory.pull_resources_from_components_dict(components_dict)
                 # TODO: start producing the products
                 for product_type, quantity in closest_order.products:
                     # get the ingredients for the product type
@@ -349,23 +394,6 @@ class SimulationManager:
                 continue
 
 
-
-            # order the customers orders by the due date
-            # order_closest = None
-            # client_closest = None
-            # for customer in self.customers:
-            #     order = customer.get_closest_order()
-            #     if order:
-            #         if not order_closest or order.due_time < order_closest.due_time:
-            #             order_closest = order
-            #             client_closest = customer
-            # # check that we have enough ingredients to fulfill the closest order
-            # if order_closest:
-            #     if not self.has_sufficient_ingredients(needed_ingredients):
-            #         print(f"Insufficient ingredients to fulfill order {order_closest.order_id}.")
-            #         # TODO: need to start the production process
-            #         continue
-
     def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]], max_lead_time) -> Supplier:
         """
         Find the cheapest supplier for the given product types.
@@ -396,7 +424,7 @@ class SimulationManager:
         total_demand = 0
         for customer in self.customers:
             for order in customer.orders:
-                if order.status != WAITING: # because it either fulfilled or ingredients ordered
+                if order.status != INGREDIENTS_WAITING: # because it either fulfilled or ingredients ordered
                     continue  
                 for product_object in order.products:
                     product, quantity = product_object
@@ -414,9 +442,9 @@ class SimulationManager:
                 lead_time=random.randint(SUPPLIER_LEAD_TIME_MIN, SUPPLIER_LEAD_TIME_MAX),
                 fixed_order_cost=random.randint(SUPPLIER_ORDER_COST_MIN, SUPPLIER_ORDER_COST_MAX),
                 raw_material_cost_distribution={
-                    self.product_x: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_X]),
-                    self.product_y: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_Y]),
-                    self.product_z: random.uniform(*RAW_MATERIAL_COST[PRODUCT_ID_Z])
+                    self.product_x: random.randint(*RAW_MATERIAL_COST[PRODUCT_ID_X]),
+                    self.product_y: random.randint(*RAW_MATERIAL_COST[PRODUCT_ID_Y]),
+                    self.product_z: random.randint(*RAW_MATERIAL_COST[PRODUCT_ID_Z])
                 }
             ) for i in range(num_suppliers)
         ]
@@ -454,7 +482,8 @@ class SimulationManager:
                 2: 0,  # Station 2
                 3: 0   # Station 3
             },
-            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_FIRST]
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_FIRST],
+            cost=random.randint(PRODUCT_A_MIN_PRICE, PRODUCT_A_MAX_PRICE)
         )
         self.product_two = ProductType(
             product_id=PRODUCT_ID_SECOND,
@@ -463,7 +492,8 @@ class SimulationManager:
                 2: 0,  # Station 2
                 3: 0   # Station 3 (custom for product 2)
             },
-            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_SECOND]
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_SECOND],
+            cost=random.randint(PRODUCT_B_MIN_PRICE, PRODUCT_B_MAX_PRICE)
         )
         self.product_x = ProductType(
             product_id=PRODUCT_ID_X,
@@ -472,7 +502,7 @@ class SimulationManager:
                 2: 0,  # Station 2
                 3: 0   # Station 3 (custom for product x)
             },
-            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_X]
+            volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_X],
         )
         self.product_y = ProductType(
             product_id=PRODUCT_ID_Y,
@@ -502,14 +532,14 @@ class SimulationManager:
             holding_cost_per_unit=HOLDING_COST_PER_UNIT
         )
         self.inventory.set_random_inventory([
-            ProductInstance(product_type=self.product_one, order_id=None, amount=10 * random.randint(PRODUCT_ONE_BASE_INVENTORY_LOW, PRODUCT_ONE_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_two, order_id=None, amount=10 * random.randint(PRODUCT_TWO_BASE_INVENTORY_LOW, PRODUCT_TWO_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_x,   order_id=None, amount=10 * random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_one, order_id=None, amount=3 * random.randint(PRODUCT_ONE_BASE_INVENTORY_LOW, PRODUCT_ONE_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_two, order_id=None, amount=1 * random.randint(PRODUCT_TWO_BASE_INVENTORY_LOW, PRODUCT_TWO_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_x,   order_id=None, amount=2 * random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
             ProductInstance(product_type=self.product_y,   order_id=None, amount= random.randint(PRODUCT_Y_BASE_INVENTORY_LOW, PRODUCT_Y_BASE_INVENTORY_HIGH)),
             ProductInstance(product_type=self.product_z,   order_id=None, amount= random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
         ])
 
-    def init_customer_order_for_day(self, product_one, product_two) -> None:
+    def init_customer_order_for_day(self, product_one, product_two, day) -> None:
         """
         For each customer, randomly decide whether to place an order for each product type for the day.
         """
@@ -520,11 +550,11 @@ class SimulationManager:
             q_1 = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
             q_2 = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
             if v1 < CUSTOMER_PROBABILITY_TO_ORDER and v2 >= CUSTOMER_PROBABILITY_TO_ORDER:
-                customer.place_order([(product_one, q_1)])
+                customer.place_order([(product_one, q_1)], day)
             elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 >= CUSTOMER_PROBABILITY_TO_ORDER:
-                customer.place_order([(product_two, q_2)])
+                customer.place_order([(product_two, q_2)], day)
             elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 < CUSTOMER_PROBABILITY_TO_ORDER:
-                customer.place_order([(product_one, q_1), (product_two, q_2)])
+                customer.place_order([(product_one, q_1), (product_two, q_2)], day)
 
     def log_statistics(self):
         """Log or print simulation statistics."""
@@ -556,27 +586,27 @@ class SimulationManager:
                     total_ingredients[ingredient] = 0
                 total_ingredients[ingredient] += amount
         return total_ingredients
-    
-    def check_if_components_in_stock(self, order: Order) -> bool:
+
+    def check_if_components_in_stock(self, order: Order, order_id: str | None = None, status: str | None = INGREDIENTS_WAITING) -> bool:
         """
         Check if the ingredients for the order are available.
         Only items that are not related to an order
         """
         needed_ingredients = self.get_tree_from_products_list(order.products)
         
-        return self.inventory.has_sufficient_ingredients(needed_ingredients)
+        return self.inventory.has_sufficient_ingredients(needed_ingredients, order_id=order_id, status=status)
     
     def check_if_ingredients_are_processed(self, station_id: int, amount: int, product_type: ProductType, order_id: int) -> bool:
         """
         This will check if the ingredients for the product are ready to be processed and available in the inventory.
         And the pre-requisites for the product are processed.
         """
-        # if STATION_ONE_ID then we check if the inventory have amount of product x, status STATUS_WAITING
+        # if STATION_ONE_ID then we check if the inventory have amount of product x, status INGREDIENTS_WAITING
         if station_id == STATION_ONE_ID:
-            return self.inventory.has_product_in_status(self.product_x, amount, STATUS_WAITING)
-        # elif STATION_TWO_ID then inventory need to have amount of product y, status STATUS_WAITING
+            return self.inventory.has_product_in_status(self.product_x, amount, INGREDIENTS_WAITING)
+        # elif STATION_TWO_ID then inventory need to have amount of product y, status INGREDIENTS_WAITING
         elif station_id == STATION_TWO_ID:
-            return self.inventory.has_product_in_status(self.product_y, amount, STATUS_WAITING)
+            return self.inventory.has_product_in_status(self.product_y, amount, INGREDIENTS_WAITING)
         # else then inventory need to have amount  of x , y according to the product_tree function
         else:
             product_tree = self.product_tree(product_type, amount)
