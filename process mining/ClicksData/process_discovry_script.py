@@ -16,6 +16,7 @@ import numpy as np
 from utils import *
 from pm4py.visualization.process_tree import visualizer as pt_visualizer
 from pm4py.visualization.petri_net import visualizer as pn_visualizer
+from pm4py.discovery import discover_petri_net_inductive
 
 from pm4py.algo.discovery.alpha import algorithm as alpha_miner
 from pm4py.algo.discovery.heuristics import algorithm as heuristics_miner
@@ -90,78 +91,69 @@ def calculate_outcomes():
         test_df = dataframe_utils.convert_timestamp_columns_in_df(test_df)
         # Convert to EventLog
         test_log = log_converter.apply(test_df, variant=log_converter.Variants.TO_EVENT_LOG)
-        net, im, fm = alpha_miner.apply(filtered_log)
+        # net, im, fm = alpha_miner.apply(filtered_log)
 
         # gviz = pn_visualizer.apply(net, im, fm)
         # pn_visualizer.view(gviz)
 
         # we will conduct conformance checking on the filtered log
-        fitness_tok = fitness_token_based_replay(test_log, net, im, fm)
-        print("🎯 Token-based Fitness:", fitness_tok)
+        # fitness_tok = fitness_token_based_replay(test_log, net, im, fm)
+        # print("🎯 Token-based Fitness:", fitness_tok)
         
 
-        fitness_align = fitness_alignments(test_log, net, im, fm)
-        print("🎯 Alignment-based Fitness:", fitness_align)
+        # fitness_align = fitness_alignments(test_log, net, im, fm)
+        # print("🎯 Alignment-based Fitness:", fitness_align)
 
-        precision_tok = precision_token_based_replay(test_log, net, im, fm)
-        print("🎯 Token-based Precision:", precision_tok    )
+        # precision_tok = precision_token_based_replay(test_log, net, im, fm)
+        # print("🎯 Token-based Precision:", precision_tok    )
 
-        precision_align = precision_alignments(test_log, net, im, fm)
-        print("🎯 Alignment-based Precision:", precision_align)
-        alpha_miner_results.append({
-            "top_n": top_n,
-            "fitness_tok": fitness_tok,
-            "fitness_align": fitness_align,
-            "precision_tok": precision_tok,
-            "precision_align": precision_align
-        })
-        # %% [markdown]
-        # ### heuristics_miner
+        # precision_align = precision_alignments(test_log, net, im, fm)
+        # print("🎯 Alignment-based Precision:", precision_align)
+        # alpha_miner_results.append({
+        #     "top_n": top_n,
+        #     "fitness_tok": fitness_tok,
+        #     "fitness_align": fitness_align,
+        #     "precision_tok": precision_tok,
+        #     "precision_align": precision_align
+        # })
+        # # %% [markdown]
+        # # ### heuristics_miner
 
-        # %%
-        net, im, fm = heuristics_miner.apply(filtered_log, variant=heuristics_miner.Variants.CLASSIC)
+        # # %%
+        # net, im, fm = heuristics_miner.apply(filtered_log, variant=heuristics_miner.Variants.CLASSIC)
 
-        # %%
-        # gviz = pn_visualizer.apply(net, im, fm)
-        # pn_visualizer.view(gviz)
+        # # %%
+        # # gviz = pn_visualizer.apply(net, im, fm)
+        # # pn_visualizer.view(gviz)
 
-        # %%
-        # we will conduct conformance checking on the filtered log
-        fitness_tok = fitness_token_based_replay(test_log, net, im, fm)
-        print("🎯 Token-based Fitness:", fitness_tok)
+        # # %%
+        # # we will conduct conformance checking on the filtered log
+        # fitness_tok = fitness_token_based_replay(test_log, net, im, fm)
+        # print("🎯 Token-based Fitness:", fitness_tok)
 
-        fitness_align = fitness_alignments(test_log, net, im, fm)
-        print("🎯 Alignment-based Fitness:", fitness_align)
+        # fitness_align = fitness_alignments(test_log, net, im, fm)
+        # print("🎯 Alignment-based Fitness:", fitness_align)
 
-        precision_tok = precision_token_based_replay(test_log, net, im, fm)
-        print("🎯 Token-based Precision:", precision_tok    )
+        # precision_tok = precision_token_based_replay(test_log, net, im, fm)
+        # print("🎯 Token-based Precision:", precision_tok    )
 
-        precision_align = precision_alignments(test_log, net, im, fm)
-        print("🎯 Alignment-based Precision:", precision_align)
-        heuristics_miner_results.append({
-            "top_n": top_n,
-            "fitness_tok": fitness_tok,
-            "fitness_align": fitness_align,
-            "precision_tok": precision_tok,
-            "precision_align": precision_align
-        })
+        # precision_align = precision_alignments(test_log, net, im, fm)
+        # print("🎯 Alignment-based Precision:", precision_align)
+        # heuristics_miner_results.append({
+        #     "top_n": top_n,
+        #     "fitness_tok": fitness_tok,
+        #     "fitness_align": fitness_align,
+        #     "precision_tok": precision_tok,
+        #     "precision_align": precision_align
+        # })
         # %% [markdown]
         # ### inductive_miner
 
         # %%
 
-        tree = inductive_miner.apply(filtered_log)
-
-        # %%
-        # pt_gviz = pt_visualizer.apply(tree)
-        # pt_visualizer.view(pt_gviz)
-
-        # %%
-        # net, im, fm = convert_to_petri_net(tree)
-        # gviz = pn_visualizer.apply(net, im, fm)
-        # pn_visualizer.view(gviz)
-
-        # %%
+        # tree = inductive_miner.apply(filtered_log)  # gives ProcessTree
+        # net, im, fm = tree_converter.apply(tree, variant=tree_converter.Variants.TO_PETRI_NET)
+        net, im, fm = discover_petri_net_inductive(filtered_log) 
         # we will conduct conformance checking on the filtered log
         fitness_tok = fitness_token_based_replay(test_log, net, im, fm)
         print("🎯 Token-based Fitness:", fitness_tok)
@@ -185,10 +177,10 @@ def calculate_outcomes():
 
 alpha_miner_results, heuristics_miner_results, inductive_miner_results = calculate_outcomes()
 # save the to json files
-with open('algorithms/alpha_miner_results.json', 'w') as f:
-    json.dump(alpha_miner_results, f)
-with open('algorithms/heuristics_miner_results.json', 'w') as f:
-    json.dump(heuristics_miner_results, f)
+# with open('algorithms/alpha_miner_results.json', 'w') as f:
+#     json.dump(alpha_miner_results, f)
+# with open('algorithms/heuristics_miner_results.json', 'w') as f:
+#     json.dump(heuristics_miner_results, f)
 with open('algorithms/inductive_miner_results.json', 'w') as f:
     json.dump(inductive_miner_results, f)
 
