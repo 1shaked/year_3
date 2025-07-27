@@ -36,3 +36,25 @@ data mining/Rec6 - Classification - decision tree/data-tergul6/Titanic_final.csv
 data mining/Rec8 - Hyperparameter_Tuning/data-tergul8/Titanic_final.csv
 top_topics/h1_pivot/sales_data_sample.csv
 top_topics/h2_pbi/AdData.csv
+process mining/ClicksData/source.csv
+process mining/ClicksData/remaining_sessions.json
+data mining/Final project Part 2/churn_dataset_test_cleaned.csv
+design/eda_data.csv
+design/archive/benefits.csv
+design/archive/companies.csv
+design/archive/company_industries.csv
+design/archive/company_specialities.csv
+design/archive/dashbored.twb
+design/archive/employee_counts.csv
+design/archive/job_industries.csv
+design/archive/job_postings.csv
+design/archive/job_skills.csv
+process mining/ClicksData/accepted_ipid.json
+process mining/ClicksData/accepted_sessions.json
+process mining/ClicksData/actions_per_session.json
+process mining/ClicksData/data_counts.json
+process mining/ClicksData/collapsed_df.csv
+process mining/ClicksData/MODIFIED.csv
+process mining/ClicksData/temp.csv
+process mining/ClicksData/temp.csv
+process mining/ClicksData/temp.csv
