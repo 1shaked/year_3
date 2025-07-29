@@ -1,7 +1,7 @@
 import math
 from typing import Dict, List, Any, Optional, Tuple, Union
 from consts import *
-
+import numpy as np
 
 
 # STATION_ID_X = 'PRODUCT_X'
@@ -20,9 +20,10 @@ class ProductType:
 
     def sample_processing_time(self, station_id: int) -> float:
         """Sample processing time for a given station."""
-        dist = self.processing_time_distributions.get(station_id)
-        if dist:
-            return dist.sample()
+        lambda_value = self.processing_time_distributions.get(station_id)
+        if lambda_value:
+            val = np.random.exponential(scale=lambda_value, size=1)
+            return val[0]
         raise ValueError(f"No distribution for station {station_id}")
 
 class Supplier:
@@ -66,7 +67,7 @@ class ProductInstance:
     """
     Represents an instance of a product in the system.
     """
-    def __init__(self, product_type: ProductType, order_id: int | None, status: str = INGREDIENTS_WAITING, amount: int = 1):
+    def __init__(self, product_type: ProductType, order_id: int | None, status: str = INGREDIENTS_WAITING, amount: int = 1 , product_designation: str | None = None):
         '''
         The status can be (INGREDIENTS_WAITING, INGREDIENTS_ORDERED, FULFILLED)
         '''
@@ -74,10 +75,16 @@ class ProductInstance:
         self.order_id = order_id
         self.status = status
         self.amount = amount
+        self.product_designation = product_designation # can be PRODUCT_ID_FIRST , PRODUCT_ID_SECOND , or None
 
     def __str__(self):
         """String representation of the product instance."""
-        return f"ProductInstance(product_id={self.product_type.product_id}, order_id={self.order_id}, status={self.status}, amount={self.amount})"
+        return f"ProductInstance(product_id={self.product_type.product_id}, order_id={self.order_id}, status={self.status}, amount={self.amount}, product_designation={self.product_designation})"
+
+    def __repr__(self):
+        """Official string representation of the product instance."""
+        return (f"ProductInstance(product_id={self.product_type.product_id}, "
+                f"order_id={self.order_id}, status={self.status}, amount={self.amount}, product_designation={self.product_designation})")
 
     def advance_to_next_station(self):
         """Advance this product to the next station in its route."""
@@ -96,9 +103,14 @@ class Station:
     def __init__(self, station_id: int):
         self.station_id = station_id
         # the queue holds tuples of (ProductInstance, processing_time)
-        self.queue: List[(ProductInstance, float)] = []
+        self.queue: List[(ProductInstance | List[ProductInstance], float)] = []
         self.working_item_index: Optional[int] = None  # Index of the currently processing item, if any
 
+    def get_next_finish_time(self) -> float:
+        """Get the next finish time for the station."""
+        if self.queue:
+            return self.queue[0][1]
+        return math.inf  # If the queue is empty, return infinity
 
     def get_item_in_queue(self, index: int) -> Tuple[ProductInstance, float ] | None:
         """Get the current queue of product instances."""
@@ -133,24 +145,46 @@ class Station:
         """Sample processing time for a product type at this station."""
         return product_type.sample_processing_time(self.station_id)
 
-    def add_to_queue(self, product_instance: ProductInstance) -> float:
+    def add_to_queue(self, product_instance: ProductInstance | List[ProductInstance]) -> float:
         """Add a product instance to the station's queue."""
+        if isinstance(product_instance, list):
+            # this is only for product z
+            processing_time = self.sample_processing_time(product_instance[0].product_type)
+            self.queue.append((product_instance, processing_time))
+            return processing_time
         processing_time = self.sample_processing_time(product_instance.product_type)
         self.queue.append((product_instance, processing_time))
-        # self.queue.sort(key=lambda x: x[1])
         return processing_time
 
-    def check_can_be_processed(self, product: ProductType) -> bool:
+    def check_can_be_processed(self) -> bool:
         '''
         This will be needed for the product type z
         '''
-        if product.product_id == PRODUCT_ID_Z:
-            # we need to check that product x and y are processed before product z
-
-            pass
-        # Check if the product can be processed at this station
-        pass
-
+        if self.station_id == STATION_ONE_ID:
+            # we only need to check if the product is of type x is present in the queue
+            if len(self.queue) == 0:
+                return None
+            return self.queue[0].product_type.product_id == PRODUCT_ID_X
+        
+        if self.station_id == STATION_TWO_ID:
+            # we only need to check if the product is of type y is present in the queue
+            if len(self.queue) == 0:
+                return None
+            return self.queue[0].product_type.product_id == PRODUCT_ID_Y
+        
+        # if the product is z then we need to check if the first item have x , y , z
+        if self.station_id == STATION_THREE_ID:
+            if len(self.queue) == 0:
+                return None
+            items_needed = [PRODUCT_ID_X, PRODUCT_ID_Y, PRODUCT_ID_Z]
+            for item in self.queue[0]:
+                if item.product_type.product_id in items_needed:
+                    # pop the item from the queue
+                    items_needed.remove(item.product_type.product_id)
+            return len(items_needed) == 0
+        
+        raise ValueError(f"Unknown station ID: {self.station_id}")
+        # return False
     def pop_from_queue(self, index=0) -> Optional[Tuple[ProductInstance, float]]:
         """Pop the next product instance from the queue."""
         if self.queue:
@@ -172,6 +206,10 @@ class Order:
         self.due_time = due_time
         self.status = INGREDIENTS_WAITING  # Order status can be 'WAITING', 'INGREDIENTS_ORDERED', 'FULFILLED', etc.
 
+    def __str__(self):
+        return f"Order ID: {self.order_id}, Products: {[(product.product_id, quantity) for product, quantity in self.products]}, Due Time: {self.due_time}, Status: {self.status}"
+    def __repr__(self):
+        return f"Order({self.order_id}, {self.products}, {self.due_time}, {self.status})"
     def mark_fulfilled(self):
         """Mark the order as fulfilled."""
         self.status = FULFILLED
