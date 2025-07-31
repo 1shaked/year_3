@@ -39,6 +39,14 @@ class ProductType:
             return round(val, ROUND_DECIMAL_PLACES)
         raise ValueError(f"No distribution for station {station}")
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the product type to a dictionary for JSON serialization."""
+        return {
+            'product_id': self.product_id,
+            'processing_time_distributions': self.processing_time_distributions,
+            'volume_per_unit': self.volume_per_unit,
+            'cost': self.cost
+        }
 class Supplier:
     """
     Represents a supplier of raw materials.
@@ -75,6 +83,16 @@ class Supplier:
         """Deliver materials at the given time."""
         pass
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the supplier to a dictionary for JSON serialization."""
+        return {
+            'supplier_id': self.supplier_id,
+            'lead_time': self.lead_time,
+            'fixed_order_cost': self.fixed_order_cost,
+            'raw_material_cost_distribution': {product_type.product_id: cost for product_type, cost in self.raw_material_cost_distribution.items()},
+            'orders': self.orders
+        }
+
 
 class ProductInstance:
     """
@@ -109,6 +127,16 @@ class ProductInstance:
             raise ValueError("Product type cost is not set.")
         # Assuming the cost is per unit, multiply by the amount
         return self.product_type.cost * self.amount
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the product instance to a dictionary for JSON serialization."""
+        return {
+            'product_id': self.product_type.product_id,
+            'order_id': self.order_id,
+            'status': self.status,
+            'amount': self.amount,
+            'product_designation': self.product_designation
+        }
 class Station:
     """
     Represents a processing station with a queue of products.
@@ -277,7 +305,13 @@ class Station:
             if item.product_designation == product_instance.product_designation and item.order_id ==product_instance.order_id:
                 # add the item to the index
                 self.queue[index][0].append(item)
-    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the station to a dictionary for JSON serialization."""
+        return {
+            'station_id': self.station_id,
+            'queue': [(item[0].to_dict(), item[1]) for item in self.queue],
+            'working_item_index': self.working_item_index
+        }
 class Order:
     """
     Represents an order placed by a customer.
@@ -306,6 +340,14 @@ class Order:
         '''String representation of the order for logging purposes'''
         return f"Order ID: {self.order_id}, \nProducts: {[(product.product_id, quantity) for product, quantity in self.products]}, \nDue Time: {self.due_time},\tStatus: {self.status}"
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the order to a dictionary for JSON serialization."""
+        return {
+            'order_id': self.order_id,
+            'products': [(product.product_id, quantity) for product, quantity in self.products],
+            'due_time': self.due_time,
+            'status': self.status
+        }
 class Customer:
     """
     Represents a customer who places orders.
@@ -337,4 +379,21 @@ class Customer:
                     due_date = order.due_time
                     closest_order = order
         return closest_order
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the customer to a dictionary for JSON serialization."""
+        return {
+            'customer_id': self.customer_id,
+            'max_lead_time': self.max_lead_time,
+            'order_cost': self.order_cost,
+            'orders': [order.to_dict() for order in self.orders]
+        }
+
+    def __str__(self):
+        """String representation of the customer."""
+        return f"Customer ID: {self.customer_id}, Max Lead Time: {self.max_lead_time}, Order Cost: {self.order_cost}, Orders: {len(self.orders)}"
+    
+    def __repr__(self):
+        """Official string representation of the customer."""
+        return f"Customer({self.customer_id}, {self.max_lead_time}, {self.order_cost})"
 
