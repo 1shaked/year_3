@@ -17,16 +17,27 @@ class ProductType:
         self.processing_time_distributions = processing_time_distributions  # station_id -> distribution
         self.volume_per_unit = volume_per_unit
         self.cost = cost  # Cost per unit of this product type
+        self.processing_time = self.sample_processing_time()  # Total processing time for this product type
 
-    def sample_processing_time(self, station_id: int) -> float:
+    def sample_processing_time(self) -> float:
         """Sample processing time for a given station."""
-        lambda_value = self.processing_time_distributions.get(station_id)
+        if self.product_id in (PRODUCT_ID_FIRST, PRODUCT_ID_SECOND):
+            return 0
+        if self.product_id == PRODUCT_ID_X:
+            station = STATION_ONE_ID
+        elif self.product_id == PRODUCT_ID_Y:
+            station = STATION_TWO_ID
+        elif self.product_id == PRODUCT_ID_Z:
+            station = STATION_THREE_ID
+        else:
+            raise ValueError(f"Unknown product ID: {self.product_id}")
+        lambda_value = self.processing_time_distributions.get(station)
         if lambda_value:
             val = np.random.exponential(scale=lambda_value, size=1)[0]
             while val > WORKING_DAY_LENGTH or val <= MIN_PROCESSING_TIME:  # Ensure the processing time does not exceed the working day length
                 val = round(np.random.exponential(scale=lambda_value, size=1)[0], ROUND_DECIMAL_PLACES)
             return round(val, ROUND_DECIMAL_PLACES)
-        raise ValueError(f"No distribution for station {station_id}")
+        raise ValueError(f"No distribution for station {station}")
 
 class Supplier:
     """
@@ -191,10 +202,12 @@ class Station:
         """Add a product instance to the station's queue."""
         if isinstance(product_instance, list):
             # this is only for product z
-            processing_time = self.sample_processing_time(product_instance[0].product_type)
+            # processing_time = self.sample_processing_time(product_instance[0].product_type)
+            processing_time = product_instance[0].product_type.processing_time
             self.queue.append((product_instance, processing_time))
             return processing_time
-        processing_time = self.sample_processing_time(product_instance.product_type)
+        # processing_time = self.sample_processing_time(product_instance.product_type)
+        processing_time = product_instance.product_type.processing_time
         self.queue.append((product_instance, processing_time))
         return processing_time
 
