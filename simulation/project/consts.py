@@ -1,5 +1,6 @@
 import random
 
+ROUND_DECIMAL_PLACES = 2  # Number of decimal places for rounding prices and costs
 
 SIMULATION_DAYS = 30
 SUPPLIER_COUNT_MIN = 1
@@ -16,10 +17,13 @@ CUSTOMER_ORDER_COST_MIN = 10.0
 CUSTOMER_ORDER_COST_MAX = 30.0
 WORKING_DAY_LENGTH = 8   # 8 hours 
 STATION_PROCESS_TIME = {
-    1: random.randint(3, 6),  # Station 1 min/max
-    2: random.randint(4, 6),  # Station 2 min/max
-    3: random.randint(4, 6),  # Station 3 min/max
+    1: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 1 min/max
+    2: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 2 min/max
+    3: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 3 min/max
 }
+
+MIN_PROCESSING_TIME = 0.1  # Minimum processing time for a product
+
 PRODUCT_ID_X = 'x'
 PRODUCT_ID_Y = 'y'
 PRODUCT_ID_Z = 'z'
@@ -31,6 +35,20 @@ PRODUCT_VOLUME = {
     PRODUCT_ID_X: 2.0,  # Product x has a different volume
     PRODUCT_ID_Y: 1.2,  # Product y has a different volume
     PRODUCT_ID_Z: 1.8,  # Product z has a different volume
+}
+
+'''
+v = {
+            self.product_one: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
+            self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
+        }
+'''
+FACTOR_PRODUCT_ONE = 1/0.75
+FACTOR_PRODUCT_TWO = 1/0.75
+
+FACTOR_DICT = {
+    PRODUCT_ID_FIRST: FACTOR_PRODUCT_ONE,
+    PRODUCT_ID_SECOND: FACTOR_PRODUCT_TWO,
 }
 
 CUSTOMER_PROBABILITY_TO_ORDER = 0.6  # 60% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
@@ -71,4 +89,8 @@ INGREDIENTS_WAITING = 'WAITING'
 INGREDIENTS_ORDERED = 'INGREDIENTS_ORDERED'
 INGREDIENTS_READY_TO_PROCESS = 'READY_TO_PROCESS'
 INGREDIENTS_PROCESSED = 'PROCESSED'
-FULFILLED = 'FULFILLED'
+ORDER_FULFILLED = 'ORDER_FULFILLED'
+
+ORDER_PREPARED = 'PREPARED'
+ORDER_IN_STOCK = 'IN_STOCK'
+ORDER_NOT_READY_YET = 'NOT_READY_YET'
