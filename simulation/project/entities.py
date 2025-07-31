@@ -118,12 +118,12 @@ class Station:
             return self.queue[index]
         return None
     
-    def start_processing(self, index) -> float:
+    def start_processing(self, index = 0) -> float:
         self.queue[index][0].status = STATUS_PROCESSING_MACHINE
         self.working_item_index = index
         return self.queue[index][1]
     
-    def decrement_processing_time(self, index: int, time: float) -> Tuple[ProductInstance | None, float]:
+    def decrement_processing_time(self, index: int, time: float) -> Tuple[ProductInstance, float ] | Tuple[None, None]:
         """Decrement the processing time of the product instance at the given index."""
         if 0 <= index < len(self.queue):
             product_instance, processing_time = self.queue[index]
@@ -131,9 +131,13 @@ class Station:
             self.queue[index] = (product_instance, new_processing_time)
             if new_processing_time == 0:
                 product_instance.status = STATUS_COMPLETED_MACHINE
-                self.working_item_index = None
-            return product_instance , new_processing_time
-        return None , 0.0
+                # pop the first item from the queue
+                self.queue.pop(0)
+                if len(self.queue) > 0:
+                    self.working_item_index = 0
+                return product_instance , new_processing_time
+            return None , None
+        return None , None
     
     def decrement_processing_time_for_working_item(self, time: float) -> Tuple[ProductInstance | None, float]:
         """Decrement the processing time of the currently working item."""
@@ -164,20 +168,23 @@ class Station:
             # we only need to check if the product is of type x is present in the queue
             if len(self.queue) == 0:
                 return None
-            return self.queue[0].product_type.product_id == PRODUCT_ID_X
+            return self.queue[0][0].product_type.product_id == PRODUCT_ID_X
         
         if self.station_id == STATION_TWO_ID:
             # we only need to check if the product is of type y is present in the queue
             if len(self.queue) == 0:
                 return None
-            return self.queue[0].product_type.product_id == PRODUCT_ID_Y
+            return self.queue[0][0].product_type.product_id == PRODUCT_ID_Y
         
         # if the product is z then we need to check if the first item have x , y , z
         if self.station_id == STATION_THREE_ID:
             if len(self.queue) == 0:
                 return None
             items_needed = [PRODUCT_ID_X, PRODUCT_ID_Y, PRODUCT_ID_Z]
-            for item in self.queue[0]:
+            # check first if list 
+            if not isinstance(self.queue[0][0], list):
+                raise ValueError("Expected a list of ProductInstances for station three.")
+            for item in self.queue[0][0]:
                 if item.product_type.product_id in items_needed:
                     # pop the item from the queue
                     items_needed.remove(item.product_type.product_id)
@@ -195,6 +202,30 @@ class Station:
     def can_be_processed(self, ) -> bool:
         '''This function check if the station have all the resources to process the product in the queue'''
         pass
+
+    def add_processed_item(self, product_instance: ProductInstance):
+        # add to the first index
+        if len(self.queue) == 0:
+            raise ValueError('The queue is empty')
+        # we need to find the index of the item which have the same order_id, and the same product_designation
+        product_instance.product_designation
+        product_instance.order_id
+        for index in range(self.queue):
+            items_list = self.queue[index][0]
+            if not isinstance(items_list , List) or len(items_list) == 0:
+                raise ValueError(f'Expected List but did not get it, or the len(item) is empty {len(item)}')
+            
+            item = None
+            for product_item in items_list:
+                if product_item.product_id == PRODUCT_ID_Z:
+                    item = product_item
+                    break
+            if item is None:
+                raise ValueError(f'Expend the queue to have item z')
+            # item = items_list.
+            if item.product_designation == product_instance.product_designation and item.order_id ==product_instance.order_id:
+                # add the item to the index
+                self.queue[index][0].append(item)
     
 class Order:
     """
