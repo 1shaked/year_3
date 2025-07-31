@@ -5,6 +5,7 @@ from itertools import combinations
 from consts import *
 from entities import INGREDIENTS_WAITING, Order, ProductType, Supplier, Station, ProductInstance, Customer
 import json
+from datetime import datetime
 # =====================
 # Simulation Constants
 # =====================
@@ -253,6 +254,7 @@ class SimulationManager:
         self.orders_fulfilled = set()
         self.orders_fulfilled_list = []
         self.total_income = 0.0
+        self.json_info = dict()
         # ...existing code...
         # self.entities = []
         # self.statistics = {}
@@ -266,10 +268,12 @@ class SimulationManager:
         # initialize the products types
         self.setup_products()
         self.v = {
-            self.product_one: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
+            self.product_one: {(self.product_x, 2), (self.product_y, 1), (self.product_z, 1.15)},
             self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
         }
+        self.json_info[RECIPE_KEY] = self.v
         self.setup_suppliers()
+        self.json_info[SUPPLIER_KEY] = [supplier.to_dict() for supplier in self.suppliers]
         self.setup_customers()
         self.simulation_days = SIMULATION_DAYS
         self.setup_stations()
@@ -776,3 +780,11 @@ class SimulationManager:
             # check for the product z
             have_z = self.inventory.get_product_instances_by_type_and_order(self.product_z, order_id, STATION_ONE_ID) >= amount
             return have_x_y and have_z
+
+
+    def generate_file_name(self) -> str:
+        now = datetime.now()
+        # Format as year_month_day_hour_minute_second
+        timestamp = now.strftime("%Y_%m_%d_%H_%M_%S")
+        file_name = f"simulation_results_{timestamp}.json"
+        return file_name
