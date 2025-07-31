@@ -1,3 +1,4 @@
+from consts import *
 from main import (
     SimulationManager,
 
@@ -7,4 +8,4 @@ from main import (
 
 if __name__ == "__main__":
     sim = SimulationManager()
-    sim.initialize_entities()
+    sim.initialize_entities(ALGORITHM_SPT)
