@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Any, Tuple
 from itertools import combinations
 from consts import *
 from entities import INGREDIENTS_WAITING, Order, ProductType, Supplier, Station, ProductInstance, Customer
+import json
 # =====================
 # Simulation Constants
 # =====================
@@ -396,7 +397,18 @@ class SimulationManager:
                     station = self.stations[2]
                     station.add_to_queue([item])
                 print(f"Adding {item} to station {station.station_id} queue.")
-        
+    
+
+    def total_orders_count(self) -> None:
+        orders = {}
+        for customer in self.customers:
+            for order in customer.orders:
+                for product_type, quantity in order.products:
+                    if product_type.product_id not in orders:
+                        orders[product_type.product_id] = 0
+                    orders[product_type.product_id] += quantity
+        print(f"Total orders count: {json.dumps(orders, indent=4)}")
+
     def producing_by_demand_only(self) -> None:
         """
         Produce products only based on the demand calculated from customer orders.
@@ -412,6 +424,7 @@ class SimulationManager:
             closest_order = self.get_closest_order(False)
             closest_lead_time = closest_order.due_time if closest_order else None
             time = 0
+            self.total_orders_count()
             while closest_order is not None :
                 print(f'The next closest order is {closest_order} ')
                 is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
@@ -434,21 +447,28 @@ class SimulationManager:
                     break
                 if closest_order.status != INGREDIENTS_READY_TO_PROCESS:
                     self.add_items_from_order_to_station(closest_order)
-                next_finish_time, station_with_item = self.find_next_station_finished()
-                if next_finish_time is None:
-                    # start the processing 
-                    raise ValueError("No station is currently processing an item.")
-                print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
-                self.decrement_time_to_stations(time, next_finish_time, WORKING_DAY_LENGTH)
-                time = next_finish_time + time
+                
+                done_running = False
+                while time < WORKING_DAY_LENGTH:
+                    next_finish_time, station_with_item = self.find_next_station_finished()
+                    if next_finish_time is None or time + next_finish_time > WORKING_DAY_LENGTH:
+                        done_running = True
+                        break  # No station is currently processing an item
+                    #     # start the processing 
+                    #     raise ValueError("No station is currently processing an item.")
+                    print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
+                    self.decrement_time_to_stations(time, next_finish_time, WORKING_DAY_LENGTH)
+                    time = next_finish_time + time
                 print(self.inventory)
                 # check if any order is ready to be fulfilled
-                self.fulfill_orders_in_stock(closest_order)
-                
+                closest_order_temp, closest_lead_time_temp = self.fulfill_orders_in_stock(closest_order)
+                if closest_order_temp is not None and closest_lead_time_temp is not None:
+                    closest_order = closest_order_temp
+                    closest_lead_time = closest_lead_time_temp
 
-                if time > WORKING_DAY_LENGTH:
+                if done_running:
                     print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - time}")
-                    continue
+                    break
                 
 
             if closest_lead_time is None:
