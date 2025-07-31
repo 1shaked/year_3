@@ -43,7 +43,7 @@ v = {
             self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
         }
 '''
-FACTOR_PRODUCT_ONE = 1/0.75
+FACTOR_PRODUCT_ONE = 1/1.15
 FACTOR_PRODUCT_TWO = 1/0.75
 
 FACTOR_DICT = {
@@ -51,7 +51,7 @@ FACTOR_DICT = {
     PRODUCT_ID_SECOND: FACTOR_PRODUCT_TWO,
 }
 
-CUSTOMER_PROBABILITY_TO_ORDER = 0.6  # 60% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
+CUSTOMER_PROBABILITY_TO_ORDER = 0.3  # 20% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
 RAW_MATERIAL_COST = {
     PRODUCT_ID_X: [6.0, 8.0],  
     PRODUCT_ID_Y: [8.0, 10.0], 
@@ -100,3 +100,5 @@ ALGORITHM_SPT = 'ALGORITHM_SPT'
 # ALGORITHM_FCFS = 'ALGORITHM_FCFS'
 # ALGORITHM_LPT = 'ALGORITHM_LPT'
 # ALGORITHM_CUSTOM = 'ALGORITHM_CUSTOM'
+
+DATA_FOLDER = 'data'
