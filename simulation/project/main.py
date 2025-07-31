@@ -261,7 +261,7 @@ class SimulationManager:
         """Run the main simulation loop."""
         pass
 
-    def initialize_entities(self):
+    def initialize_entities(self, algorithm=ALGORITHM_EDD):
         """Initialize all simulation entities (stations, products, etc.)."""
         # initialize the products types
         self.setup_products()
@@ -276,16 +276,21 @@ class SimulationManager:
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
         # simulation days loop
-        self.producing_by_demand_only()
+        self.producing_by_demand_only(algorithm)
 
     def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
-        due_date = math.inf
-        for customer in self.customers:
-            order = customer.get_closest_order()
-            if order and (order.status == INGREDIENTS_WAITING or not filter_by_waiting):
-                due_date = min(due_date, order.due_time)
-        return due_date if due_date != math.inf else None
-    
+        order = self.get_closest_order(filter_by_waiting)
+        return order.due_time if order else None
+
+
+    def sort_stations_by_processing_time(self) -> List[Station]:
+        """
+        Sort stations by their processing time.
+        Returns a list of stations sorted by processing time.
+        """
+        for station in self.stations:
+            station.queue.sort(key=lambda x: x[1])  # Sort queue by processing time
+
     def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None:
         """
         Get the closest order that is not yet fulfilled.
@@ -409,7 +414,7 @@ class SimulationManager:
                     orders[product_type.product_id] += quantity
         print(f"Total orders count: {json.dumps(orders, indent=4)}")
 
-    def producing_by_demand_only(self) -> None:
+    def producing_by_demand_only(self, algorithm=ALGORITHM_EDD) -> None:
         """
         Produce products only based on the demand calculated from customer orders.
         This method will be called after initializing the customers and their orders.
@@ -425,6 +430,9 @@ class SimulationManager:
             closest_lead_time = closest_order.due_time if closest_order else None
             time = 0
             self.total_orders_count()
+            if algorithm == ALGORITHM_SPT:
+                self.sort_stations_by_processing_time()
+
             while closest_order is not None :
                 print(f'The next closest order is {closest_order} ')
                 is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
