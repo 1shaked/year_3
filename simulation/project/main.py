@@ -80,20 +80,6 @@ class Inventory:
         """Check if there is enough of a product in the stock"""
         return self.get_product_instances_by_type(product) >= quantity
     
-    
-
-    # def get_tree_from_products_list(self, products: List[Tuple[ProductType, int]]) -> Dict[ProductType, int]:
-    #     """
-    #     Get the total ingredients required for a list of product instances.
-    #     """
-    #     total_ingredients = {}
-    #     for product, quantity in products:
-    #         ingredients = self.product_tree(product, quantity)
-    #         for ingredient, amount in ingredients.items():
-    #             if ingredient not in total_ingredients:
-    #                 total_ingredients[ingredient] = 0
-    #             total_ingredients[ingredient] += amount
-    #     return total_ingredients
 
     def has_sufficient_ingredients(self, ingredients: Dict[ProductType, int], order_id: str| None , status: str | None) -> bool:
         """
@@ -112,7 +98,7 @@ class Inventory:
         '''
         count = 0
         for item in self.items:
-            if item.product_type == product_type and (order_id is None or item.order_id == order_id) and (status is None or item.status == status):
+            if item.product_type.product_id == product_type.product_id and (order_id is None or item.order_id == order_id) and (status is None or item.status == status):
                 count += item.amount
         return count
     
@@ -141,17 +127,18 @@ class Inventory:
                 count += item.amount
         return count
 
-    def pull_resource_from_stock(self, product_type: ProductType, quantity: int, order_id: str | None = None , status=INGREDIENTS_WAITING) -> Optional[ProductInstance]:
+    def pull_resource_from_stock(self, product_type: ProductType, quantity: int, order_id: str | None = None , status : str | None=INGREDIENTS_WAITING) -> Optional[ProductInstance]:
         """
         Pull a resource from the stock if available.
         Returns the pulled product instance or None if not enough stock.
         """
-        for item in self.items:
-            if item.product_type == product_type and (order_id is None or item.order_id == order_id) and item.status == status:
+        for index in range(len(self.items)):
+            item = self.items[index]
+            if item.product_type.product_id == product_type.product_id and (order_id is None or item.order_id == order_id) and (status is None or item.status == status):
                 if item.amount >= quantity:
                     item.amount -= quantity
                     if item.amount == 0:
-                        self.items.remove(item)
+                        self.items.pop(index)
                     self.calculate_total_volume()
                     # create a copy of the item to return
                     pulled_item = ProductInstance(product_type=item.product_type, order_id=item.order_id, status=item.status, amount=quantity)
@@ -174,7 +161,32 @@ class Inventory:
             else:
                 raise ValueError(f"Not enough stock to fulfill order for {product_type.product_id}.")
         return pulled_items
+    
+    def pull_resources_from_available_place(self, order: Order) -> List[ProductInstance]:
+        pulled_items = []
+        for product_type, quantity in order.products:
+            # we need to check if we first find item prepared for the order else we look for the item in stock
+            quantity_available_produced = self.get_product_instances_by_type(product_type, order_id=order.order_id, status=None)
+            if quantity_available_produced >= quantity:
+                # we pull the resource from the stock
+                pulled_item = self.pull_resource_from_stock(product_type, quantity, order_id=order.order_id, status=None)
+                if not pulled_item:
+                    raise ValueError(f"Not enough prepared items for {product_type.product_id}. Requested: {quantity}, Available: {quantity_available_produced}")
+                
+                # delete for the inventory all the product with the same product_designation and order_id
+                for item in self.items:
+                    if item.product_designation == product_type.product_id and item.order_id == order.order_id:
+                        self.items.remove(item)
+                pulled_items.append(pulled_item)
 
+            # we need to check if the item is in stock
+            quantity_available_in_stock = self.get_product_instances_by_type(product_type, order_id=None, status=None)
+            if quantity_available_in_stock >= quantity:
+                # we pull the resource from the stock
+                pulled_item = self.pull_resource_from_stock(product_type, quantity, order_id=None, status=None)
+                if pulled_item:
+                    pulled_items.append(pulled_item)
+        return pulled_items
     def pull_resources_from_components_dict(self, components_dict: Dict[ProductType, int], order_id: str | None = None, status: str = INGREDIENTS_WAITING) -> List[ProductInstance]:
         """
         Pull resources from stock based on a components dictionary.
@@ -201,9 +213,27 @@ class Inventory:
         Check if the inventory has sufficient stock to fulfill an order.
         """
         for product_type, quantity in order.products:
-            if not self.check_if_has_in_stock(product_type, quantity):
+            is_prepared = self.check_if_has_in_stock(product_type, quantity, order_id=order.order_id, status=None)
+            is_in_stock = self.check_if_has_in_stock(product_type, quantity)
+            if not (is_prepared or is_in_stock):
                 return False
         return True
+
+    def check_if_order_is_produced(self, order: Order) -> bool:
+        '''
+        This function checks if all products in the order are produced and ready for delivery.
+        '''
+        for product_type, quantity in order.products:
+            is_prepared = self.check_if_has_in_stock(product_type, quantity, order_id=order.order_id, status=None)
+            if not is_prepared :
+                return False
+        return True
+    
+    def remove_products_by_designation(self, product_designation: str, order_id: str) -> None:
+        """
+        Remove all products with a specific designation and order ID from the inventory.
+        """
+        self.items = list(filter(lambda item: not (item.product_designation == product_designation and item.order_id == order_id), self.items))
 
     def has_product_in_status(self, product_type: ProductType , order_id: str | None, quantity: int, status: str=INGREDIENTS_READY_TO_PROCESS) -> bool:
         """
@@ -220,6 +250,7 @@ class SimulationManager:
     def __init__(self):
         self.time : int = 0
         self.orders_fulfilled = set()
+        self.orders_fulfilled_list = []
         self.total_income = 0.0
         # ...existing code...
         # self.entities = []
@@ -305,16 +336,26 @@ class SimulationManager:
         
 
     def send_order_in_stock(self,closest_order: Order, ) -> Tuple[Order, float]:
-        pulled_items = self.inventory.pull_resources_from_stock_by_order(closest_order, status=INGREDIENTS_WAITING)
-        print(pulled_items)
+        '''
+        We find if there is any combination which either products are in the stock by either production or inventory.
+        '''
+        pulled_items = self.inventory.pull_resources_from_available_place(closest_order)
         closest_order.mark_fulfilled()
+        print('-' * 50)
+        print(f"Order {closest_order.order_id} is fulfilled with items: {pulled_items}.")
+        print('-' * 50)
         if closest_order.order_id in self.orders_fulfilled:
             raise ValueError(f"Order {closest_order.order_id} is already fulfilled.")
+        self.orders_fulfilled_list.append(closest_order)
+        # delete the order from the customer's orders
+        for customer in self.customers:
+            if closest_order in customer.orders:
+                customer.orders.remove(closest_order)
         self.orders_fulfilled.add(closest_order.order_id)
         income = closest_order.calculate_order_cost()
         self.total_income += income
-        closest_lead_time = self.get_closest_order_lead_time(True)
         closest_order = self.get_closest_order(True)
+        closest_lead_time = closest_order.due_time if closest_order else None
         return closest_order, closest_lead_time
     
     def handle_no_components_in_stock(self, closest_order: Order) -> Tuple[Order, float]:
@@ -335,6 +376,7 @@ class SimulationManager:
         Add items from the closest order to the respective station queues.
         This will be called after pulling resources from the inventory.
         """
+        closest_order.status = INGREDIENTS_READY_TO_PROCESS
         for product , q in closest_order.products:
             product_resources = self.get_tree_from_products_list([(product, q)])
             pulled_items = self.inventory.pull_resources_from_components_dict(product_resources)
@@ -367,14 +409,13 @@ class SimulationManager:
             self.receive_supplier_orders()
             self.order_missing_components_to_produce()
             # start with the closest order
-            closest_lead_time = self.get_closest_order_lead_time(False)
             closest_order = self.get_closest_order(False)
+            closest_lead_time = closest_order.due_time if closest_order else None
             time = 0
             while closest_order is not None :
                 print(f'The next closest order is {closest_order} ')
                 is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
             
-                print(f'The next closest order is {closest_order} ')
                 print(self.inventory)
                 if is_order_in_stock:
                     closest_order, closest_lead_time = self.send_order_in_stock(closest_order)
@@ -382,7 +423,7 @@ class SimulationManager:
                 
                 print(f'The next closest order is {closest_order} ')
                 has_components_in_stock = self.check_if_components_in_stock(closest_order, )
-                if not has_components_in_stock:
+                if not has_components_in_stock and closest_order.status != INGREDIENTS_READY_TO_PROCESS:
                     closest_order, closest_lead_time = self.handle_no_components_in_stock(closest_order)
                     continue
 
@@ -391,107 +432,42 @@ class SimulationManager:
                 if closest_order is None:
                     print("No orders to fulfill today.")
                     break
-
-                self.add_items_from_order_to_station(closest_order)
-                next_finish_time = self.find_next_station_finished()
+                if closest_order.status != INGREDIENTS_READY_TO_PROCESS:
+                    self.add_items_from_order_to_station(closest_order)
+                next_finish_time, station_with_item = self.find_next_station_finished()
                 if next_finish_time is None:
                     # start the processing 
                     raise ValueError("No station is currently processing an item.")
+                print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
                 self.decrement_time_to_stations(time, next_finish_time, WORKING_DAY_LENGTH)
                 time = next_finish_time + time
+                print(self.inventory)
+                # check if any order is ready to be fulfilled
+                self.fulfill_orders_in_stock(closest_order)
+                
 
                 if time > WORKING_DAY_LENGTH:
                     print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - time}")
                     continue
-                # TODO: extract to it's own function
-                # for product , q in closest_order.products:
-                #     product_resources = self.get_tree_from_products_list([(product, q)])
-                #     pulled_items = self.inventory.pull_resources_from_components_dict(product_resources)
-                #     for item in pulled_items: 
-                #         item.status = INGREDIENTS_READY_TO_PROCESS
-                #         item.order_id = closest_order.order_id
-                #         item.product_designation = product.product_id  # Set the product designation
-                #         self.inventory.add(item)
-                #         # add the pulled items to the station queue
-                #         if item.product_type == self.product_x:
-                #             station = self.stations[0]
-                #             station.add_to_queue(item)
-                #         elif item.product_type == self.product_y:
-                #             station = self.stations[1]
-                #             station.add_to_queue(item)
-                #         elif item.product_type == self.product_z:  # product z can only be processed after product x and y
-                #             station = self.stations[2]
-                #             station.add_to_queue([item])
-                #         print(f"Adding {item} to station {station.station_id} queue.")
-            # find the next closest item that will end processing
-
-
-
-                # pull the resources from the inventory
-                # pulled_items = self.inventory.pull_resources_from_components_dict(components_dict)
-                # # make the pulled items to be in the INGREDIENTS_READY_TO_PROCESS status and set the order_id
-                # for item in pulled_items:
-                #     item.status = INGREDIENTS_READY_TO_PROCESS
-                #     item.order_id = closest_order.order_id
-                #     self.inventory.add(item)
-                # print(f"Pulled items from stock: {pulled_items}")
-                # # add the pulled items to the inventory
-                # # TODO: start producing the products
-                # for product_type, quantity in closest_order.products:
-                #     # get the ingredients for the product type
-                #     ingredients = self.product_tree(product_type, quantity)
-                #     for ingredient, amount in ingredients.items():
-                #         # process the ingredient on the station
-                #         product_instance = ProductInstance(product_type=ingredient, order_id=closest_order.order_id, amount=amount)
-                #         if ingredient == self.product_x:
-                #             station = self.stations[0]  # Assuming we start with the first station
-                #         elif ingredient == self.product_y:
-                #             station = self.stations[1]
-                #         elif ingredient == self.product_z: #  product z can only be processed after product x and y
-                #             station = self.stations[2]
-                #         station.add_to_queue(product_instance)
-
-                    # process_times = []
-                    # # process the next one 
-                    # # this mean we for each product we check if the station can process it
-                    # for station in self.stations:
-                    #     for index in range(len(station.queue)):
-                    #         next_in_queue, amount_processes = station.get_item_in_queue(index)
-                    #         can_be_processed = self.check_if_ingredients_are_preprocessed(
-                    #             station.station_id, amount_processes, product_type, next_in_queue.order_id)
-                    #         if not can_be_processed:
-                    #             continue
-                    #         else: 
-                    #             processing_time = station.start_processing(index)
-                                
-                    #             process_times.append(processing_time)
-                    # # check the max processing time, and with that max this is the time we add in the clock and increase the time
-                    # if process_times:
-                    #     max_processing_time = max(process_times)
-                    #     if max_processing_time + time <= WORKING_DAY_LENGTH:
-                    #         time += max_processing_time
-                    #         # subtract the preprocessed time from all the station processed item
-                    #         for station in self.stations:
-                    #             product, process_time_remain = station.decrement_processing_time_for_working_item(max_processing_time)
-                    #             if product: # this mean add this to the inventory
-                    #                 self.inventory.add(product)
-                                    
-
-
-                    # if max(process_times) + time <= WORKING_DAY_LENGTH:
-                    #     time += max(process_times)
-                    #     print(f"Processing {quantity} of {product_type.product_id} at stations with times: {process_times}")
-                    # else:
-                    #     print(f"Not enough time to process {quantity} of {product_type.product_id} today. Remaining time: {WORKING_DAY_LENGTH - time}")
-                    #     break
-
+                
 
             if closest_lead_time is None:
                 print("No orders to fulfill today.")
                 continue
 
-    
-
+    def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
+        # check for each order if the order is already produced and in stock
+        closest_order, closest_lead_time = closest_order, closest_order.due_time
+        for customer in self.customers:
+            for order in customer.orders:
+                is_in_stock = self.inventory.check_if_order_is_produced(order)
+                if is_in_stock:
+                    self.send_order_in_stock(order , )
+                    if closest_order == order:
+                        closest_order = self.get_closest_order(False)
+                        closest_lead_time = closest_order.due_time if closest_order else None
+        return closest_order, closest_lead_time
+                    
     def decrement_time_to_stations(self, current_time: float, delta: float , max_time: float) -> None:
         """
         Add time to all stations and process items in the queue.
@@ -503,30 +479,51 @@ class SimulationManager:
             next_finish_time = station.get_next_finish_time()
             if can_processed and current_time + next_finish_time <= max_time:
                 station.start_processing()
-                item, time = station.decrement_processing_time(0,delta)
+                item, time = station.decrement_processing_time(0,delta, )
                 # add the item to the inventory
                 if not item:
                     continue
+                print(f"Station {station.station_id} processed item {item} in {time} time units.")
+                if item.product_type.product_id == PRODUCT_ID_FIRST or item.product_type.product_id == PRODUCT_ID_SECOND:
+                    self.inventory.remove_products_by_designation(item.product_type.product_id, item.order_id)
+                    # add the item to the inventory
+                    self.inventory.add(item)
+                    continue
+                
                 # check for the item, 
                 if item.product_type.product_id != PRODUCT_ID_Z:
                     # add to product z station by the 
-                    self.stations[-1].add_processed_item(item)
-                    pass
-                #TODO: finish here
-                    # self.inventory.add(item)
+                    # find the station where station_id is STATION_THREE_ID
+                    station_z = next((s for s in self.stations if s.station_id == STATION_THREE_ID), None)
+                    if not station_z:
+                        raise ValueError("Station Z not found.")
+                    
+                    # add to the station_z queue where where the element has the same product_designation as item.product_designation and the same order_id
+                    found = False
+                    for queue_item in station_z.queue:
+                        if queue_item[0][0].product_designation == item.product_designation and queue_item[0][0].order_id == item.order_id:
+                            queue_item[0].append(item)
+                            found = True
+                            break
+                    if not found:
+                        station_z.queue.append(([item], 0))
+                        raise ValueError("Product Z station not found.")
+                
 
     def find_next_station_finished(self) -> float | None:
         '''
         The goal is to find the time when the next station will finish processing an item.
         '''
         next_time = math.inf
+        station_with_item = None
         for station in self.stations:
             finish_time = station.get_next_finish_time()
-            if finish_time < next_time:
+            if finish_time < next_time and station.check_can_be_processed():
                 next_time = finish_time
+                station_with_item = station
         if next_time == math.inf:
-            return None
-        return next_time
+            return None , None
+        return next_time , station_with_item
 
     def find_cheapest_supplier(self, product_types: List[Tuple[ProductType, int]], max_lead_time) -> Supplier:
         """
@@ -632,7 +629,7 @@ class SimulationManager:
         self.product_x = ProductType(
             product_id=PRODUCT_ID_X,
             processing_time_distributions={
-                1: random.expovariate(STATION_PROCESS_TIME[1]),  # Station 1
+                1: max(round(random.expovariate(STATION_PROCESS_TIME[1]), ROUND_DECIMAL_PLACES), MIN_PROCESSING_TIME),  # Station 1
                 2: 0,  # Station 2
                 3: 0   # Station 3 (custom for product x)
             },
@@ -642,7 +639,7 @@ class SimulationManager:
             product_id=PRODUCT_ID_Y,
             processing_time_distributions={
                 1: 0,  # Station 1
-                2: random.expovariate(STATION_PROCESS_TIME[2]),  # Station 2
+                2: max(round(random.expovariate(STATION_PROCESS_TIME[2]), ROUND_DECIMAL_PLACES), MIN_PROCESSING_TIME),  # Station 2
                 3: 0   # Station 3 (custom for product y)
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Y]
@@ -652,7 +649,7 @@ class SimulationManager:
             processing_time_distributions={
                 1: 0,  # Station 1
                 2: 0,  # Station 2
-                3: random.expovariate(STATION_PROCESS_TIME[3])   # Station 3 (custom for product z)
+                3: max(round(random.expovariate(STATION_PROCESS_TIME[3]), ROUND_DECIMAL_PLACES), MIN_PROCESSING_TIME)  # Station 3 (custom for product z)
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_Z]
         )
