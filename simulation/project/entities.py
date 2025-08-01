@@ -45,7 +45,8 @@ class ProductType:
             'product_id': self.product_id,
             'processing_time_distributions': self.processing_time_distributions,
             'volume_per_unit': self.volume_per_unit,
-            'cost': self.cost
+            'cost': self.cost,
+            'processing_time': self.processing_time
         }
 class Supplier:
     """
@@ -135,7 +136,8 @@ class ProductInstance:
             'order_id': self.order_id,
             'status': self.status,
             'amount': self.amount,
-            'product_designation': self.product_designation
+            'product_designation': self.product_designation,
+            'product_type': self.product_type.to_dict()
         }
 class Station:
     """
@@ -213,8 +215,6 @@ class Station:
                 return product_instance , new_processing_time
             return None , None
         return None , None
-    
-    
 
     def decrement_processing_time_for_working_item(self, time: float) -> Tuple[ProductInstance | None, float]:
         """Decrement the processing time of the currently working item."""
@@ -309,7 +309,7 @@ class Station:
         """Convert the station to a dictionary for JSON serialization."""
         return {
             'station_id': self.station_id,
-            'queue': [(item[0].to_dict(), item[1]) for item in self.queue],
+            'queue': list(map(lambda x: x[0].to_dict() if isinstance(x[0], ProductInstance) else [i.to_dict() for i in x[0]], self.queue)),
             'working_item_index': self.working_item_index
         }
 class Order:
@@ -344,7 +344,7 @@ class Order:
         """Convert the order to a dictionary for JSON serialization."""
         return {
             'order_id': self.order_id,
-            'products': [(product.product_id, quantity) for product, quantity in self.products],
+            'products': [(product.to_dict(), quantity) for product, quantity in self.products],
             'due_time': self.due_time,
             'status': self.status
         }
