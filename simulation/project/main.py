@@ -455,7 +455,8 @@ class SimulationManager:
             self.total_orders_count()
             if algorithm == ALGORITHM_SPT:
                 self.sort_stations_by_processing_time()
-
+            temp_data[TYPE_TOTAL_INCOME] = self.total_income
+            temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.to_dict() for order in self.orders_fulfilled_list]
             temp_days_action_data = []
             # temp_days_action_data.append(dict(
             #     day=self.time,
@@ -465,7 +466,11 @@ class SimulationManager:
             while closest_order is not None :
                 print(f'The next closest order is {closest_order} ')
                 is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
-            
+                temp_days_action_data.append(dict(
+                    type=TYPE_SET_CLOSEST_ORDER,
+                    current_day_time=current_day_time,
+                    closest_order=closest_order.to_dict() if closest_order else None,
+                ))
                 print(self.inventory)
                 inv_before = self.inventory.to_dict()
                 if is_order_in_stock:
@@ -532,7 +537,19 @@ class SimulationManager:
                     ))
                 print(self.inventory)
                 # check if any order is ready to be fulfilled
+                temp_days_action_data.append(dict(
+                    type=ORDER_FULFILLED_FROM_WORKING_DAY_START,
+                    current_day_time=current_day_time,
+                    customer=[customer.to_dict() for customer in self.customers],
+                    orders=[order.to_dict() for order in self.orders_fulfilled_list]
+                ))
                 closest_order_temp, closest_lead_time_temp = self.fulfill_orders_in_stock(closest_order)
+                temp_days_action_data.append(dict(
+                    type=ORDER_FULFILLED_FROM_WORKING_DAY_END,
+                    current_day_time=current_day_time,
+                    customer=[customer.to_dict() for customer in self.customers],
+                    orders=[order.to_dict() for order in self.orders_fulfilled_list]
+                ))
                 if closest_order_temp is not None and closest_lead_time_temp is not None:
                     closest_order = closest_order_temp
                     closest_lead_time = closest_lead_time_temp
@@ -541,12 +558,17 @@ class SimulationManager:
                     print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - current_day_time}")
                     break
             
-            # temp_data[TYPE_DAYS_ACTION_DATA] = temp_days_action_data
 
             if closest_lead_time is None:
                 print("No orders to fulfill today.")
                 continue
-
+        self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
+        self.save_json_info()
+    def save_json_info(self):
+        file = self.generate_file_name()
+        with open(file, 'w') as f:
+            json.dump(self.json_info, f, indent=4)
+        print(f"Simulation data saved to {file}")
     def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
         # check for each order if the order is already produced and in stock
         closest_order, closest_lead_time = closest_order, closest_order.due_time
@@ -846,5 +868,5 @@ class SimulationManager:
         now = datetime.now()
         # Format as year_month_day_hour_minute_second
         timestamp = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"simulation_results_{timestamp}.json"
+        file_name = f"data/simulation_results_{timestamp}.json"
         return file_name
