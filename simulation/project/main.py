@@ -564,31 +564,6 @@ class SimulationManager:
                         inventory_after=self.inventory.to_dict()
                     ))
                 
-                
-                # done_running = False
-                # while self.current_day_time < WORKING_DAY_LENGTH:
-                #     next_finish_time, station_with_item = self.find_next_station_finished()
-                #     if next_finish_time is None or self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
-                #         done_running = True
-                #         break  # No station is currently processing an item
-                #     #     # start the processing 
-                #     #     raise ValueError("No station is currently processing an item.")
-                #     print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
-                #     temp_days_action_data.append(dict(
-                #         type=TYPE_STATION_PROCESSING_TIME,
-                #         current_day_time=self.current_day_time,
-                #         stations=[station.to_dict() for station in self.stations ],
-                #         inventory=self.inventory.to_dict()
-                #     ))
-                #     self.decrement_time_to_stations(self.current_day_time, next_finish_time, WORKING_DAY_LENGTH)
-                #     self.current_day_time = next_finish_time + self.current_day_time
-                #     temp_days_action_data.append(dict(
-                #         type=TYPE_STATION_PROCESSING_TIME,
-                #         current_day_time=self.current_day_time,
-                #         stations=[station.to_dict() for station in self.stations ],
-                #         inventory=self.inventory.to_dict()
-                #     ))
-                # print(self.inventory)
                 # check if any order is ready to be fulfilled
                 done_running = self.run_day_processing(temp_days_action_data)
                 temp_days_action_data.append(dict(
