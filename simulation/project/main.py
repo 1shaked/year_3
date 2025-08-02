@@ -321,7 +321,7 @@ class SimulationManager:
             can_not_process.sort(key=lambda x: x[1])
             # join the two lists
             station.queue = can_process + can_not_process
-    def sort_by_lpt(self):
+    def sort_stations_by_lpt(self):
         '''
         Sort the stations by their processing time in descending order.
         '''
@@ -340,28 +340,93 @@ class SimulationManager:
             # join the two lists
             station.queue = can_process + can_not_process
 
-    def sort_by_edd(self):
-        # TODO: finish implementing the EDD sorting algorithm
+    def sort_stations_by_edd(self):
         '''
         We will sort the stations by the due time of the order the items are related to.
         '''
-        orders_ids = set()
-        orders_list = []
         for station in self.stations:
+            items_to_sort = []
             # when sorting we also need to check if the station can process the items in the queue
             for index, item in enumerate(station.queue):
                 if station.check_can_be_processed(index):
                     if isinstance(item, list):
-                        orders_ids.add(item[0])
-                        orders_list.append(self.find_order_by_id(item[0].order_id))
+                        order = self.find_order_by_id(item[0].order_id)
+                        items_to_sort.append((item, order.due_time))
                     else:
-                        orders_ids.add(item[0])
-                        orders_list.append(self.find_order_by_id(item.order_id))
+                        order = self.find_order_by_id(item.order_id)
+                        items_to_sort.append((item, order.due_time))
+                else:
+                    items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
+            # we will sort the orders by their due time
+            items_to_sort.sort(key=lambda x: x[1])
+            # now we will sort the station queue by the due time of the order
+            station.queue = [item for item, _ in items_to_sort]
 
-        # sort the orders by due time
-        orders_list.sort(key=lambda x: x.due_time)
-    
-        return orders_list
+    def sort_stations_by_critical_ratio(self):
+        """ Sort the stations by the critical ratio of the orders in the queue.
+        The critical ratio is calculated as (due time - current time) / processing time.
+        """
+        for station in self.stations:
+            items_to_sort = []
+            # when sorting we also need to check if the station can process the items in the queue
+            for index, item in enumerate(station.queue):
+                if station.check_can_be_processed(index):
+                    if isinstance(item, list):
+                        order = self.find_order_by_id(item[0].order_id)
+                        cr_score = (order.due_time - self.time) / item[1] if item[1] > 0 else math.inf
+                        items_to_sort.append((item, cr_score))
+                    else:
+                        order = self.find_order_by_id(item.order_id)
+                        cr_score = (order.due_time - self.time) / item.processing_time if item.processing_time > 0 else math.inf
+                        items_to_sort.append((item, cr_score))
+                else:
+                    items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
+            # we will sort the orders by their due time
+            items_to_sort.sort(key=lambda x: x[1])
+            # now we will sort the station queue by the due time of the order
+            station.queue = [item for item, _ in items_to_sort]
+
+
+    def sort_stations_by_slack(self):
+        """ Sort the stations by the slack time of the orders in the queue.
+        The slack time is calculated as (due time - current time - processing time).
+        """
+        for station in self.stations:
+            items_to_sort = []
+            # when sorting we also need to check if the station can process the items in the queue
+            for index, item in enumerate(station.queue):
+                if station.check_can_be_processed(index):
+                    if isinstance(item, list):
+                        order = self.find_order_by_id(item[0].order_id)
+                        slack_time = order.due_time - self.time - item[1]
+                        items_to_sort.append((item, slack_time))
+                    else:
+                        order = self.find_order_by_id(item.order_id)
+                        slack_time = order.due_time - self.time - item.processing_time
+                        items_to_sort.append((item, slack_time))
+                else:
+                    items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
+            # we will sort the orders by their due time
+            items_to_sort.sort(key=lambda x: x[1])
+            # now we will sort the station queue by the due time of the order
+            station.queue = [item for item, _ in items_to_sort]
+
+
+    def sort_stations_by_algorithm(self, algorithm: str):
+        """ Sort the stations based on the specified algorithm.
+        """
+        if algorithm == ALGORITHM_EDD:
+            self.sort_stations_by_edd()
+        elif algorithm == ALGORITHM_SLACK:
+            self.sort_stations_by_slack()
+        elif algorithm == ALGORITHM_CRITICAL_RATIONAL:
+            self.sort_stations_by_critical_ratio()
+        elif algorithm == ALGORITHM_LPT:
+            self.sort_stations_by_lpt()
+        elif algorithm == ALGORITHM_SPT:
+            self.sort_stations_by_processing_time()
+        else:
+            raise ValueError(f"Unknown algorithm: {algorithm}")
 
     def find_order_by_id(self, order_id: str) -> Optional[Order]:
         """
@@ -378,6 +443,13 @@ class SimulationManager:
         Get the closest order that is not yet fulfilled.
         If filter_by_waiting is True, only consider orders that are waiting.
         """
+        return self.get_closest_order_by_due_time(filter_by_waiting)
+
+    def get_closest_order_by_due_time(self, filter_by_waiting: bool = True) -> Order | None:
+        """
+        Get the closest order by due time that is not yet fulfilled.
+        If filter_by_waiting is True, only consider orders that are waiting.
+        """
         due_date = math.inf
         closest_order = None
         for customer in self.customers:
@@ -387,7 +459,6 @@ class SimulationManager:
                     due_date = order.due_time
                     closest_order = order
         return closest_order
-
 
     def receive_supplier_orders(self,):
         # update the inventory based on the suppliers orders received, (by the due date)
@@ -557,8 +628,9 @@ class SimulationManager:
         temp_data = {}
         for self.time in range(1,SIMULATION_DAYS + 1):
             closest_order, closest_lead_time = self.start_day(temp_data)
-            if algorithm == ALGORITHM_SPT:
-                self.sort_stations_by_processing_time()
+            # if algorithm == ALGORITHM_SPT:
+            #     self.sort_stations_by_processing_time()
+            self.sort_stations_by_algorithm(algorithm)
             temp_data[TYPE_TOTAL_INCOME] = self.total_income
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.to_dict() for order in self.orders_fulfilled_list]
             temp_days_action_data = []
