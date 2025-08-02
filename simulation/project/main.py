@@ -244,6 +244,14 @@ class Inventory:
         product_type = self.get_product_instances_by_type(product_type, order_id=order_id, status=status)
         return product_type >= quantity
 
+    def to_dict(self) -> Dict[str, Any]:
+        """ Convert the inventory to a dictionary representation. """
+        return dict(
+            items=[item.to_dict() for item in self.items],
+            capacity_limit=self.capacity_limit,
+            total_volume=self.total_volume,
+            holding_cost_per_unit=self.holding_cost_per_unit
+        )
     
 class SimulationManager:
     """
@@ -255,9 +263,6 @@ class SimulationManager:
         self.orders_fulfilled_list = []
         self.total_income = 0.0
         self.json_info = dict()
-        # ...existing code...
-        # self.entities = []
-        # self.statistics = {}
 
     def run(self):
         """Run the main simulation loop."""
@@ -276,7 +281,7 @@ class SimulationManager:
         self.setup_stations()
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
-        self.json_info[RECIPE_KEY] = self.v
+        self.save_current_state(algorithm)
         # simulation days loop
         self.producing_by_demand_only(algorithm)
         
@@ -287,8 +292,9 @@ class SimulationManager:
         self.json_info[SUPPLIER_KEY] = [supplier.to_dict() for supplier in self.suppliers]
         self.simulation_days = SIMULATION_DAYS
         self.json_info[SIMULATION_DAYS_KEY] = SIMULATION_DAYS
-        self.json_info[STATIONS_KEY] = [station.to_dict() for station in self.stations]
-        self.json_info[INVENTORY_KEY] = [item.to_dict() for item in self.inventory.items]
+        # self.json_info[STATIONS_KEY] = [station.to_dict() for station in self.stations]
+        # self.json_info[INVENTORY_KEY] = [item.to_dict() for item in self.inventory.items]
+        # self.json_info[RECIPE_KEY] = self.v
         self.json_info[ALGORITHM_KEY] = algorithm
 
     def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
@@ -426,6 +432,58 @@ class SimulationManager:
                     orders[product_type.product_id] += quantity
         print(f"Total orders count: {json.dumps(orders, indent=4)}")
 
+
+    def start_day(self, temp_data: dict) -> None:
+        """
+        Prepare the simulation for a new day.
+        """
+        print(f"Day {self.time}: Starting production cycle.")
+        self.init_customer_order_for_day()
+        self.receive_supplier_orders()
+        needed_ingredients , closest_lead_time , cheapest_supplier = self.order_missing_components_to_produce()
+        closest_order = self.get_closest_order(False)
+        closest_lead_time = closest_order.due_time if closest_order else None
+        self.total_orders_count()
+        # save the related data to the temp_data dictionary
+        temp_data[DAY_KEY] = self.time
+        temp_data[CUSTOMER_ORDERS_KEY] = [customer.to_dict() for customer in self.customers]
+        temp_data[SUPPLIER_ORDERS_KEY] = [supplier.to_dict() for supplier in self.suppliers]
+        temp_data[NEEDED_INGREDIENTS_KEY] = dict(
+            needed_ingredients=[(product.to_dict(), quantity) for product, quantity in needed_ingredients],
+            closest_lead_time=closest_lead_time,
+            cheapest_supplier=cheapest_supplier.to_dict() if cheapest_supplier else None
+        )
+        temp_data[CLOSEST_ORDER_KEY] = closest_order.to_dict() if closest_order else None
+        return closest_order, closest_lead_time
+    def run_day_processing(self, temp_days_action_data: List[Dict[str, Any]]) -> bool:
+        """
+        Run the day processing loop.
+        """
+        done_running = False
+        while self.current_day_time < WORKING_DAY_LENGTH:
+            next_finish_time, station_with_item = self.find_next_station_finished()
+            if next_finish_time is None or self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
+                done_running = True
+                break  # No station is currently processing an item
+            #     # start the processing 
+            #     raise ValueError("No station is currently processing an item.")
+            print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
+            temp_days_action_data.append(dict(
+                type=TYPE_STATION_PROCESSING_TIME,
+                current_day_time=self.current_day_time,
+                stations=[station.to_dict() for station in self.stations],
+                inventory=self.inventory.to_dict()
+            ))
+            self.decrement_time_to_stations(self.current_day_time, next_finish_time, WORKING_DAY_LENGTH)
+            self.current_day_time = next_finish_time + self.current_day_time
+            temp_days_action_data.append(dict(
+                type=TYPE_STATION_PROCESSING_TIME,
+                current_day_time=self.current_day_time,
+                stations=[station.to_dict() for station in self.stations],
+                inventory=self.inventory.to_dict()
+            ))
+        print(self.inventory)
+        return done_running
     def producing_by_demand_only(self, algorithm=ALGORITHM_EDD) -> None:
         """
         Produce products only based on the demand calculated from customer orders.
@@ -433,42 +491,37 @@ class SimulationManager:
         """
         self.json_info[SIMULATION_DAYS_ARRAY_KEY] = []
         temp_data = {}
-        for i in range(SIMULATION_DAYS):
-            self.time += 1  # Increment the time step for each day
-            temp_data[DAY_KEY] = self.time
-            print(f"Day {self.time}: Starting production cycle.")
-            self.init_customer_order_for_day(self.product_one, self.product_two, i)
-            temp_data[CUSTOMER_ORDERS_KEY] = [customer.to_dict() for customer in self.customers]
-            self.receive_supplier_orders()
-            temp_data[SUPPLIER_ORDERS_KEY] = [supplier.to_dict() for supplier in self.suppliers]
-            needed_ingredients , closest_lead_time , cheapest_supplier = self.order_missing_components_to_produce()
-            temp_data[NEEDED_INGREDIENTS_KEY] = dict(
-                needed_ingredients=needed_ingredients,
-                closest_lead_time=closest_lead_time,
-                cheapest_supplier=cheapest_supplier.to_dict() if cheapest_supplier else None
-            )
-            # start with the closest order
-            closest_order = self.get_closest_order(False)
-            temp_data[CLOSEST_ORDER_KEY] = closest_order.to_dict() if closest_order else None
-            closest_lead_time = closest_order.due_time if closest_order else None
-            current_day_time = 0
-            self.total_orders_count()
+        for self.time in range(1,SIMULATION_DAYS + 1):
+            # self.time += 1  # Increment the time step for each day
+            # temp_data[DAY_KEY] = self.time
+            # print(f"Day {self.time}: Starting production cycle.")
+            # self.init_customer_order_for_day()
+            # temp_data[CUSTOMER_ORDERS_KEY] = [customer.to_dict() for customer in self.customers]
+            # self.receive_supplier_orders()
+            # temp_data[SUPPLIER_ORDERS_KEY] = [supplier.to_dict() for supplier in self.suppliers]
+            # needed_ingredients , closest_lead_time , cheapest_supplier = self.order_missing_components_to_produce()
+            # temp_data[NEEDED_INGREDIENTS_KEY] = dict(
+            #     needed_ingredients=needed_ingredients,
+            #     closest_lead_time=closest_lead_time,
+            #     cheapest_supplier=cheapest_supplier.to_dict() if cheapest_supplier else None
+            # )
+            # # start with the closest order
+            # closest_order = self.get_closest_order(False)
+            # temp_data[CLOSEST_ORDER_KEY] = closest_order.to_dict() if closest_order else None
+            # closest_lead_time = closest_order.due_time if closest_order else None
+            closest_order, closest_lead_time = self.start_day(temp_data)
             if algorithm == ALGORITHM_SPT:
                 self.sort_stations_by_processing_time()
             temp_data[TYPE_TOTAL_INCOME] = self.total_income
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.to_dict() for order in self.orders_fulfilled_list]
             temp_days_action_data = []
-            # temp_days_action_data.append(dict(
-            #     day=self.time,
-            #     current_day_time=current_day_time,
-            #     closest_order=closest_order.to_dict() if closest_order else None
-            # ))
+            self.current_day_time = 0
             while closest_order is not None :
                 print(f'The next closest order is {closest_order} ')
                 is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
                 temp_days_action_data.append(dict(
                     type=TYPE_SET_CLOSEST_ORDER,
-                    current_day_time=current_day_time,
+                    current_day_time=self.current_day_time,
                     closest_order=closest_order.to_dict() if closest_order else None,
                 ))
                 print(self.inventory)
@@ -477,19 +530,18 @@ class SimulationManager:
                     closest_order, closest_lead_time = self.send_order_in_stock(closest_order)
                     temp_days_action_data.append(dict(
                         type=TYPE_ORDER_IN_STOCK,
-                        current_day_time=current_day_time,
+                        current_day_time=self.current_day_time,
                         closest_order=closest_order.to_dict() if closest_order else None,
                         inventory_before=inv_before,
                         inventory_after=self.inventory.to_dict()
                     ))
                     continue
                 
-                print(f'The next closest order is {closest_order} ')
                 has_components_in_stock = self.check_if_components_in_stock(closest_order, )
                 if not has_components_in_stock and closest_order.status != INGREDIENTS_READY_TO_PROCESS:
                     temp_days_action_data.append(dict(
                         type=TYPE_COMPONENTS_NOT_IN_STOCK,
-                        current_day_time=current_day_time,
+                        current_day_time=self.current_day_time,
                         closest_order=closest_order.to_dict() if closest_order else None,
                         inventory_before=inv_before,
                         inventory_after=self.inventory.to_dict()
@@ -506,47 +558,49 @@ class SimulationManager:
                     self.add_items_from_order_to_station(closest_order)
                     temp_days_action_data.append(dict(
                         type=TYPE_ADD_INGREDIENTS_TO_STATION,
-                        current_day_time=current_day_time,
+                        current_day_time=self.current_day_time,
                         closest_order=closest_order.to_dict() if closest_order else None,
                         inventory_before=inv_before,
                         inventory_after=self.inventory.to_dict()
                     ))
                 
-                done_running = False
-                while current_day_time < WORKING_DAY_LENGTH:
-                    next_finish_time, station_with_item = self.find_next_station_finished()
-                    if next_finish_time is None or current_day_time + next_finish_time > WORKING_DAY_LENGTH:
-                        done_running = True
-                        break  # No station is currently processing an item
-                    #     # start the processing 
-                    #     raise ValueError("No station is currently processing an item.")
-                    print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
-                    temp_days_action_data.append(dict(
-                        type=TYPE_STATION_PROCESSING_TIME,
-                        current_day_time=current_day_time,
-                        stations=[station.to_dict() for station in self.stations if station.is_processing],
-                        inventory=self.inventory.to_dict()
-                    ))
-                    self.decrement_time_to_stations(current_day_time, next_finish_time, WORKING_DAY_LENGTH)
-                    current_day_time = next_finish_time + current_day_time
-                    temp_days_action_data.append(dict(
-                        type=TYPE_STATION_PROCESSING_TIME,
-                        current_day_time=current_day_time,
-                        stations=[station.to_dict() for station in self.stations if station.is_processing],
-                        inventory=self.inventory.to_dict()
-                    ))
-                print(self.inventory)
+                
+                # done_running = False
+                # while self.current_day_time < WORKING_DAY_LENGTH:
+                #     next_finish_time, station_with_item = self.find_next_station_finished()
+                #     if next_finish_time is None or self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
+                #         done_running = True
+                #         break  # No station is currently processing an item
+                #     #     # start the processing 
+                #     #     raise ValueError("No station is currently processing an item.")
+                #     print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
+                #     temp_days_action_data.append(dict(
+                #         type=TYPE_STATION_PROCESSING_TIME,
+                #         current_day_time=self.current_day_time,
+                #         stations=[station.to_dict() for station in self.stations ],
+                #         inventory=self.inventory.to_dict()
+                #     ))
+                #     self.decrement_time_to_stations(self.current_day_time, next_finish_time, WORKING_DAY_LENGTH)
+                #     self.current_day_time = next_finish_time + self.current_day_time
+                #     temp_days_action_data.append(dict(
+                #         type=TYPE_STATION_PROCESSING_TIME,
+                #         current_day_time=self.current_day_time,
+                #         stations=[station.to_dict() for station in self.stations ],
+                #         inventory=self.inventory.to_dict()
+                #     ))
+                # print(self.inventory)
                 # check if any order is ready to be fulfilled
+                done_running = self.run_day_processing(temp_days_action_data)
                 temp_days_action_data.append(dict(
                     type=ORDER_FULFILLED_FROM_WORKING_DAY_START,
-                    current_day_time=current_day_time,
+                    current_day_time=self.current_day_time,
                     customer=[customer.to_dict() for customer in self.customers],
                     orders=[order.to_dict() for order in self.orders_fulfilled_list]
                 ))
                 closest_order_temp, closest_lead_time_temp = self.fulfill_orders_in_stock(closest_order)
                 temp_days_action_data.append(dict(
                     type=ORDER_FULFILLED_FROM_WORKING_DAY_END,
-                    current_day_time=current_day_time,
+                    current_day_time=self.current_day_time,
                     customer=[customer.to_dict() for customer in self.customers],
                     orders=[order.to_dict() for order in self.orders_fulfilled_list]
                 ))
@@ -555,7 +609,7 @@ class SimulationManager:
                     closest_lead_time = closest_lead_time_temp
 
                 if done_running:
-                    print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - current_day_time}")
+                    print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}")
                     break
             
 
@@ -784,7 +838,7 @@ class SimulationManager:
             ProductInstance(product_type=self.product_z,   order_id=None, amount=5 * random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
         ])
 
-    def init_customer_order_for_day(self, product_one, product_two, day) -> None:
+    def init_customer_order_for_day(self) -> None:
         """
         For each customer, randomly decide whether to place an order for each product type for the day.
         """
@@ -795,11 +849,11 @@ class SimulationManager:
             q_1 = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
             q_2 = random.randint(CUSTOMER_MIN_ORDER_QUANTITY, CUSTOMER_MAX_ORDER_QUANTITY)
             if v1 < CUSTOMER_PROBABILITY_TO_ORDER and v2 >= CUSTOMER_PROBABILITY_TO_ORDER:
-                customer.place_order([(product_one, q_1)], day)
+                customer.place_order([(self.product_one, q_1)], self.time)
             elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 >= CUSTOMER_PROBABILITY_TO_ORDER:
-                customer.place_order([(product_two, q_2)], day)
+                customer.place_order([(self.product_two, q_2)], self.time)
             elif v2 < CUSTOMER_PROBABILITY_TO_ORDER and v1 < CUSTOMER_PROBABILITY_TO_ORDER:
-                customer.place_order([(product_one, q_1), (product_two, q_2)], day)
+                customer.place_order([(self.product_one, q_1), (self.product_two, q_2)], self.time)
 
     def log_statistics(self):
         """Log or print simulation statistics."""

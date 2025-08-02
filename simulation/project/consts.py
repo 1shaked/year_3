@@ -2,7 +2,7 @@ import random
 
 ROUND_DECIMAL_PLACES = 2  # Number of decimal places for rounding prices and costs
 
-SIMULATION_DAYS = 30
+SIMULATION_DAYS = 200
 SUPPLIER_COUNT_MIN = 1
 SUPPLIER_COUNT_MAX = 5
 CUSTOMER_COUNT_MIN = 5

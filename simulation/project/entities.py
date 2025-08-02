@@ -73,11 +73,11 @@ class Supplier:
         for product_type, quantity in product_types:
             material_cost = self.sample_raw_material_cost(product_type)
             order_cost += material_cost * quantity
-        self.orders.append({
-            'products': product_types,
-            'order_cost': order_cost,
-            'due_time': current_time + self.lead_time
-        })
+        self.orders.append(dict(
+            products=product_types,
+            order_cost=order_cost,
+            due_time=current_time + self.lead_time
+        ))
         return order_cost
 
     def deliver_materials(self, current_time: float):
@@ -90,8 +90,12 @@ class Supplier:
             'supplier_id': self.supplier_id,
             'lead_time': self.lead_time,
             'fixed_order_cost': self.fixed_order_cost,
-            'raw_material_cost_distribution': {product_type.product_id: cost for product_type, cost in self.raw_material_cost_distribution.items()},
-            'orders': self.orders
+            'raw_material_cost_distribution': [(product_type.to_dict(), cost) for product_type, cost in self.raw_material_cost_distribution.items()],
+            'orders': [dict(
+                products=[(product_type.to_dict(), quantity) for product_type, quantity in order['products']],
+                order_cost=order['order_cost'],
+                due_time=order['due_time']
+            ) for order in self.orders]
         }
 
 
@@ -132,12 +136,11 @@ class ProductInstance:
     def to_dict(self) -> Dict[str, Any]:
         """Convert the product instance to a dictionary for JSON serialization."""
         return {
-            'product_id': self.product_type.product_id,
+            'product_type': self.product_type.to_dict(),
             'order_id': self.order_id,
             'status': self.status,
             'amount': self.amount,
             'product_designation': self.product_designation,
-            'product_type': self.product_type.to_dict()
         }
 class Station:
     """
