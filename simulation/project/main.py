@@ -454,6 +454,7 @@ class SimulationManager:
             cheapest_supplier=cheapest_supplier.to_dict() if cheapest_supplier else None
         )
         temp_data[CLOSEST_ORDER_KEY] = closest_order.to_dict() if closest_order else None
+        temp_data[TYPE_TOTAL_INCOME] = self.total_income
         return closest_order, closest_lead_time
     def run_day_processing(self, temp_days_action_data: List[Dict[str, Any]]) -> bool:
         """
