@@ -493,23 +493,6 @@ class SimulationManager:
         self.json_info[SIMULATION_DAYS_ARRAY_KEY] = []
         temp_data = {}
         for self.time in range(1,SIMULATION_DAYS + 1):
-            # self.time += 1  # Increment the time step for each day
-            # temp_data[DAY_KEY] = self.time
-            # print(f"Day {self.time}: Starting production cycle.")
-            # self.init_customer_order_for_day()
-            # temp_data[CUSTOMER_ORDERS_KEY] = [customer.to_dict() for customer in self.customers]
-            # self.receive_supplier_orders()
-            # temp_data[SUPPLIER_ORDERS_KEY] = [supplier.to_dict() for supplier in self.suppliers]
-            # needed_ingredients , closest_lead_time , cheapest_supplier = self.order_missing_components_to_produce()
-            # temp_data[NEEDED_INGREDIENTS_KEY] = dict(
-            #     needed_ingredients=needed_ingredients,
-            #     closest_lead_time=closest_lead_time,
-            #     cheapest_supplier=cheapest_supplier.to_dict() if cheapest_supplier else None
-            # )
-            # # start with the closest order
-            # closest_order = self.get_closest_order(False)
-            # temp_data[CLOSEST_ORDER_KEY] = closest_order.to_dict() if closest_order else None
-            # closest_lead_time = closest_order.due_time if closest_order else None
             closest_order, closest_lead_time = self.start_day(temp_data)
             if algorithm == ALGORITHM_SPT:
                 self.sort_stations_by_processing_time()
