@@ -242,31 +242,29 @@ class Station:
         self.queue.append((product_instance, processing_time))
         return processing_time
 
-    def check_can_be_processed(self) -> bool:
+    def check_can_be_processed(self, index=0) -> bool:
         '''
         This will be needed for the product type z
         '''
+        if len(self.queue) == 0:
+            return None
+        if index < 0 or index >= len(self.queue):
+            raise IndexError("Index out of range for the queue.")
         if self.station_id == STATION_ONE_ID:
             # we only need to check if the product is of type x is present in the queue
-            if len(self.queue) == 0:
-                return None
-            return self.queue[0][0].product_type.product_id == PRODUCT_ID_X
+            return self.queue[index][0].product_type.product_id == PRODUCT_ID_X
         
         if self.station_id == STATION_TWO_ID:
             # we only need to check if the product is of type y is present in the queue
-            if len(self.queue) == 0:
-                return None
-            return self.queue[0][0].product_type.product_id == PRODUCT_ID_Y
-        
+            return self.queue[index][0].product_type.product_id == PRODUCT_ID_Y
+
         # if the product is z then we need to check if the first item have x , y , z
         if self.station_id == STATION_THREE_ID:
-            if len(self.queue) == 0:
-                return None
             items_needed = [PRODUCT_ID_X, PRODUCT_ID_Y, PRODUCT_ID_Z]
             # check first if list 
-            if not isinstance(self.queue[0][0], list):
+            if not isinstance(self.queue[index][0], list):
                 raise ValueError("Expected a list of ProductInstances for station three.")
-            for item in self.queue[0][0]:
+            for item in self.queue[index][0]:
                 if item.product_type.product_id in items_needed:
                     # pop the item from the queue
                     items_needed.remove(item.product_type.product_id)

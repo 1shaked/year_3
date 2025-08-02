@@ -308,7 +308,70 @@ class SimulationManager:
         Returns a list of stations sorted by processing time.
         """
         for station in self.stations:
-            station.queue.sort(key=lambda x: x[1])  # Sort queue by processing time
+            # when sorting we also need to check if the station can process the items in the queue
+            can_process = []
+            can_not_process = []
+            for index, item in enumerate(station.queue):
+                if station.check_can_be_processed(index):
+                    can_process.append(item)
+                else:
+                    can_not_process.append(item)
+            # sort by processing time
+            can_process.sort(key=lambda x: x[1])
+            can_not_process.sort(key=lambda x: x[1])
+            # join the two lists
+            station.queue = can_process + can_not_process
+    def sort_by_lpt(self):
+        '''
+        Sort the stations by their processing time in descending order.
+        '''
+        for station in self.stations:
+            # when sorting we also need to check if the station can process the items in the queue
+            can_process = []
+            can_not_process = []
+            for index, item in enumerate(station.queue):
+                if station.check_can_be_processed(index):
+                    can_process.append(item)
+                else:
+                    can_not_process.append(item)
+            # sort by processing time
+            can_process.sort(key=lambda x: x[1], reverse=True)
+            can_not_process.sort(key=lambda x: x[1], reverse=True)
+            # join the two lists
+            station.queue = can_process + can_not_process
+
+    def sort_by_edd(self):
+        # TODO: finish implementing the EDD sorting algorithm
+        '''
+        We will sort the stations by the due time of the order the items are related to.
+        '''
+        orders_ids = set()
+        orders_list = []
+        for station in self.stations:
+            # when sorting we also need to check if the station can process the items in the queue
+            for index, item in enumerate(station.queue):
+                if station.check_can_be_processed(index):
+                    if isinstance(item, list):
+                        orders_ids.add(item[0])
+                        orders_list.append(self.find_order_by_id(item[0].order_id))
+                    else:
+                        orders_ids.add(item[0])
+                        orders_list.append(self.find_order_by_id(item.order_id))
+
+        # sort the orders by due time
+        orders_list.sort(key=lambda x: x.due_time)
+    
+        return orders_list
+
+    def find_order_by_id(self, order_id: str) -> Optional[Order]:
+        """
+        Find an order by its ID.
+        """
+        for customer in self.customers:
+            for order in customer.orders:
+                if order.order_id == order_id:
+                    return order
+        return None
 
     def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None:
         """
