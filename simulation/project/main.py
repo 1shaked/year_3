@@ -63,6 +63,7 @@ class Inventory:
                 item.amount += product_instance.amount
                 self.calculate_total_volume()
                 return
+        product_instance.amount = round(product_instance.amount, ROUND_DECIMAL_PLACES)    
         self.items.append(product_instance)
         self.calculate_total_volume()
 
@@ -180,6 +181,7 @@ class Inventory:
                     if item.product_designation == product_type.product_id and item.order_id == order.order_id:
                         self.items.remove(item)
                 pulled_items.append(pulled_item)
+                continue
 
             # we need to check if the item is in stock
             quantity_available_in_stock = self.get_product_instances_by_type(product_type, order_id=None, status=None)
@@ -265,6 +267,7 @@ class SimulationManager:
         self.json_info = dict()
         self.get_next_order_by = get_next_order_by
         self.algorithm = algorithm  # Default algorithm
+        self.orders_filled_today = []
 
     def run(self):
         self.initialize_entities()
@@ -284,8 +287,6 @@ class SimulationManager:
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
         self.save_current_state()
-        # simulation days loop
-        # self.producing_by_demand_only()
         
     def save_current_state(self, ) -> None:
         self.json_info[INITIAL_PRODUCTS_KEY] = [self.product_one.to_dict(), self.product_two.to_dict(), 
@@ -297,6 +298,11 @@ class SimulationManager:
         self.json_info[STATIONS_KEY] = [station.to_dict() for station in self.stations]
         self.json_info[INVENTORY_KEY] = [item.to_dict() for item in self.inventory.items]
         # self.json_info[RECIPE_KEY] = self.v
+        temp_v_json = {}
+        for product, ingredients in self.v.items():
+            temp_v_json[product.product_id] = [{"id": ing[0].product_id, "quantity": ing[1]} for ing in ingredients]
+        self.json_info[RECIPE_KEY] = temp_v_json
+        self.json_info[RECIPE_KEY] = temp_v_json
         self.json_info[ALGORITHM_KEY] = self.algorithm
         self.json_info[TYPE_GET_NEXT_ORDER_BY_KEY] = self.get_next_order_by
 
@@ -352,11 +358,11 @@ class SimulationManager:
             # when sorting we also need to check if the station can process the items in the queue
             for index, item in enumerate(station.queue):
                 if station.check_can_be_processed(index):
-                    if isinstance(item, list):
-                        order = self.find_order_by_id(item[0].order_id)
+                    if isinstance(item[0], list):
+                        order = self.find_order_by_id(item[0][0].order_id)
                         items_to_sort.append((item, order.due_time))
                     else:
-                        order = self.find_order_by_id(item.order_id)
+                        order = self.find_order_by_id(item[0].order_id)
                         items_to_sort.append((item, order.due_time))
                 else:
                     items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
@@ -528,6 +534,7 @@ class SimulationManager:
         if closest_order.order_id in self.orders_fulfilled:
             raise ValueError(f"Order {closest_order.order_id} is already fulfilled.")
         self.orders_fulfilled_list.append(closest_order)
+        self.orders_filled_today.append(closest_order)
         # delete the order from the customer's orders
         for customer in self.customers:
             if closest_order in customer.orders:
@@ -648,12 +655,14 @@ class SimulationManager:
         This method will be called after initializing the customers and their orders.
         """
         self.json_info[SIMULATION_DAYS_ARRAY_KEY] = []
-        temp_data = {}
+        # temp_data = {}
         for self.time in range(1,SIMULATION_DAYS + 1):
+            self.orders_filled_today = []
+            temp_data = dict()
             closest_order, closest_lead_time = self.start_day(temp_data)
             self.sort_stations_by_algorithm()
             temp_data[TYPE_TOTAL_INCOME] = self.total_income
-            temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.to_dict() for order in self.orders_fulfilled_list]
+            
             temp_days_action_data = []
             self.current_day_time = 0
             while closest_order is not None :
@@ -709,35 +718,35 @@ class SimulationManager:
                 temp_days_action_data.append(dict(
                     type=ORDER_FULFILLED_FROM_WORKING_DAY_START,
                     current_day_time=self.current_day_time,
-                    customer=[customer.to_dict() for customer in self.customers],
-                    orders=[order.to_dict() for order in self.orders_fulfilled_list]
                 ))
                 closest_order_temp, closest_lead_time_temp = self.fulfill_orders_in_stock(closest_order)
                 temp_days_action_data.append(dict(
                     type=ORDER_FULFILLED_FROM_WORKING_DAY_END,
                     current_day_time=self.current_day_time,
-                    customer=[customer.to_dict() for customer in self.customers],
-                    orders=[order.to_dict() for order in self.orders_fulfilled_list]
                 ))
                 if closest_order_temp is not None and closest_lead_time_temp is not None:
                     closest_order = closest_order_temp
                     closest_lead_time = closest_lead_time_temp
 
                 if done_running:
-                    print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}")
+                    print(f"""Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}
+                    Ending the day and saving the current day ({self.time}).
+                    """)
                     break
             
-
-            if closest_lead_time is None:
-                print("No orders to fulfill today.")
-                continue
-        self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
+            temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.order_id for order in self.orders_filled_today]
+            self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
+        print('-' * 50)
+        print(f"Total income from all orders: {self.total_income}")
         self.save_json_info()
     def save_json_info(self):
         file = self.generate_file_name()
-        with open(file, 'w') as f:
-            json.dump(self.json_info, f, indent=4)
-        print(f"Simulation data saved to {file}")
+        import pickle
+        with open(f'{file}.pkl', 'wb') as f:
+            pickle.dump(self.json_info, f)
+            print(f"Simulation data saved to {file}")
+        with open(f'{file}.json', 'w') as f:
+            json.dump(self.json_info, f)
     def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
         # check for each order if the order is already produced and in stock
         closest_order, closest_lead_time = closest_order, closest_order.due_time
@@ -1037,5 +1046,5 @@ class SimulationManager:
         now = datetime.now()
         # Format as year_month_day_hour_minute_second
         timestamp = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"data/simulation_results_{timestamp}.json"
+        file_name = f"data/simulation_results_{timestamp}"
         return file_name

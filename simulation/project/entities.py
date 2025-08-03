@@ -33,7 +33,7 @@ class ProductType:
             raise ValueError(f"Unknown product ID: {self.product_id}")
         lambda_value = self.processing_time_distributions.get(station)
         if lambda_value:
-            val = np.random.exponential(scale=lambda_value, size=1)[0]
+            val = math.inf
             while val > WORKING_DAY_LENGTH or val <= MIN_PROCESSING_TIME:  # Ensure the processing time does not exceed the working day length
                 val = round(np.random.exponential(scale=lambda_value, size=1)[0], ROUND_DECIMAL_PLACES)
             return round(val, ROUND_DECIMAL_PLACES)
@@ -103,14 +103,14 @@ class ProductInstance:
     """
     Represents an instance of a product in the system.
     """
-    def __init__(self, product_type: ProductType, order_id: int | None, status: str = INGREDIENTS_WAITING, amount: int = 1 , product_designation: str | None = None):
+    def __init__(self, product_type: ProductType, order_id: int | None, status: str = INGREDIENTS_WAITING, amount: float = 1 , product_designation: str | None = None):
         '''
         The status can be (INGREDIENTS_WAITING, INGREDIENTS_ORDERED, )
         '''
         self.product_type = product_type
         self.order_id = order_id
         self.status = status
-        self.amount = amount
+        self.amount = round(amount, ROUND_DECIMAL_PLACES)
         self.product_designation = product_designation # can be PRODUCT_ID_FIRST , PRODUCT_ID_SECOND , or None
 
     def __str__(self):
