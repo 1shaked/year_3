@@ -359,6 +359,14 @@ class Customer:
         self.order_cost = order_cost
         self.orders: List[Order] = []
 
+    def get_most_expensive_order(self) -> Order | None:
+        """Get the most expensive order placed by the customer."""
+        if not self.orders:
+            return None
+        return max(self.orders, key=lambda order: order.calculate_order_cost())
+
+    
+
     def place_order(self, products: List[Tuple[ProductType, int]] , day: int) -> None:
         """Place a new order for a product type."""
         order_id = f'{self.customer_id}_{day}_{len(self.orders) + 1}'  # Simple ID generation
