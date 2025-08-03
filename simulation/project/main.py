@@ -438,12 +438,17 @@ class SimulationManager:
                     return order
         return None
 
-    def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None:
+    def get_closest_order(self, filter_by_waiting: bool = True, GET_BY: str=GET_NEXT_ORDER_BY_DUE_DATE) -> Order | None:
         """
         Get the closest order that is not yet fulfilled.
         If filter_by_waiting is True, only consider orders that are waiting.
         """
-        return self.get_closest_order_by_due_time(filter_by_waiting)
+        if GET_BY == GET_NEXT_ORDER_BY_DUE_DATE:
+            return self.get_closest_order_by_due_time(filter_by_waiting)
+        elif GET_BY == GET_NEXT_ORDER_BY_PRICE:
+            return self.get_closest_order_by_order_price(filter_by_waiting)
+        else:
+            raise ValueError(f"Unknown GET_BY parameter: {GET_BY}")
 
     def get_closest_order_by_due_time(self, filter_by_waiting: bool = True) -> Order | None:
         """
@@ -458,6 +463,21 @@ class SimulationManager:
                 if order.due_time < due_date:
                     due_date = order.due_time
                     closest_order = order
+        return closest_order
+    
+    def get_closest_order_by_order_price(self, filter_by_waiting: bool = True) -> Order | None:
+        """
+        Get the closest order by order size that is not yet fulfilled.
+        If filter_by_waiting is True, only consider orders that are waiting.
+        """
+        order_price = 0
+        closest_order = None
+        for customer in self.customers:
+            for order in customer.orders:
+                if order.status == INGREDIENTS_WAITING or not filter_by_waiting:
+                    if order.calculate_order_cost() > order_price:
+                        order_price = order.calculate_order_cost()
+                        closest_order = order
         return closest_order
 
     def receive_supplier_orders(self,):
