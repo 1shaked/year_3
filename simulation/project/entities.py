@@ -17,10 +17,12 @@ class ProductType:
         self.processing_time_distributions = processing_time_distributions  # station_id -> distribution
         self.volume_per_unit = volume_per_unit
         self.cost = cost  # Cost per unit of this product type
-        self.processing_time = self.sample_processing_time()  # Total processing time for this product type
+        # self.processing_time = self.sample_processing_time()  # Total processing time for this product type
 
-    def sample_processing_time(self) -> float:
-        """Sample processing time for a given station."""
+    def sample_processing_time(self, product_designation: str) -> float:
+        """Sample processing time for a given station.
+        product_designation can be PRODUCT_ID_FIRST or PRODUCT_ID_SECOND, if it is one of them then the processing time is 0
+        """
         if self.product_id in (PRODUCT_ID_FIRST, PRODUCT_ID_SECOND):
             return 0
         if self.product_id == PRODUCT_ID_X:
@@ -31,7 +33,8 @@ class ProductType:
             station = STATION_THREE_ID
         else:
             raise ValueError(f"Unknown product ID: {self.product_id}")
-        lambda_value = self.processing_time_distributions.get(station)
+        lambda_value = STATION_PROCESSING_TIME_LAMBDA[self.product_id][product_designation]
+        # lambda_value = self.processing_time_distributions.get(station)
         if lambda_value:
             val = math.inf
             while val > WORKING_DAY_LENGTH or val <= MIN_PROCESSING_TIME:  # Ensure the processing time does not exceed the working day length
@@ -43,10 +46,10 @@ class ProductType:
         """Convert the product type to a dictionary for JSON serialization."""
         return {
             'product_id': self.product_id,
-            'processing_time_distributions': self.processing_time_distributions,
+            # 'processing_time_distributions': self.processing_time_distributions,
             'volume_per_unit': self.volume_per_unit,
             'cost': self.cost,
-            'processing_time': self.processing_time
+            # 'processing_time': self.processing_time
         }
 class Supplier:
     """
@@ -234,11 +237,11 @@ class Station:
         if isinstance(product_instance, list):
             # this is only for product z
             # processing_time = self.sample_processing_time(product_instance[0].product_type)
-            processing_time = product_instance[0].product_type.processing_time
+            processing_time = product_instance[0].product_type.sample_processing_time(product_instance[0].product_designation)
             self.queue.append((product_instance, processing_time))
             return processing_time
         # processing_time = self.sample_processing_time(product_instance.product_type)
-        processing_time = product_instance.product_type.processing_time
+        processing_time = product_instance.product_type.sample_processing_time(product_instance.product_designation)
         self.queue.append((product_instance, processing_time))
         return processing_time
 

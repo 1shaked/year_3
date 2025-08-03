@@ -305,6 +305,7 @@ class SimulationManager:
         self.json_info[RECIPE_KEY] = temp_v_json
         self.json_info[ALGORITHM_KEY] = self.algorithm
         self.json_info[TYPE_GET_NEXT_ORDER_BY_KEY] = self.get_next_order_by
+        self.json_info[TYPE_PROCESSING_TIME_DISTRIBUTIONS] = STATION_PROCESSING_TIME_LAMBDA
 
     def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
         order = self.get_closest_order(filter_by_waiting)
@@ -835,9 +836,7 @@ class SimulationManager:
             if total_cost < cost:
                 cheapest_supplier = supplier
                 cost = total_cost
-            
-        # TODO: check if we order from multiple suppliers
-        
+                    
         return cheapest_supplier
 
     def demand_for_product(self, product_type: ProductType) -> int:
