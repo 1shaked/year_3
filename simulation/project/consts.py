@@ -43,8 +43,8 @@ v = {
             self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
         }
 '''
-FACTOR_PRODUCT_ONE = 1/1.15
-FACTOR_PRODUCT_TWO = 1/0.75
+FACTOR_PRODUCT_ONE = 1
+FACTOR_PRODUCT_TWO = 1
 
 FACTOR_DICT = {
     PRODUCT_ID_FIRST: FACTOR_PRODUCT_ONE,

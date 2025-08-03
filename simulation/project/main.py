@@ -278,8 +278,8 @@ class SimulationManager:
         # initialize the products types
         self.setup_products()
         self.v = {
-            self.product_one: {(self.product_x, 2), (self.product_y, 1), (self.product_z, 1.15)},
-            self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 0.75)},
+            self.product_one: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 1)},
+            self.product_two: {(self.product_x, 1), (self.product_y, 1), (self.product_z, 1)},
         }
         self.setup_suppliers()
         self.setup_customers()
@@ -379,8 +379,8 @@ class SimulationManager:
             # when sorting we also need to check if the station can process the items in the queue
             for index, item in enumerate(station.queue):
                 if station.check_can_be_processed(index):
-                    if isinstance(item, list):
-                        order = self.find_order_by_id(item[0].order_id)
+                    if isinstance(item[0], list):
+                        order = self.find_order_by_id(item[0][0].order_id)
                         cr_score = (order.due_time - self.time) / item[1] if item[1] > 0 else math.inf
                         items_to_sort.append((item, cr_score))
                     else:
@@ -403,14 +403,15 @@ class SimulationManager:
             items_to_sort = []
             # when sorting we also need to check if the station can process the items in the queue
             for index, item in enumerate(station.queue):
+                processing_time = item[1]
                 if station.check_can_be_processed(index):
-                    if isinstance(item, list):
-                        order = self.find_order_by_id(item[0].order_id)
-                        slack_time = order.due_time - self.time - item[1]
+                    if isinstance(item[0], list):
+                        order = self.find_order_by_id(item[0][0].order_id)
+                        slack_time = order.due_time - self.time - processing_time
                         items_to_sort.append((item, slack_time))
                     else:
                         order = self.find_order_by_id(item[0].order_id)
-                        slack_time = order.due_time - self.time - item[0].processing_time
+                        slack_time = order.due_time - self.time - processing_time
                         items_to_sort.append((item, slack_time))
                 else:
                     items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
