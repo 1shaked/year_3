@@ -291,8 +291,6 @@ class Station:
         if len(self.queue) == 0:
             raise ValueError('The queue is empty')
         # we need to find the index of the item which have the same order_id, and the same product_designation
-        product_instance.product_designation
-        product_instance.order_id
         for index in range(len(self.queue)):
             items_list = self.queue[index][0]
             if not isinstance(items_list , List) or len(items_list) == 0:
