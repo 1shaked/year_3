@@ -7,5 +7,5 @@ from main import (
 # ...existing code...
 
 if __name__ == "__main__":
-    sim = SimulationManager()
-    sim.initialize_entities(ALGORITHM_SPT)
+    sim = SimulationManager(GET_NEXT_ORDER_BY_PRICE, ALGORITHM_SLACK)
+    sim.run()

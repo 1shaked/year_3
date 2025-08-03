@@ -257,16 +257,18 @@ class SimulationManager:
     """
     Manages the simulation loop, initializes entities, tracks time and performance.
     """
-    def __init__(self):
+    def __init__(self, get_next_order_by: str = GET_NEXT_ORDER_BY_DUE_DATE, algorithm: str = ALGORITHM_EDD):
         self.time : int = 0
         self.orders_fulfilled = set()
         self.orders_fulfilled_list = []
         self.total_income = 0.0
         self.json_info = dict()
+        self.get_next_order_by = get_next_order_by
+        self.algorithm = algorithm  # Default algorithm
 
     def run(self):
-        """Run the main simulation loop."""
-        pass
+        self.initialize_entities()
+        self.producing_by_demand_only()
 
     def initialize_entities(self, algorithm=ALGORITHM_EDD):
         """Initialize all simulation entities (stations, products, etc.)."""
@@ -281,21 +283,22 @@ class SimulationManager:
         self.setup_stations()
         # create the base inventory for the products
         self.setup_inventory()  # Moved inventory setup here
-        self.save_current_state(algorithm)
+        self.save_current_state()
         # simulation days loop
-        self.producing_by_demand_only(algorithm)
+        # self.producing_by_demand_only()
         
-    def save_current_state(self, algorithm: str=ALGORITHM_EDD) -> None:
+    def save_current_state(self, ) -> None:
         self.json_info[INITIAL_PRODUCTS_KEY] = [self.product_one.to_dict(), self.product_two.to_dict(), 
                                                 self.product_x.to_dict(), self.product_y.to_dict(), self.product_z.to_dict()
                                                 ]
         self.json_info[SUPPLIER_KEY] = [supplier.to_dict() for supplier in self.suppliers]
         self.simulation_days = SIMULATION_DAYS
         self.json_info[SIMULATION_DAYS_KEY] = SIMULATION_DAYS
-        # self.json_info[STATIONS_KEY] = [station.to_dict() for station in self.stations]
-        # self.json_info[INVENTORY_KEY] = [item.to_dict() for item in self.inventory.items]
+        self.json_info[STATIONS_KEY] = [station.to_dict() for station in self.stations]
+        self.json_info[INVENTORY_KEY] = [item.to_dict() for item in self.inventory.items]
         # self.json_info[RECIPE_KEY] = self.v
-        self.json_info[ALGORITHM_KEY] = algorithm
+        self.json_info[ALGORITHM_KEY] = self.algorithm
+        self.json_info[TYPE_GET_NEXT_ORDER_BY_KEY] = self.get_next_order_by
 
     def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
         order = self.get_closest_order(filter_by_waiting)
@@ -412,21 +415,21 @@ class SimulationManager:
             station.queue = [item for item, _ in items_to_sort]
 
 
-    def sort_stations_by_algorithm(self, algorithm: str):
+    def sort_stations_by_algorithm(self, ):
         """ Sort the stations based on the specified algorithm.
         """
-        if algorithm == ALGORITHM_EDD:
+        if self.algorithm == ALGORITHM_EDD:
             self.sort_stations_by_edd()
-        elif algorithm == ALGORITHM_SLACK:
+        elif self.algorithm == ALGORITHM_SLACK:
             self.sort_stations_by_slack()
-        elif algorithm == ALGORITHM_CRITICAL_RATIONAL:
+        elif self.algorithm == ALGORITHM_CRITICAL_RATIONAL:
             self.sort_stations_by_critical_ratio()
-        elif algorithm == ALGORITHM_LPT:
+        elif self.algorithm == ALGORITHM_LPT:
             self.sort_stations_by_lpt()
-        elif algorithm == ALGORITHM_SPT:
+        elif self.algorithm == ALGORITHM_SPT:
             self.sort_stations_by_processing_time()
         else:
-            raise ValueError(f"Unknown algorithm: {algorithm}")
+            raise ValueError(f"Unknown algorithm: {self.algorithm}")
 
     def find_order_by_id(self, order_id: str) -> Optional[Order]:
         """
@@ -438,17 +441,17 @@ class SimulationManager:
                     return order
         return None
 
-    def get_closest_order(self, filter_by_waiting: bool = True, GET_BY: str=GET_NEXT_ORDER_BY_DUE_DATE) -> Order | None:
+    def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None:
         """
         Get the closest order that is not yet fulfilled.
         If filter_by_waiting is True, only consider orders that are waiting.
         """
-        if GET_BY == GET_NEXT_ORDER_BY_DUE_DATE:
+        if self.get_next_order_by == GET_NEXT_ORDER_BY_DUE_DATE:
             return self.get_closest_order_by_due_time(filter_by_waiting)
-        elif GET_BY == GET_NEXT_ORDER_BY_PRICE:
+        elif self.get_next_order_by == GET_NEXT_ORDER_BY_PRICE:
             return self.get_closest_order_by_order_price(filter_by_waiting)
         else:
-            raise ValueError(f"Unknown GET_BY parameter: {GET_BY}")
+            raise ValueError(f"Unknown GET_BY parameter: {self.get_next_order_by}")
 
     def get_closest_order_by_due_time(self, filter_by_waiting: bool = True) -> Order | None:
         """
@@ -639,7 +642,7 @@ class SimulationManager:
             ))
         print(self.inventory)
         return done_running
-    def producing_by_demand_only(self, algorithm=ALGORITHM_EDD) -> None:
+    def producing_by_demand_only(self) -> None:
         """
         Produce products only based on the demand calculated from customer orders.
         This method will be called after initializing the customers and their orders.
@@ -648,9 +651,7 @@ class SimulationManager:
         temp_data = {}
         for self.time in range(1,SIMULATION_DAYS + 1):
             closest_order, closest_lead_time = self.start_day(temp_data)
-            # if algorithm == ALGORITHM_SPT:
-            #     self.sort_stations_by_processing_time()
-            self.sort_stations_by_algorithm(algorithm)
+            self.sort_stations_by_algorithm()
             temp_data[TYPE_TOTAL_INCOME] = self.total_income
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.to_dict() for order in self.orders_fulfilled_list]
             temp_days_action_data = []
