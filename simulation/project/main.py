@@ -297,11 +297,9 @@ class SimulationManager:
         self.json_info[SIMULATION_DAYS_KEY] = SIMULATION_DAYS
         self.json_info[STATIONS_KEY] = [station.to_dict() for station in self.stations]
         self.json_info[INVENTORY_KEY] = [item.to_dict() for item in self.inventory.items]
-        # self.json_info[RECIPE_KEY] = self.v
         temp_v_json = {}
         for product, ingredients in self.v.items():
             temp_v_json[product.product_id] = [{"id": ing[0].product_id, "quantity": ing[1]} for ing in ingredients]
-        self.json_info[RECIPE_KEY] = temp_v_json
         self.json_info[RECIPE_KEY] = temp_v_json
         self.json_info[ALGORITHM_KEY] = self.algorithm
         self.json_info[TYPE_GET_NEXT_ORDER_BY_KEY] = self.get_next_order_by
