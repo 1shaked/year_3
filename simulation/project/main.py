@@ -384,8 +384,8 @@ class SimulationManager:
                         cr_score = (order.due_time - self.time) / item[1] if item[1] > 0 else math.inf
                         items_to_sort.append((item, cr_score))
                     else:
-                        order = self.find_order_by_id(item.order_id)
-                        cr_score = (order.due_time - self.time) / item.processing_time if item.processing_time > 0 else math.inf
+                        order = self.find_order_by_id(item[0].order_id)
+                        cr_score = (order.due_time - self.time) / item[0].processing_time if item[0].processing_time > 0 else math.inf
                         items_to_sort.append((item, cr_score))
                 else:
                     items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
@@ -409,8 +409,8 @@ class SimulationManager:
                         slack_time = order.due_time - self.time - item[1]
                         items_to_sort.append((item, slack_time))
                     else:
-                        order = self.find_order_by_id(item.order_id)
-                        slack_time = order.due_time - self.time - item.processing_time
+                        order = self.find_order_by_id(item[0].order_id)
+                        slack_time = order.due_time - self.time - item[0].processing_time
                         items_to_sort.append((item, slack_time))
                 else:
                     items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
@@ -516,7 +516,8 @@ class SimulationManager:
         cheapest_supplier = None
         count = 0
         while cheapest_supplier is None:
-            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients, closest_lead_time + count )
+            closest_lead_time_with_none = closest_lead_time if closest_lead_time is not None else 0
+            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients, closest_lead_time_with_none + count )
             count += 1
         cheapest_supplier.place_order(needed_ingredients, self.time)
         return needed_ingredients , closest_lead_time , cheapest_supplier 
@@ -744,8 +745,8 @@ class SimulationManager:
         with open(f'{file}.pkl', 'wb') as f:
             pickle.dump(self.json_info, f)
             print(f"Simulation data saved to {file}")
-        with open(f'{file}.json', 'w') as f:
-            json.dump(self.json_info, f)
+        # with open(f'{file}.json', 'w') as f:
+        #     json.dump(self.json_info, f)
     def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
         # check for each order if the order is already produced and in stock
         closest_order, closest_lead_time = closest_order, closest_order.due_time
