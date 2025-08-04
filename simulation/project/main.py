@@ -419,7 +419,7 @@ class SimulationManager:
                         items_to_sort.append((item, cr_score))
                     else:
                         order = self.find_order_by_id(item[0].order_id)
-                        cr_score = (order.due_time - self.time) / item[0].processing_time if item[0].processing_time > 0 else math.inf
+                        cr_score = (order.due_time - self.time) / item[1] if item[1] > 0 else math.inf
                         items_to_sort.append((item, cr_score))
                 else:
                     items_to_sort.append((item, math.inf))  # If not processable, set due time to infinity
@@ -743,6 +743,7 @@ class SimulationManager:
         Run the day processing loop.
         """
         done_running = False
+        next_finish_time = None
         while self.current_day_time < WORKING_DAY_LENGTH:
             next_finish_time, station_with_item = self.find_next_station_finished()
             if next_finish_time is None:
