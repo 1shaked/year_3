@@ -22,7 +22,7 @@ STATION_PROCESS_TIME = {
     3: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 3 min/max
 }
 
-MIN_PROCESSING_TIME = 0.1  # Minimum processing time for a product
+MIN_PROCESSING_TIME = 0.5  # Minimum processing time for a product
 
 PRODUCT_ID_X = 'x'
 PRODUCT_ID_Y = 'y'
@@ -51,14 +51,14 @@ FACTOR_DICT = {
     PRODUCT_ID_SECOND: FACTOR_PRODUCT_TWO,
 }
 
-CUSTOMER_PROBABILITY_TO_ORDER = 0.3  # 20% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
+CUSTOMER_PROBABILITY_TO_ORDER = 0.6  # 60% chance to place an order of some item each day (P(order_one) = P(order_two)  and they are independent)
 RAW_MATERIAL_COST = {
     PRODUCT_ID_X: [6.0, 8.0],  
     PRODUCT_ID_Y: [8.0, 10.0], 
     PRODUCT_ID_Z: [9.0, 11.0], 
 }
 CUSTOMER_MIN_ORDER_QUANTITY = 3
-CUSTOMER_MAX_ORDER_QUANTITY = 10
+CUSTOMER_MAX_ORDER_QUANTITY = 15
 STATUS_WAITING_MACHINE = "waiting"
 STATUS_PROCESSING_MACHINE = "processing"
 STATUS_COMPLETED_MACHINE = "completed"
@@ -86,16 +86,16 @@ PRODUCT_ID_TO_STATION_ID = {
 }
 STATION_PROCESSING_TIME_LAMBDA = {
     PRODUCT_ID_X: {
-        PRODUCT_ID_FIRST: 3,
+        PRODUCT_ID_FIRST: 0.2,
         PRODUCT_ID_SECOND: 0.5,
     },
     PRODUCT_ID_Y: {
-        PRODUCT_ID_FIRST: 2,
+        PRODUCT_ID_FIRST: 0.1,
         PRODUCT_ID_SECOND: 0.5,
     },
     PRODUCT_ID_Z: {
-        PRODUCT_ID_FIRST: 4,
-        PRODUCT_ID_SECOND: 1.2,
+        PRODUCT_ID_FIRST: 0.1,
+        PRODUCT_ID_SECOND: 0.75,
     },
 }
 
