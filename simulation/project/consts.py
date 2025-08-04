@@ -15,7 +15,7 @@ CUSTOMER_LEAD_TIME_MIN = 1.0
 CUSTOMER_LEAD_TIME_MAX = 5.0
 CUSTOMER_ORDER_COST_MIN = 10.0
 CUSTOMER_ORDER_COST_MAX = 30.0
-WORKING_DAY_LENGTH = 8   # 8 hours 
+WORKING_DAY_LENGTH = 8   # 8 hours
 STATION_PROCESS_TIME = {
     1: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 1 min/max
     2: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 2 min/max
@@ -79,18 +79,23 @@ STATION_ONE_ID = 1
 STATION_TWO_ID = 2
 STATION_THREE_ID = 3
 
+PRODUCT_ID_TO_STATION_ID = {
+    PRODUCT_ID_X: STATION_ONE_ID,
+    PRODUCT_ID_Y: STATION_TWO_ID,
+    PRODUCT_ID_Z: STATION_THREE_ID,
+}
 STATION_PROCESSING_TIME_LAMBDA = {
     PRODUCT_ID_X: {
-        PRODUCT_ID_FIRST: 0.2,
+        PRODUCT_ID_FIRST: 3,
         PRODUCT_ID_SECOND: 0.5,
     },
     PRODUCT_ID_Y: {
-        PRODUCT_ID_FIRST: 0.2,
+        PRODUCT_ID_FIRST: 2,
         PRODUCT_ID_SECOND: 0.5,
     },
     PRODUCT_ID_Z: {
-        PRODUCT_ID_FIRST: 0.9,
-        PRODUCT_ID_SECOND: 0.1,
+        PRODUCT_ID_FIRST: 4,
+        PRODUCT_ID_SECOND: 1.2,
     },
 }
 
@@ -166,3 +171,10 @@ GET_NEXT_ORDER_OPTIONS = [
     GET_NEXT_ORDER_BY_DUE_DATE,
     GET_NEXT_ORDER_BY_PRICE,
 ]
+
+STATION_VOLUME = {
+    STATION_ONE_ID: 100.0,  # Example volume capacity for station 1
+    STATION_TWO_ID: 150.0,  # Example volume capacity for station 2
+    STATION_THREE_ID: 200.0,  # Example volume capacity for station 3
+}
+TYPE_PROBABILITY_TO_ORDER = 'PROBABILITY_TO_ORDER'
