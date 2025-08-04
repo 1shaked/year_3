@@ -8,7 +8,8 @@ from main import (
 
 if __name__ == "__main__":
     for i in range(1, 2):
-        for OPTION in GET_NEXT_ORDER_OPTIONS:
-            for ALGORITHM in ALGORITHM_SORTING_OPTIONS:
-                sim = SimulationManager(OPTION, ALGORITHM)
-                sim.run()
+        for ordering_strategy in ORDERING_STRATEGIES:
+            for OPTION in GET_NEXT_ORDER_OPTIONS:
+                for ALGORITHM in ALGORITHM_SORTING_OPTIONS:
+                    sim = SimulationManager(OPTION, ALGORITHM, ordering_strategy)
+                    sim.run()

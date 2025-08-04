@@ -266,7 +266,7 @@ class SimulationManager:
     """
     Manages the simulation loop, initializes entities, tracks time and performance.
     """
-    def __init__(self, get_next_order_by: str = GET_NEXT_ORDER_BY_DUE_DATE, algorithm: str = ALGORITHM_EDD):
+    def __init__(self, get_next_order_by: str = GET_NEXT_ORDER_BY_DUE_DATE, algorithm: str = ALGORITHM_EDD, ordering_strategy: str = DEMAND_ONLY):
         self.time : int = 0
         self.orders_fulfilled = set()
         self.orders_fulfilled_list = []
@@ -278,6 +278,7 @@ class SimulationManager:
         self.processing_time_per_order: Dict[str, Dict[str, float]] = dict() # for each order_id we will store the processing time per station
         self.avg_demand_per_day_product_one = []
         self.avg_demand_per_day_product_two = []
+        self.ordering_strategy = ordering_strategy
 
     def register_demand(self, product: ProductType, quantity: int) -> None:
         """Register the demand for a product."""
@@ -710,7 +711,7 @@ class SimulationManager:
         print(f"Day {self.time}: Starting production cycle.")
         self.init_customer_order_for_day()
         self.receive_supplier_orders()
-        needed_ingredients , closest_lead_time , cheapest_supplier = self.order_missing_components_to_produce()
+        needed_ingredients , closest_lead_time , cheapest_supplier = self.order_missing_components_to_produce() if self.ordering_strategy == DEMAND_ONLY else self.order_missing_components_to_produce_by_eoq()
         closest_order = self.get_closest_order(False)
         closest_lead_time = closest_order.due_time if closest_order else None
         self.total_orders_count()
