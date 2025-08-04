@@ -86,15 +86,15 @@ PRODUCT_ID_TO_STATION_ID = {
 }
 STATION_PROCESSING_TIME_LAMBDA = {
     PRODUCT_ID_X: {
-        PRODUCT_ID_FIRST: 0.2,
+        PRODUCT_ID_FIRST: 1,
         PRODUCT_ID_SECOND: 0.5,
     },
     PRODUCT_ID_Y: {
-        PRODUCT_ID_FIRST: 0.1,
+        PRODUCT_ID_FIRST: 1,
         PRODUCT_ID_SECOND: 0.5,
     },
     PRODUCT_ID_Z: {
-        PRODUCT_ID_FIRST: 0.1,
+        PRODUCT_ID_FIRST: 2,
         PRODUCT_ID_SECOND: 0.75,
     },
 }
@@ -173,11 +173,17 @@ GET_NEXT_ORDER_OPTIONS = [
 ]
 
 STATION_VOLUME = {
-    STATION_ONE_ID: 85.0,  # Example volume capacity for station 1
-    STATION_TWO_ID: 85.0,  # Example volume capacity for station 2
-    STATION_THREE_ID: 200.0,  # Example volume capacity for station 3
+    STATION_ONE_ID: 200.0,  # Example volume capacity for station 1
+    STATION_TWO_ID: 200.0,  # Example volume capacity for station 2
+    STATION_THREE_ID: 500.0,  # Example volume capacity for station 3
 }
 TYPE_PROBABILITY_TO_ORDER = 'PROBABILITY_TO_ORDER'
 
 DAY_FINE_PERCENTAGE = 0.95  # 5% fine for delayed orders
 TYPE_FINE_DELAYED_PERCENTAGE = 'FINE_DELAYED_ORDERS'
+
+HOLDING_COST_PER_UNIT = 1.0  # Example holding cost per unit
+MAX_PREVIOUS_ORDERS = 5  # Maximum number of previous orders to keep track of
+TYPE_HOLDING_COST_PER_UNIT = 'HOLDING_COST_PER_UNIT'
+
+EXTRA_INGREDIENTS_ORDERED_FACTOR = 1.2 # Factor for extra ingredients ordered
