@@ -335,6 +335,7 @@ class SimulationManager:
         self.json_info[TYPE_GET_NEXT_ORDER_BY_KEY] = self.get_next_order_by
         self.json_info[TYPE_PROCESSING_TIME_DISTRIBUTIONS] = STATION_PROCESSING_TIME_LAMBDA
         self.json_info[TYPE_PROBABILITY_TO_ORDER] = CUSTOMER_PROBABILITY_TO_ORDER
+        self.json_info[TYPE_STRATEGY_ORDER] = self.ordering_strategy
     def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
         order = self.get_closest_order(filter_by_waiting)
         return order.due_time if order else None
