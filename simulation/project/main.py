@@ -968,7 +968,7 @@ class SimulationManager:
                 3: 0   # Station 3
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_FIRST],
-            cost=random.randint(PRODUCT_A_MIN_PRICE, PRODUCT_A_MAX_PRICE)
+            cost=float(random.randint(PRODUCT_A_MIN_PRICE, PRODUCT_A_MAX_PRICE))
         )
         self.product_two = ProductType(
             product_id=PRODUCT_ID_SECOND,
@@ -978,7 +978,7 @@ class SimulationManager:
                 3: 0   # Station 3 (custom for product 2)
             },
             volume_per_unit=PRODUCT_VOLUME[PRODUCT_ID_SECOND],
-            cost=random.randint(PRODUCT_B_MIN_PRICE, PRODUCT_B_MAX_PRICE)
+            cost=float(random.randint(PRODUCT_B_MIN_PRICE, PRODUCT_B_MAX_PRICE))
         )
         self.product_x = ProductType(
             product_id=PRODUCT_ID_X,
