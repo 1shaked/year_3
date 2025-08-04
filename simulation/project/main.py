@@ -872,6 +872,9 @@ class SimulationManager:
                 if status == 'NO_STATION_PROCESSING' and closest_order is not None:
                     print("No station is currently processing an item. Ending the day.")
                     break
+                if status is None:
+                    print("All stations are processing items. Continuing the day.")
+                    continue
             
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.order_id for order in self.orders_filled_today]
             self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
