@@ -255,6 +255,13 @@ class Inventory:
             holding_cost_per_unit=self.holding_cost_per_unit
         )
     
+    def get_total_volume(self) -> float:
+        """ Get the total volume of the inventory. """
+        return self.total_volume
+    
+    def get_holding_cost(self) -> float:
+        return self.total_volume * HOLDING_COST_PER_UNIT
+    
 class SimulationManager:
     """
     Manages the simulation loop, initializes entities, tracks time and performance.
@@ -269,6 +276,27 @@ class SimulationManager:
         self.algorithm = algorithm  # Default algorithm
         self.orders_filled_today = []
         self.processing_time_per_order: Dict[str, Dict[str, float]] = dict() # for each order_id we will store the processing time per station
+        self.avg_demand_per_day_product_one = []
+        self.avg_demand_per_day_product_two = []
+
+    def register_demand(self, product: ProductType, quantity: int) -> None:
+        """Register the demand for a product."""
+        if product == self.product_one:
+            if len(self.avg_demand_per_day_product_one) >= MAX_PREVIOUS_ORDERS:
+                self.avg_demand_per_day_product_one.pop(0)
+            self.avg_demand_per_day_product_one.append(quantity)
+        elif product == self.product_two:
+            if len(self.avg_demand_per_day_product_two) >= MAX_PREVIOUS_ORDERS:
+                self.avg_demand_per_day_product_two.pop(0)
+            self.avg_demand_per_day_product_two.append(quantity)
+        else:
+            raise ValueError(f"Unknown product type: {product.product_id}")
+        
+    def get_demand_for_product(self, product: ProductType ) -> float:
+        count = 0
+        for customer in self.customers:
+            count += customer.get_demand_for_product(product, self.time)
+        return count
 
     def run(self):
         self.initialize_entities()
@@ -545,7 +573,7 @@ class SimulationManager:
         # calculate how much product are needed to produce
         needed_one = max(0, demand_one - stock_one)
         needed_two = max(0, demand_two - stock_two)
-        ingredients = self.get_tree_from_products_list([(self.product_one , needed_one) , (self.product_two, needed_two)])
+        ingredients = self.get_tree_from_products_list([(self.product_one , needed_one * EXTRA_INGREDIENTS_ORDERED_FACTOR) , (self.product_two, needed_two * EXTRA_INGREDIENTS_ORDERED_FACTOR)])
         # find the cheapest supplier for either the first or second product or both
         # transform the ingredients into a list of product types and their quantities
         
@@ -560,6 +588,32 @@ class SimulationManager:
         cheapest_supplier.place_order(needed_ingredients, self.time)
         return needed_ingredients , closest_lead_time , cheapest_supplier 
 
+    def eoq(self,) -> float:
+        order_cost = math.mean(supplier.order_cost for supplier in self.suppliers)
+        holding_cost = self.inventory.holding_cost_per_unit
+        demand = math.mean(math.mean(self.avg_demand_per_day_product_one) + math.mean(self.avg_demand_per_day_product_two)) if self.avg_demand_per_day_product_one and self.avg_demand_per_day_product_two else 20
+        return math.sqrt((2 * order_cost * demand) / holding_cost)
+
+    def order_missing_components_to_produce_by_eoq(self,):
+        # calculate how much product are needed left to produce to fulfill orders
+        stock_one = self.inventory.get_product_instances_by_type(self.product_one)
+        demand_one = self.demand_for_product(self.product_one)
+        # calculate how much product are needed to produce
+        needed_one = self.eoq() if self.avg_demand_per_day_product_one else  max(0, demand_one - stock_one)
+        ingredients = self.get_tree_from_products_list([(self.product_one , needed_one) ])
+        # find the cheapest supplier for either the first or second product or both
+        # transform the ingredients into a list of product types and their quantities
+        
+        needed_ingredients = list(ingredients.items())
+        closest_lead_time = self.get_closest_order_lead_time()
+        cheapest_supplier = None
+        count = 0
+        while cheapest_supplier is None:
+            closest_lead_time_with_none = closest_lead_time if closest_lead_time is not None else 0
+            cheapest_supplier = self.find_cheapest_supplier(needed_ingredients, closest_lead_time_with_none + count )
+            count += 1
+        cheapest_supplier.place_order(needed_ingredients, self.time)
+        return needed_ingredients , closest_lead_time , cheapest_supplier 
     def send_order_in_stock(self,closest_order: Order, ) -> Tuple[Order, float]:
         '''
         We find if there is any combination which either products are in the stock by either production or inventory.
@@ -661,6 +715,10 @@ class SimulationManager:
         closest_lead_time = closest_order.due_time if closest_order else None
         self.total_orders_count()
         self.fine_all_delayed_orders()
+        self.register_demand(self.product_one, self.get_demand_for_product(self.product_one))
+        self.register_demand(self.product_two, self.get_demand_for_product(self.product_two))
+        # self.get_demand_for_product(self.product_one)
+        # self.get_demand_for_product(self.product_two)
         # save the related data to the temp_data dictionary
         temp_data[DAY_KEY] = self.time
         temp_data[CUSTOMER_ORDERS_KEY] = [customer.to_dict() for customer in self.customers]
@@ -680,9 +738,12 @@ class SimulationManager:
         done_running = False
         while self.current_day_time < WORKING_DAY_LENGTH:
             next_finish_time, station_with_item = self.find_next_station_finished()
-            if next_finish_time is None or self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
-                done_running = True
+            if next_finish_time is None:
                 break  # No station is currently processing an item
+            if self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
+                done_running = True
+                print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}")
+                break
             #     # start the processing 
             #     raise ValueError("No station is currently processing an item.")
             print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
@@ -795,7 +856,7 @@ class SimulationManager:
                     print(f"""Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}
                     Ending the day and saving the current day ({self.time}).
                     """)
-                    break
+                    
             
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.order_id for order in self.orders_filled_today]
             self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
@@ -812,12 +873,17 @@ class SimulationManager:
         # with open(f'{file}.json', 'w') as f:
         #     json.dump(self.json_info, f)
     def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
+        count = 0
         # check for each order if the order is already produced and in stock
         closest_order, closest_lead_time = closest_order, closest_order.due_time
         for customer in self.customers:
             for order in customer.orders:
                 is_in_stock = self.inventory.check_if_order_is_produced(order)
                 if is_in_stock:
+                    count += 1
+                    if count > 1:
+                        print(f"Order {order.order_id} is already fulfilled and in stock.")
+                        
                     self.send_order_in_stock(order , )
                     if closest_order == order:
                         closest_order = self.get_closest_order(False)
