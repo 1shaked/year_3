@@ -374,6 +374,8 @@ class Order:
             'status': self.status,
             'created_at': self.get_order_day_from_id()
         }
+    
+
 class Customer:
     """
     Represents a customer who places orders.
@@ -403,6 +405,10 @@ class Customer:
         """Check if an order is late."""
         return current_time > order.due_time
     
+    def get_demand_for_product(self, product_type: ProductType, day: int) -> float:
+        """Get the total demand for a specific product type."""
+        return sum(quantity for order in self.orders for product, quantity in order.products if product.product_id == product_type.product_id and order.get_order_day_from_id() == day)
+
     def get_closest_order(self, filter_by_waiting: bool = True) -> Order | None: 
         """Get the closest order that is not yet fulfilled."""
         due_date = math.inf
