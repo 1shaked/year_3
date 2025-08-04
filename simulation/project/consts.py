@@ -187,3 +187,7 @@ MAX_PREVIOUS_ORDERS = 5  # Maximum number of previous orders to keep track of
 TYPE_HOLDING_COST_PER_UNIT = 'HOLDING_COST_PER_UNIT'
 
 EXTRA_INGREDIENTS_ORDERED_FACTOR = 1.2 # Factor for extra ingredients ordered
+
+DEMAND_ONLY = 'DEMAND_ONLY'
+EOQ = 'EOQ'
+ORDERING_STRATEGIES = [DEMAND_ONLY, EOQ]
