@@ -7,7 +7,7 @@ from entities import INGREDIENTS_WAITING, Order, ProductType, Supplier, Station,
 import json
 from datetime import datetime
 # =====================
-# Simulation Constants (1)
+# Simulation Constants (2)
 # =====================
 
 
