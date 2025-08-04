@@ -660,6 +660,7 @@ class SimulationManager:
         closest_order = self.get_closest_order(False)
         closest_lead_time = closest_order.due_time if closest_order else None
         self.total_orders_count()
+        self.fine_all_delayed_orders()
         # save the related data to the temp_data dictionary
         temp_data[DAY_KEY] = self.time
         temp_data[CUSTOMER_ORDERS_KEY] = [customer.to_dict() for customer in self.customers]
@@ -701,6 +702,16 @@ class SimulationManager:
             ))
         print(self.inventory)
         return done_running
+    
+    def fine_all_delayed_orders(self) -> None:
+        """
+        Find all orders that are delayed and update their status.
+        """
+        for customer in self.customers:
+            for order in customer.orders:
+                if order.due_time < self.time:
+                    for product_type, quantity in order.products:
+                        product_type.cost = product_type.cost * DAY_FINE_PERCENTAGE
     def producing_by_demand_only(self) -> None:
         """
         Produce products only based on the demand calculated from customer orders.
