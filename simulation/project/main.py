@@ -305,7 +305,7 @@ class SimulationManager:
         self.json_info[ALGORITHM_KEY] = self.algorithm
         self.json_info[TYPE_GET_NEXT_ORDER_BY_KEY] = self.get_next_order_by
         self.json_info[TYPE_PROCESSING_TIME_DISTRIBUTIONS] = STATION_PROCESSING_TIME_LAMBDA
-
+        self.json_info[TYPE_PROBABILITY_TO_ORDER] = CUSTOMER_PROBABILITY_TO_ORDER
     def get_closest_order_lead_time(self, filter_by_waiting: bool = False) -> float | None:
         order = self.get_closest_order(filter_by_waiting)
         return order.due_time if order else None
@@ -468,13 +468,38 @@ class SimulationManager:
         due_date = math.inf
         closest_order = None
         for customer in self.customers:
-            order = customer.get_closest_order(filter_by_waiting)
-            if order and (order.status == INGREDIENTS_WAITING or not filter_by_waiting):
-                if order.due_time < due_date:
-                    due_date = order.due_time
-                    closest_order = order
+            orders = customer.orders
+            if not orders:
+                continue
+            for order in orders:
+                can_add = self.can_order_added_to_queue(order)
+                if not can_add:
+                    print(f"Cannot add order {order.order_id} to queue due to insufficient station capacity.")
+                    continue
+                # if the order is not fulfilled and is waiting or we don't filter by waiting
+                if order and (order.status == INGREDIENTS_WAITING or not filter_by_waiting):
+                    if order.due_time < due_date:
+                        due_date = order.due_time
+                        closest_order = order
         return closest_order
     
+    def can_order_added_to_queue(self, order: Order) -> float:
+        """
+        Calculate the total volume of the order.
+        """
+        tree = self.get_tree_from_products_list(order.products)
+        can_process = True
+        for product_type, quantity in tree.items():
+            station = self.get_station_by_station_id(PRODUCT_ID_TO_STATION_ID[product_type.product_id])
+            total_volume = product_type.volume_per_unit * quantity
+            if station is None:
+                raise ValueError(f"Station for product {product_type.product_id} not found.")
+            if not station.can_add_volume(total_volume):
+                can_process = False
+                print(f"Cannot add order {order.order_id} to station {station.station_id} due to insufficient volume capacity.")
+                break
+        return can_process
+
     def get_closest_order_by_order_price(self, filter_by_waiting: bool = True) -> Order | None:
         """
         Get the closest order by order size that is not yet fulfilled.
@@ -483,11 +508,22 @@ class SimulationManager:
         order_price = 0
         closest_order = None
         for customer in self.customers:
-            for order in customer.orders:
-                if order.status == INGREDIENTS_WAITING or not filter_by_waiting:
+            orders = customer.orders
+            if not orders:
+                continue
+            for order in orders:
+                can_add = self.can_order_added_to_queue(order)
+                if not can_add:
+                    print(f"Cannot add order {order.order_id} to queue due to insufficient station capacity.")
+                    continue
+                # if the order is not fulfilled and is waiting or we don't filter by waiting
+                if order and (order.status == INGREDIENTS_WAITING or not filter_by_waiting):
                     if order.calculate_order_cost() > order_price:
                         order_price = order.calculate_order_cost()
                         closest_order = order
+        if closest_order is None:
+            print("No orders found that can be processed.")
+            return None
         return closest_order
 
     def receive_supplier_orders(self,):
@@ -561,6 +597,14 @@ class SimulationManager:
         return closest_order, closest_lead_time
         
 
+    def get_station_by_station_id(self, station_id: str | int) -> Optional[Station]:
+        """
+        Get a station by its ID.
+        """
+        for station in self.stations:
+            if station.station_id == station_id:
+                return station
+        return None
     def add_items_from_order_to_station(self, closest_order: Order) -> None:
         """
         Add items from the closest order to the respective station queues.
@@ -986,7 +1030,6 @@ class SimulationManager:
     def log_statistics(self):
         """Log or print simulation statistics."""
         pass
-    
 
     def product_tree(self, product_type: ProductType , quantity: int = 1) -> Dict[ProductType, int]:
         """
