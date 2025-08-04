@@ -723,7 +723,7 @@ class SimulationManager:
         self.register_demand(self.product_one, self.get_demand_for_product(self.product_one))
         self.register_demand(self.product_two, self.get_demand_for_product(self.product_two))
 
-        self.total_income -= self.inventory.calculate_holding_cost()
+        # self.total_income -= self.inventory.calculate_holding_cost()
         # self.get_demand_for_product(self.product_one)
         # self.get_demand_for_product(self.product_two)
         # save the related data to the temp_data dictionary

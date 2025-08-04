@@ -186,7 +186,7 @@ HOLDING_COST_PER_UNIT = 1.0  # Example holding cost per unit
 MAX_PREVIOUS_ORDERS = 5  # Maximum number of previous orders to keep track of
 TYPE_HOLDING_COST_PER_UNIT = 'HOLDING_COST_PER_UNIT'
 
-EXTRA_INGREDIENTS_ORDERED_FACTOR = 1.2 # Factor for extra ingredients ordered
+EXTRA_INGREDIENTS_ORDERED_FACTOR = 1.0 # Factor for extra ingredients ordered
 
 DEMAND_ONLY = 'DEMAND_ONLY'
 EOQ = 'EOQ'
