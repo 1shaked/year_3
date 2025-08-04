@@ -874,7 +874,7 @@ class SimulationManager:
                     break
                 if status is None:
                     print("All stations are processing items. Continuing the day.")
-                    continue
+                    break
             
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.order_id for order in self.orders_filled_today]
             self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
