@@ -3,8 +3,8 @@ import random
 ROUND_DECIMAL_PLACES = 2  # Number of decimal places for rounding prices and costs
 
 SIMULATION_DAYS = 600
-SUPPLIER_COUNT_MIN = 1
-SUPPLIER_COUNT_MAX = 5
+SUPPLIER_COUNT_MIN = 2
+SUPPLIER_COUNT_MAX = 6
 CUSTOMER_COUNT_MIN = 5
 CUSTOMER_COUNT_MAX = 12
 SUPPLIER_LEAD_TIME_MIN = 3.0
@@ -173,8 +173,8 @@ GET_NEXT_ORDER_OPTIONS = [
 ]
 
 STATION_VOLUME = {
-    STATION_ONE_ID: 50.0,  # Example volume capacity for station 1
-    STATION_TWO_ID: 75.0,  # Example volume capacity for station 2
+    STATION_ONE_ID: 85.0,  # Example volume capacity for station 1
+    STATION_TWO_ID: 85.0,  # Example volume capacity for station 2
     STATION_THREE_ID: 200.0,  # Example volume capacity for station 3
 }
 TYPE_PROBABILITY_TO_ORDER = 'PROBABILITY_TO_ORDER'
