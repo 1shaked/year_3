@@ -22,7 +22,7 @@ STATION_PROCESS_TIME = {
     3: round((random.random() + 0.02), ROUND_DECIMAL_PLACES),  # Station 3 min/max
 }
 
-MIN_PROCESSING_TIME = 0.5  # Minimum processing time for a product
+MIN_PROCESSING_TIME = 0.8  # Minimum processing time for a product about 10% of the working day
 
 PRODUCT_ID_X = 'x'
 PRODUCT_ID_Y = 'y'
@@ -62,7 +62,7 @@ CUSTOMER_MAX_ORDER_QUANTITY = 15
 STATUS_WAITING_MACHINE = "waiting"
 STATUS_PROCESSING_MACHINE = "processing"
 STATUS_COMPLETED_MACHINE = "completed"
-INVENTORY_CAPACITY_LIMIT = 100_000_000.0  # Example capacity limit for inventory
+INVENTORY_CAPACITY_LIMIT = 100_000_000_0.0  # Example capacity limit for inventory
 HOLDING_COST_PER_UNIT = 1.0  # Example holding cost per unit
 # Base inventory constants for each product
 PRODUCT_ONE_BASE_INVENTORY_LOW = 1
