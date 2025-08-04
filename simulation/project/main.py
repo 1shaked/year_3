@@ -268,6 +268,7 @@ class SimulationManager:
         self.get_next_order_by = get_next_order_by
         self.algorithm = algorithm  # Default algorithm
         self.orders_filled_today = []
+        self.processing_time_per_order: Dict[str, Dict[str, float]] = dict() # for each order_id we will store the processing time per station
 
     def run(self):
         self.initialize_entities()
@@ -577,13 +578,16 @@ class SimulationManager:
                 # add the pulled items to the station queue
                 if item.product_type == self.product_x:
                     station = self.stations[0]
-                    station.add_to_queue(item)
+                    processing_time = station.add_to_queue(item)
                 elif item.product_type == self.product_y:
                     station = self.stations[1]
-                    station.add_to_queue(item)
+                    processing_time = station.add_to_queue(item)
                 elif item.product_type == self.product_z:  # product z can only be processed after product x and y
                     station = self.stations[2]
-                    station.add_to_queue([item])
+                    processing_time = station.add_to_queue([item])
+                if item.order_id not in self.processing_time_per_order:
+                    self.processing_time_per_order[item.order_id] = {}
+                self.processing_time_per_order[item.order_id][station.station_id] = processing_time
                 print(f"Adding {item} to station {station.station_id} queue.")
     
 
@@ -739,6 +743,7 @@ class SimulationManager:
             self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
         print('-' * 50)
         print(f"Total income from all orders: {self.total_income}")
+        self.json_info[TYPE_PROCESSING_TIME_PER_ORDER] = self.processing_time_per_order
         self.save_json_info()
     def save_json_info(self):
         file = self.generate_file_name()
