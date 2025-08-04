@@ -154,7 +154,23 @@ class Station:
         # the queue holds tuples of (ProductInstance, processing_time)
         self.queue: List[(ProductInstance | List[ProductInstance], float)] = []
         self.working_item_index: Optional[int] = None  # Index of the currently processing item, if any
+        self.volume_capacity = STATION_VOLUME.get(station_id, 100.0)  # Default volume capacity if not specified
 
+    def can_add_volume(self, volume: float) -> bool:
+        """Check if the station can add a product with the given volume."""
+        current_volume = 0
+        if not self.queue:
+            # If the queue is empty, we can add the volume
+            return volume <= self.volume_capacity
+        # Calculate the current volume in the station
+        for item , _ in self.queue:
+            if isinstance(item, list):
+                # If the item is a list, sum the volumes of all product instances in the list
+                current_volume += sum(prod.product_type.volume_per_unit * prod.amount for prod in item)
+            else:
+                # If the item is a single ProductInstance, calculate its volume
+                current_volume += item.product_type.volume_per_unit * item.amount
+        return (current_volume + volume) <= self.volume_capacity
     def get_next_finish_time(self) -> float:
         """Get the next finish time for the station."""
         if self.queue:
@@ -345,7 +361,10 @@ class Order:
     def get_order_day_from_id(self) -> int:
         """Extract the order day from the order ID."""
         return int(self.order_id.split('_')[1])
-
+    def get_order_volume(self) -> float:
+        """Calculate the total volume of the order."""
+        return sum(product.volume_per_unit * quantity for product, quantity in self.products)
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert the order to a dictionary for JSON serialization."""
         return {
@@ -394,6 +413,15 @@ class Customer:
                     due_date = order.due_time
                     closest_order = order
         return closest_order
+    
+    def get_orders_by_due_date(self, filter_by_waiting: bool = True) -> List[Order]:
+        """Get all orders sorted by due date."""
+        orders = [order for order in self.orders if not filter_by_waiting or order.status == INGREDIENTS_WAITING]
+        return sorted(orders, key=lambda order: order.due_time)
+    
+    def get_orders_by_price(self) -> List[Order]:
+        """Get all orders sorted by price."""
+        return sorted(self.orders, key=lambda order: order.calculate_order_cost(), reverse=True)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert the customer to a dictionary for JSON serialization."""
