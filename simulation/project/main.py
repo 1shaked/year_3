@@ -76,8 +76,11 @@ class Inventory:
             return False
         return True
 
-    def calculate_holding_cost(self, current_time: float) -> float:
-        pass
+    def calculate_holding_cost(self,) -> float:
+        holding_cost = 0.0
+        for item in self.items:
+            holding_cost += item.amount * self.holding_cost_per_unit
+        return holding_cost
 
     def check_capacity_for_product(self, product: ProductType, quantity: int) -> bool:
         """Check if there is enough of a product in the stock"""
@@ -719,6 +722,8 @@ class SimulationManager:
         self.fine_all_delayed_orders()
         self.register_demand(self.product_one, self.get_demand_for_product(self.product_one))
         self.register_demand(self.product_two, self.get_demand_for_product(self.product_two))
+
+        self.total_income -= self.inventory.calculate_holding_cost()
         # self.get_demand_for_product(self.product_one)
         # self.get_demand_for_product(self.product_two)
         # save the related data to the temp_data dictionary
@@ -741,6 +746,7 @@ class SimulationManager:
         while self.current_day_time < WORKING_DAY_LENGTH:
             next_finish_time, station_with_item = self.find_next_station_finished()
             if next_finish_time is None:
+                done_running = True
                 break  # No station is currently processing an item
             if self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
                 done_running = True
@@ -764,7 +770,7 @@ class SimulationManager:
                 inventory=self.inventory.to_dict()
             ))
         print(self.inventory)
-        return done_running
+        return done_running , next_finish_time
     
     def fine_all_delayed_orders(self) -> None:
         """
@@ -794,33 +800,33 @@ class SimulationManager:
             while closest_order is not None :
                 print(f'The next closest order is {closest_order} ')
                 is_order_in_stock = self.inventory.check_if_order_in_stock(closest_order , )
-                temp_days_action_data.append(dict(
-                    type=TYPE_SET_CLOSEST_ORDER,
-                    current_day_time=self.current_day_time,
-                    closest_order=closest_order.to_dict() if closest_order else None,
-                ))
+                # temp_days_action_data.append(dict(
+                #     type=TYPE_SET_CLOSEST_ORDER,
+                #     current_day_time=self.current_day_time,
+                #     closest_order=closest_order.to_dict() if closest_order else None,
+                # ))
                 print(self.inventory)
                 inv_before = self.inventory.to_dict()
                 if is_order_in_stock:
                     closest_order, closest_lead_time = self.send_order_in_stock(closest_order)
-                    temp_days_action_data.append(dict(
-                        type=TYPE_ORDER_IN_STOCK,
-                        current_day_time=self.current_day_time,
-                        closest_order=closest_order.to_dict() if closest_order else None,
-                        inventory_before=inv_before,
-                        inventory_after=self.inventory.to_dict()
-                    ))
+                    # temp_days_action_data.append(dict(
+                    #     type=TYPE_ORDER_IN_STOCK,
+                    #     current_day_time=self.current_day_time,
+                    #     closest_order=closest_order.to_dict() if closest_order else None,
+                    #     inventory_before=inv_before,
+                    #     inventory_after=self.inventory.to_dict()
+                    # ))
                     continue
                 
                 has_components_in_stock = self.check_if_components_in_stock(closest_order, )
                 if not has_components_in_stock and closest_order.status != INGREDIENTS_READY_TO_PROCESS:
-                    temp_days_action_data.append(dict(
-                        type=TYPE_COMPONENTS_NOT_IN_STOCK,
-                        current_day_time=self.current_day_time,
-                        closest_order=closest_order.to_dict() if closest_order else None,
-                        inventory_before=inv_before,
-                        inventory_after=self.inventory.to_dict()
-                    ))
+                    # temp_days_action_data.append(dict(
+                    #     type=TYPE_COMPONENTS_NOT_IN_STOCK,
+                    #     current_day_time=self.current_day_time,
+                    #     closest_order=closest_order.to_dict() if closest_order else None,
+                    #     inventory_before=inv_before,
+                    #     inventory_after=self.inventory.to_dict()
+                    # ))
                     closest_order, closest_lead_time = self.handle_no_components_in_stock(closest_order)
                     continue
 
@@ -831,33 +837,35 @@ class SimulationManager:
                     break
                 if closest_order.status != INGREDIENTS_READY_TO_PROCESS:
                     self.add_items_from_order_to_station(closest_order)
-                    temp_days_action_data.append(dict(
-                        type=TYPE_ADD_INGREDIENTS_TO_STATION,
-                        current_day_time=self.current_day_time,
-                        closest_order=closest_order.to_dict() if closest_order else None,
-                        inventory_before=inv_before,
-                        inventory_after=self.inventory.to_dict()
-                    ))
+                    # temp_days_action_data.append(dict(
+                    #     type=TYPE_ADD_INGREDIENTS_TO_STATION,
+                    #     current_day_time=self.current_day_time,
+                    #     closest_order=closest_order.to_dict() if closest_order else None,
+                    #     inventory_before=inv_before,
+                    #     inventory_after=self.inventory.to_dict()
+                    # ))
                 
                 # check if any order is ready to be fulfilled
-                done_running = self.run_day_processing(temp_days_action_data)
-                temp_days_action_data.append(dict(
-                    type=ORDER_FULFILLED_FROM_WORKING_DAY_START,
-                    current_day_time=self.current_day_time,
-                ))
+                done_running, next_finish_time = self.run_day_processing(temp_days_action_data)
+                # temp_days_action_data.append(dict(
+                #     type=ORDER_FULFILLED_FROM_WORKING_DAY_START,
+                #     current_day_time=self.current_day_time,
+                # ))
                 closest_order_temp, closest_lead_time_temp = self.fulfill_orders_in_stock(closest_order)
-                temp_days_action_data.append(dict(
-                    type=ORDER_FULFILLED_FROM_WORKING_DAY_END,
-                    current_day_time=self.current_day_time,
-                ))
+                # temp_days_action_data.append(dict(
+                #     type=ORDER_FULFILLED_FROM_WORKING_DAY_END,
+                #     current_day_time=self.current_day_time,
+                # ))
                 if closest_order_temp is not None and closest_lead_time_temp is not None:
                     closest_order = closest_order_temp
                     closest_lead_time = closest_lead_time_temp
 
-                if done_running:
+                if done_running and next_finish_time is not None:
                     print(f"""Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}
-                    Ending the day and saving the current day ({self.time}).
+                    Ending 
+                          the day and saving the current day ({self.time}).
                     """)
+                    break
                     
             
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.order_id for order in self.orders_filled_today]
@@ -872,8 +880,8 @@ class SimulationManager:
         with open(f'{file}.pkl', 'wb') as f:
             pickle.dump(self.json_info, f)
             print(f"Simulation data saved to {file}")
-        # with open(f'{file}.json', 'w') as f:
-        #     json.dump(self.json_info, f)
+        with open(f'{file}.json', 'w') as f:
+            json.dump(self.json_info, f)
     def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
         count = 0
         # check for each order if the order is already produced and in stock
