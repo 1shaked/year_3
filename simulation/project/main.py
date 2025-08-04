@@ -740,39 +740,39 @@ class SimulationManager:
         return closest_order, closest_lead_time
     def run_day_processing(self, temp_days_action_data: List[Dict[str, Any]]) -> bool:
         """
-        Run the day processing loop. TEST !121
+        Run the day processing loop.
         """
-        done_running = False
+        STATUS = None
         next_finish_time = None
         while self.current_day_time < WORKING_DAY_LENGTH:
             next_finish_time, station_with_item = self.find_next_station_finished()
             if next_finish_time is None:
-                done_running = True
+                STATUS = 'NO_STATION_PROCESSING'
                 break  # No station is currently processing an item
             if self.current_day_time + next_finish_time > WORKING_DAY_LENGTH:
-                done_running = True
+                STATUS = 'NOT_ENOUGH_TIME'
                 print(f"Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}")
                 break
             #     # start the processing 
             #     raise ValueError("No station is currently processing an item.")
             print(f"Next station to finish is {station_with_item.station_id} at time {next_finish_time}.")
-            temp_days_action_data.append(dict(
-                type=TYPE_STATION_PROCESSING_TIME,
-                current_day_time=self.current_day_time,
-                stations=[station.to_dict() for station in self.stations],
-                inventory=self.inventory.to_dict()
-            ))
+            # temp_days_action_data.append(dict(
+            #     type=TYPE_STATION_PROCESSING_TIME,
+            #     current_day_time=self.current_day_time,
+            #     stations=[station.to_dict() for station in self.stations],
+            #     inventory=self.inventory.to_dict()
+            # ))
             self.decrement_time_to_stations(self.current_day_time, next_finish_time, WORKING_DAY_LENGTH)
             self.current_day_time = next_finish_time + self.current_day_time
-            temp_days_action_data.append(dict(
-                type=TYPE_STATION_PROCESSING_TIME,
-                current_day_time=self.current_day_time,
-                stations=[station.to_dict() for station in self.stations],
-                inventory=self.inventory.to_dict()
-            ))
+            # temp_days_action_data.append(dict(
+            #     type=TYPE_STATION_PROCESSING_TIME,
+            #     current_day_time=self.current_day_time,
+            #     stations=[station.to_dict() for station in self.stations],
+            #     inventory=self.inventory.to_dict()
+            # ))
         print(self.inventory)
-        return done_running , next_finish_time
-    
+        return STATUS, next_finish_time
+
     def fine_all_delayed_orders(self) -> None:
         """
         Find all orders that are delayed and update their status.
@@ -847,7 +847,8 @@ class SimulationManager:
                     # ))
                 
                 # check if any order is ready to be fulfilled
-                done_running, next_finish_time = self.run_day_processing(temp_days_action_data)
+                status, _ = self.run_day_processing(temp_days_action_data)
+                # next_finish_time, station_with_item = self.find_next_station_finished()
                 # temp_days_action_data.append(dict(
                 #     type=ORDER_FULFILLED_FROM_WORKING_DAY_START,
                 #     current_day_time=self.current_day_time,
@@ -861,13 +862,16 @@ class SimulationManager:
                     closest_order = closest_order_temp
                     closest_lead_time = closest_lead_time_temp
 
-                if done_running and next_finish_time is not None:
+                if status == 'NOT_ENOUGH_TIME':
                     print(f"""Not enough time to process items today. Remaining time: {WORKING_DAY_LENGTH - self.current_day_time}
                     Ending 
                           the day and saving the current day ({self.time}).
                     """)
                     break
                     
+                if status == 'NO_STATION_PROCESSING' and closest_order is not None:
+                    print("No station is currently processing an item. Ending the day.")
+                    break
             
             temp_data[TYPE_ORDER_FULFILLED_LIST] = [order.order_id for order in self.orders_filled_today]
             self.json_info[SIMULATION_DAYS_ARRAY_KEY].append(temp_data)
@@ -881,8 +885,8 @@ class SimulationManager:
         with open(f'{file}.pkl', 'wb') as f:
             pickle.dump(self.json_info, f)
             print(f"Simulation data saved to {file}")
-        with open(f'{file}.json', 'w') as f:
-            json.dump(self.json_info, f)
+        # with open(f'{file}.json', 'w') as f:
+        #     json.dump(self.json_info, f)
     def fulfill_orders_in_stock(self, closest_order: Order ) -> None:
         count = 0
         # check for each order if the order is already produced and in stock
