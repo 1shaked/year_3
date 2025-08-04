@@ -1006,11 +1006,11 @@ class SimulationManager:
             holding_cost_per_unit=HOLDING_COST_PER_UNIT
         )
         self.inventory.set_random_inventory([
-            ProductInstance(product_type=self.product_one, order_id=None, amount=1 * random.randint(PRODUCT_ONE_BASE_INVENTORY_LOW, PRODUCT_ONE_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_two, order_id=None, amount=1 * random.randint(PRODUCT_TWO_BASE_INVENTORY_LOW, PRODUCT_TWO_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_x,   order_id=None, amount=6 * random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_y,   order_id=None, amount=6 * random.randint(PRODUCT_Y_BASE_INVENTORY_LOW, PRODUCT_Y_BASE_INVENTORY_HIGH)),
-            ProductInstance(product_type=self.product_z,   order_id=None, amount=5 * random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
+            ProductInstance(product_type=self.product_one, order_id=None, amount=random.randint(PRODUCT_ONE_BASE_INVENTORY_LOW, PRODUCT_ONE_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_two, order_id=None, amount=random.randint(PRODUCT_TWO_BASE_INVENTORY_LOW, PRODUCT_TWO_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_x,   order_id=None, amount=random.randint(PRODUCT_X_BASE_INVENTORY_LOW, PRODUCT_X_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_y,   order_id=None, amount=random.randint(PRODUCT_Y_BASE_INVENTORY_LOW, PRODUCT_Y_BASE_INVENTORY_HIGH)),
+            ProductInstance(product_type=self.product_z,   order_id=None, amount=random.randint(PRODUCT_Z_BASE_INVENTORY_LOW, PRODUCT_Z_BASE_INVENTORY_HIGH))
         ])
 
     def init_customer_order_for_day(self) -> None:
