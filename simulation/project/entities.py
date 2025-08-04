@@ -342,13 +342,18 @@ class Order:
         '''String representation of the order for logging purposes'''
         return f"Order ID: {self.order_id}, \nProducts: {[(product.product_id, quantity) for product, quantity in self.products]}, \nDue Time: {self.due_time},\tStatus: {self.status}"
 
+    def get_order_day_from_id(self) -> int:
+        """Extract the order day from the order ID."""
+        return int(self.order_id.split('_')[1])
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert the order to a dictionary for JSON serialization."""
         return {
             'order_id': self.order_id,
             'products': [(product.to_dict(), quantity) for product, quantity in self.products],
             'due_time': self.due_time,
-            'status': self.status
+            'status': self.status,
+            'created_at': self.get_order_day_from_id()
         }
 class Customer:
     """
