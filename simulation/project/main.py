@@ -592,8 +592,11 @@ class SimulationManager:
         print(f"Not enough components in stock to fulfill order {closest_order.order_id}.")
         closest_order.status = INGREDIENTS_ORDERED
         # get next closest order
-        closest_lead_time = self.get_closest_order_lead_time(True)
         closest_order = self.get_closest_order(True)
+        closest_lead_time = closest_order.due_time if closest_order else None
+        if closest_order is None:
+            print("No more orders to process.")
+            return None, None
         return closest_order, closest_lead_time
         
 
