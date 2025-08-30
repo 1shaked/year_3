@@ -13,10 +13,13 @@ function App() {
   )
 }
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 interface SetUpFormI {
-  M: number,
-  N: number,
+  M: number, // x axis
+  N: number, // y axis
   obstacles: {x: number, y: number}[],
 }
 export function SetUp() {
@@ -29,10 +32,40 @@ export function SetUp() {
   })
   const M = form.watch("M")
   const N = form.watch("N")
+
+
+  const [obstaclesState, setObstaclesState] = useState<{x: number, y: number}[]>([])
+  const [blueCells, setBlueCells] = useState<{x: number, y: number}[]>([])
+  function runAlgorithm() {
+    // placeholder for running the algorithm
+    // color the first cell blue
+    const start = { x: 0, y: 0 } as const
+    // let location = start
+    debugger
+    for ( let i = 0; i < M; i++ ) {
+      // color all the x values from (i,0) to the obstacles or the end of the grid
+      const blueCells: {x: number, y: number}[] = [{ x: i, y: 0 }]
+      for ( let j = 0; j < N; j++ ) {
+        let cell = { x: i, y: j }
+        if ( obstaclesState.some(ob => ob.x === cell.x && ob.y === cell.y) ) {
+          break
+        }
+        blueCells.push(cell)
+      }
+      // color the cell blue
+      setBlueCells(_ => [...blueCells] )
+      debugger
+      sleep(5000)
+    }
+
+  }
   return (
     <div>
       <h1>Set Up Your Environment</h1>
-      <form>
+      <form onSubmit={form.handleSubmit((data) => {
+        console.log(data)
+        setObstaclesState(data.obstacles)
+      })}>
         <label>Grid Size</label>
         <input type="number" {...form.register("M")} />
         <input type="number" {...form.register("N")} />
@@ -49,17 +82,42 @@ export function SetUp() {
         <br />
         <br />
         <button type="submit">Run Algorithm</button>
-        
+        <button type='button' onClick={() => {
+          runAlgorithm()
+        }}>test</button>
         {/* display the grid */}
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${M}, 40px)`, gap: '2px', marginTop: '20px' }}>
-          {Array.from({ length: M * N }).map((_, index) => {
+          {/* Draw all the rows in the grid */}
+          {Array.from({ length: N }).map((_, rowIndex) => <div key={rowIndex}>
+            {Array.from({ length: M }).map((_, colIndex) => {
+              const isObstacle = obstaclesState.some(ob => ob.x === colIndex && ob.y === rowIndex)
+              const isBlue = blueCells.some(bc => bc.x === colIndex && bc.y === rowIndex)
+              if (isBlue) {
+                return <div key={colIndex} style={{ width: '40px', height: '40px', backgroundColor: 'blue', border: '1px solid white', color: 'red' }}>({ rowIndex} , {colIndex})</div>
+              }
+              if (isObstacle) {
+                return <div key={colIndex} style={{ width: '40px', height: '40px', backgroundColor: 'white', border: '1px solid white', color: 'red' }}>({rowIndex} , {colIndex})</div>
+              }
+              return <div key={colIndex} style={{ width: '40px', height: '40px', border: '1px solid white', color: 'red' }}>({rowIndex},{colIndex})</div>
+            })}
+          </div>)}
+          <pre>
+            {JSON.stringify(blueCells, null, 2)}
+          </pre>
+          {/* {Array.from({ length: M * N }).map((_, index) => {
             const x = index % M
             const y = Math.floor(index / M)
-            const isObstacle = obstacles.fields.some(ob => ob.x === x && ob.y === y)
+            const isObstacle = obstaclesState.some(ob => ob.x === x && ob.y === y)
+            const isBlue = blueCells.some(bc => bc.x === x && bc.y === y)
+            if (isBlue) {
+              return (
+                <div key={index} style={{ width: '40px', height: '40px', backgroundColor: 'blue', border: '1px solid white', color: 'red' }}>({x},{y})</div>
+              )
+            }
             return (
               <div key={index} style={{ width: '40px', height: '40px', backgroundColor: isObstacle ? 'black' : 'lightgrey', border: '1px solid white', color: 'red' }}>({x},{y})</div>
             )
-          })}
+          })} */}
         </div>
       </form>
     </div>
