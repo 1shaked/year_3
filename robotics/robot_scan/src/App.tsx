@@ -24,7 +24,7 @@ interface SetUpFormI {
 }
 export function SetUp() {
   const form = useForm<SetUpFormI>({
-    defaultValues: { M: 10, N: 10, obstacles: [ { x: 2, y: 1 }, { x: 5, y: 2 } , { x: 6, y: 7 } ] }
+    defaultValues: { M: 10, N: 10, obstacles: [ { x: 1, y: 4 } , { x: 2, y: 1 }, { x: 5, y: 2 } , { x: 6, y: 7 } ] }
   })
   const obstacles = useFieldArray({
     control: form.control,
@@ -36,28 +36,39 @@ export function SetUp() {
 
   const [obstaclesState, setObstaclesState] = useState<{x: number, y: number}[]>([])
   const [blueCells, setBlueCells] = useState<{x: number, y: number}[]>([])
-  function runAlgorithm() {
+  async function runAlgorithm() {
     // placeholder for running the algorithm
     // color the first cell blue
     const start = { x: 0, y: 0 } as const
     // let location = start
-    debugger
+    const markedCells: {x: number, y: number}[] = []
     for ( let i = 0; i < M; i++ ) {
       // color all the x values from (i,0) to the obstacles or the end of the grid
       const blueCells: {x: number, y: number}[] = [{ x: i, y: 0 }]
+      // debugger
       for ( let j = 0; j < N; j++ ) {
         let cell = { x: i, y: j }
-        if ( obstaclesState.some(ob => ob.x === cell.x && ob.y === cell.y) ) {
+        if ( obstaclesState.some(ob => ob.x === cell.x && ob.y === cell.y) && !markedCells.some(mc => mc.x === cell.x && mc.y === cell.y) ) {
+          // color the cell blue
+          setBlueCells(_ => [...blueCells] )
+          // remove the obstacle cell from the obstacles
+          setObstaclesState(prev => [...prev.filter(ob => ob.x !== cell.x || ob.y !== cell.y)])
+          console.log('obstaclesState after removal: ', obstaclesState)
+          console.log(`Encountered an obstacle at (${cell.x}, ${cell.y}). Stopping the scan in this column. And returning home.`)
+          markedCells.push({x: cell.x, y: cell.y})
+          i = i - 1
+          await sleep(200)
           break
         }
         blueCells.push(cell)
       }
       // color the cell blue
       setBlueCells(_ => [...blueCells] )
-      debugger
-      sleep(5000)
+      await sleep(1200)
     }
-
+    setBlueCells([])
+    console.log('Finished scanning the grid.')
+    console.log('Remaining obstacles: ', obstaclesState)
   }
   return (
     <div>
@@ -101,8 +112,11 @@ export function SetUp() {
               return <div key={colIndex} style={{ width: '40px', height: '40px', border: '1px solid white', color: 'red' }}>({rowIndex},{colIndex})</div>
             })}
           </div>)}
-          <pre>
+          {/* <pre>
             {JSON.stringify(blueCells, null, 2)}
+          </pre> */}
+          <pre>
+            {JSON.stringify(obstaclesState  , null, 2)}
           </pre>
           {/* {Array.from({ length: M * N }).map((_, index) => {
             const x = index % M
