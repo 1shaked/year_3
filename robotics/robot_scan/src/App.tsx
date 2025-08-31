@@ -16,7 +16,9 @@ function App() {
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+function toNumber(value: string | number) {
+  return typeof value === 'string' ? parseInt(value) : value
+}
 interface SetUpFormI {
   M: number, // x axis
   N: number, // y axis
@@ -74,8 +76,9 @@ export function SetUp() {
     <div>
       <h1>Set Up Your Environment</h1>
       <form onSubmit={form.handleSubmit((data) => {
-        console.log(data)
-        setObstaclesState(data.obstacles)
+        data.obstacles = data.obstacles.map(ob => ({ x: toNumber(ob.x), y: toNumber(ob.y) }))
+        console.log(data.obstacles.map(ob => ({ x: toNumber(ob.x), y: toNumber(ob.y) })))
+        setObstaclesState(_ => data.obstacles.map(ob => ({ x: toNumber(ob.x), y: toNumber(ob.y) })))
       })}>
         <label>Grid Size</label>
         <input type="number" {...form.register("M")} />
