@@ -109,6 +109,11 @@ export function SetUp() {
         </div>
         <h3>Obstacles</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+            <span style={{ fontWeight: 'bold', marginRight: '10px' }}>X</span>
+            <span style={{ fontWeight: 'bold', marginRight: '10px' }}>Y</span>
+            <span style={{ fontWeight: 'bold' }}></span>
+          </div>
           {obstacles.fields.map((field, index) => (
             <div key={field.id} style={{ display: 'flex', gap: '5px', alignItems: 'center', justifyContent: 'space-between' }}>
               <input type="number" {...form.register(`obstacles.${index}.x`)} style={{ width: '60px' , fontSize: '1.3em' }} />
@@ -149,7 +154,7 @@ export function SetUp() {
               const blueClass = isBlue ? 'cellSeeing' : ''
               const obstacleClass = isObstacle ? 'cellObstacle' : ''
               const obstacleEncounteredClass = isObstacleEncountered ? 'cellSelected' : ''
-              return <div className={`cell ${blueClass} ${obstacleClass} ${obstacleEncounteredClass} `} key={colIndex} >({rowIndex},{colIndex})</div>
+              return <div className={`cell ${blueClass} ${obstacleClass} ${obstacleEncounteredClass} `} key={colIndex} >({colIndex},{rowIndex})</div>
             })}
           </div>)}
         </div>
