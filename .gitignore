@@ -59,3 +59,6 @@ process mining/ClicksData/temp.csv
 process mining/ClicksData/temp.csv
 process mining/ClicksData/temp.csv
 process mining/ClicksData/actions_graphs.ipynb
+simulation/project/on_time_by_lambda.csv
+simulation/project/scheduling_algorithm_processing_time_after_warmup.csv
+simulation/project/scheduling_algorithm_summary.csv
